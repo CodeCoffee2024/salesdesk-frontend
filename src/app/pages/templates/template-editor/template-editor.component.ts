@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TemplateService } from '../../../core/services/template.service';
 import { Template } from '../../../core/models/template.model';
@@ -33,6 +33,19 @@ export class TemplateEditorComponent implements OnInit, AfterViewInit {
   readonly headingOptions = HEADING_OPTIONS;
   readonly fontSizeOptions = FONT_SIZE_OPTIONS;
 
+  /** Computed once, not a getter: a getter bound to *ngFor rebuilds a fresh
+   *  array of fresh objects on every change-detection cycle, which — with no
+   *  trackBy — makes Angular destroy and recreate every token button on every
+   *  tick. That's what silently broke "Insert field": mousedown fired change
+   *  detection, which tore down the button that was about to receive the
+   *  click's mouseup/click, leaving nothing listening at that DOM node by the
+   *  time the click landed. A stable reference fixes it. */
+  readonly tokensByGroup: { group: string; tokens: MergeTokenDefinition[] }[] =
+    Array.from(new Set(MERGE_TOKENS.map((t) => t.group))).map((group) => ({
+      group,
+      tokens: MERGE_TOKENS.filter((t) => t.group === group)
+    }));
+
   templateId = '';
   template: Template | null = null;
   loading = true;
@@ -47,6 +60,8 @@ export class TemplateEditorComponent implements OnInit, AfterViewInit {
   saving = false;
   saveError = '';
   saved = false;
+
+  showInsertMenu = false;
 
   /** The editor's last known cursor/selection position, captured on every
    *  mouseup/keyup/input inside it. Clicking toolbar chrome (e.g. the "Insert
@@ -70,11 +85,6 @@ export class TemplateEditorComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.syncEditorContent();
-  }
-
-  get tokensByGroup(): { group: string; tokens: MergeTokenDefinition[] }[] {
-    const groups = Array.from(new Set(this.mergeTokens.map((t) => t.group)));
-    return groups.map((group) => ({ group, tokens: this.mergeTokens.filter((t) => t.group === group) }));
   }
 
   exec(command: string, value?: string): void {
@@ -144,8 +154,27 @@ export class TemplateEditorComponent implements OnInit, AfterViewInit {
     event.preventDefault();
   }
 
+  toggleInsertMenu(): void {
+    this.showInsertMenu = !this.showInsertMenu;
+  }
+
   insertToken(token: string): void {
     this.exec('insertText', `{{${token}}}`);
+    this.showInsertMenu = false;
+  }
+
+  /** Closes the "Insert field" menu on any click outside it — it isn't a
+   *  native <details>, so nothing does this automatically. */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.showInsertMenu) {
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.insert-field')) {
+      this.showInsertMenu = false;
+    }
   }
 
   onEditorInput(): void {

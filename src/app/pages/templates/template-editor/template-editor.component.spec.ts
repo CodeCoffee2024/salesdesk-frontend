@@ -135,6 +135,57 @@ describe('TemplateEditorComponent', () => {
     expect(component.editorHtml).toContain('{{Document.Number}}');
   });
 
+  // Regression: the "Insert field" dropdown used a native <details>/<summary>,
+  // which visually rendered its menu correctly but the token buttons weren't
+  // actually clickable in a real browser (a <details>/absolutely-positioned-
+  // child hit-testing quirk) — confirmed live, insertToken() never fired at
+  // all despite the button appearing hovered in a screenshot. Replaced with a
+  // plain Angular-toggled dropdown; these tests lock in that toggle behavior.
+  it('toggleInsertMenu opens and closes the dropdown', () => {
+    setup('tpl-1');
+    expect(component.showInsertMenu).toBeFalse();
+
+    component.toggleInsertMenu();
+    expect(component.showInsertMenu).toBeTrue();
+
+    component.toggleInsertMenu();
+    expect(component.showInsertMenu).toBeFalse();
+  });
+
+  it('insertToken closes the dropdown after inserting', () => {
+    setup('tpl-1');
+    component.showInsertMenu = true;
+
+    component.insertToken('Customer.Email');
+
+    expect(component.showInsertMenu).toBeFalse();
+    expect(component.editorHtml).toContain('{{Customer.Email}}');
+  });
+
+  it('onDocumentClick closes the dropdown when the click is outside it', () => {
+    setup('tpl-1');
+    component.showInsertMenu = true;
+
+    component.onDocumentClick({ target: document.body } as unknown as MouseEvent);
+
+    expect(component.showInsertMenu).toBeFalse();
+  });
+
+  it('onDocumentClick leaves the dropdown open when the click is inside it', () => {
+    setup('tpl-1');
+    component.showInsertMenu = true;
+    const insertFieldEl = document.createElement('div');
+    insertFieldEl.className = 'insert-field';
+    const innerButton = document.createElement('button');
+    insertFieldEl.appendChild(innerButton);
+    document.body.appendChild(insertFieldEl);
+
+    component.onDocumentClick({ target: innerButton } as unknown as MouseEvent);
+
+    expect(component.showInsertMenu).toBeTrue();
+    document.body.removeChild(insertFieldEl);
+  });
+
   it('save sends the current name, edited body, and unchanged metadata', () => {
     setup('tpl-1');
     component.name = 'Studio Standard v2';

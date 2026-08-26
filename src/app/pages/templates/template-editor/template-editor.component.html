@@ -57,20 +57,24 @@
     <span class="toolbar__divider"></span>
 
     <div class="insert-field">
-      <details>
-        <summary title="Insert a merge field">+ Insert field</summary>
-        <div class="insert-field__menu">
-          <div class="insert-field__group" *ngFor="let group of tokensByGroup">
-            <span class="insert-field__group-label">{{ group.group }}</span>
-            <button
-              type="button"
-              *ngFor="let def of group.tokens"
-              (mousedown)="preventFocusLoss($event)"
-              (click)="insertToken(def.token)"
-            >{{ def.label }} <code>{{ '{{' + def.token + '}}' }}</code></button>
-          </div>
+      <button
+        type="button"
+        title="Insert a merge field"
+        (mousedown)="preventFocusLoss($event)"
+        (click)="toggleInsertMenu()"
+      >+ Insert field</button>
+
+      <div class="insert-field__menu" *ngIf="showInsertMenu">
+        <div class="insert-field__group" *ngFor="let group of tokensByGroup">
+          <span class="insert-field__group-label">{{ group.group }}</span>
+          <button
+            type="button"
+            *ngFor="let def of group.tokens"
+            (mousedown)="preventFocusLoss($event)"
+            (click)="insertToken(def.token)"
+          >{{ def.label }} <code>{{ '{{' + def.token + '}}' }}</code></button>
         </div>
-      </details>
+      </div>
     </div>
   </div>
 

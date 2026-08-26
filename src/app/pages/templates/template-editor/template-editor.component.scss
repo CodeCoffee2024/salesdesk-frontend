@@ -78,8 +78,7 @@
   padding: 8px 10px;
 
   button,
-  select,
-  summary {
+  select {
     border: 1px solid transparent;
     background: transparent;
     border-radius: var(--sd-radius-sm);
@@ -109,17 +108,8 @@
 .insert-field {
   position: relative;
 
-  details {
-    position: relative;
-  }
-
-  summary {
-    list-style: none;
+  > button {
     font-weight: 600;
-
-    &::-webkit-details-marker {
-      display: none;
-    }
   }
 }
 
