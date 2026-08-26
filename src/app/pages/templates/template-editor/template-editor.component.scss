@@ -55,6 +55,84 @@
   max-width: 480px;
 }
 
+/*
+ * .field / .btn-primary / .btn-secondary: Angular scopes component styles, so
+ * these have to be redeclared here to match templates.component.scss (the
+ * pattern this whole app follows — each page duplicates the shared button/
+ * field look rather than a global stylesheet). Without them, the Description
+ * field and the Cancel/Save buttons above fall back to unstyled browser
+ * defaults: an inline (not stacked) label next to a bare textarea, and plain
+ * bordered boxes instead of the app's primary/secondary button treatment.
+ */
+.field {
+  margin-bottom: 14px;
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sd-muted);
+    margin-bottom: 6px;
+  }
+
+  .field__optional {
+    font-weight: 400;
+    text-transform: none;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: var(--sd-radius-sm);
+    border: 1px solid var(--sd-border);
+    font-size: 13px;
+    background: var(--sd-bg);
+    font-family: inherit;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--sd-primary);
+    }
+  }
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 9px 16px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.btn-primary {
+  background: var(--sd-primary);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: var(--sd-primary-dark);
+  }
+}
+
+.btn-secondary {
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-border);
+  color: var(--sd-ink);
+
+  &:hover:not(:disabled) {
+    background: var(--sd-bg);
+  }
+}
+
 .editor__saved {
   color: var(--sd-success);
   font-size: 13px;
