@@ -82,6 +82,8 @@
         class="editor__body"
         contenteditable="true"
         (input)="onEditorInput()"
+        (mouseup)="captureSelection()"
+        (keyup)="captureSelection()"
       ></div>
     </div>
 

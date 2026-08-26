@@ -91,6 +91,50 @@ describe('TemplateEditorComponent', () => {
     expect(component.previewHtml).toBe('<p>INV-2026-014 for Northstar Studio</p>');
   });
 
+  // Regression (reported live): clicking a token in the "Insert field" dropdown
+  // did nothing, because opening the dropdown's <summary> steals the browser's
+  // document selection away from the contenteditable body — by the time
+  // insertToken() ran there was no cursor position left for execCommand to act
+  // on. exec() now explicitly restores a saved Range before every command.
+  it('insertToken still inserts after the document selection is lost elsewhere (dropdown click)', () => {
+    setup('tpl-1');
+    const editorEl: HTMLDivElement = component.editorElRef!.nativeElement;
+    editorEl.innerHTML = '<p>Hello world</p>';
+
+    // Place a real cursor inside the editor and capture it, the way typing or
+    // clicking into the body would.
+    const textNode = editorEl.querySelector('p')!.firstChild!;
+    const range = document.createRange();
+    range.setStart(textNode, 5);
+    range.collapse(true);
+    const selection = window.getSelection()!;
+    selection.removeAllRanges();
+    selection.addRange(range);
+    component.captureSelection();
+
+    // Simulate opening the "Insert field" <summary> stealing the selection —
+    // this is the actual browser behavior that caused the bug.
+    const dummy = document.createElement('button');
+    document.body.appendChild(dummy);
+    dummy.focus();
+    selection.removeAllRanges();
+
+    component.insertToken('Customer.Name');
+
+    expect(component.editorHtml).toContain('{{Customer.Name}}');
+    document.body.removeChild(dummy);
+  });
+
+  it('insertToken falls back to appending at the end when nothing was ever selected', () => {
+    setup('tpl-1');
+    const editorEl: HTMLDivElement = component.editorElRef!.nativeElement;
+    editorEl.innerHTML = '<p>Hello world</p>';
+
+    component.insertToken('Document.Number');
+
+    expect(component.editorHtml).toContain('{{Document.Number}}');
+  });
+
   it('save sends the current name, edited body, and unchanged metadata', () => {
     setup('tpl-1');
     component.name = 'Studio Standard v2';

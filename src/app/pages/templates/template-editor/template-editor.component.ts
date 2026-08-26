@@ -48,6 +48,15 @@ export class TemplateEditorComponent implements OnInit, AfterViewInit {
   saveError = '';
   saved = false;
 
+  /** The editor's last known cursor/selection position, captured on every
+   *  mouseup/keyup/input inside it. Clicking toolbar chrome (e.g. the "Insert
+   *  field" <summary>) steals the browser's document selection away from the
+   *  contenteditable entirely, so by the time a toolbar action runs there's
+   *  often no selection left inside the editor for execCommand to act on —
+   *  restoring this saved Range before every exec() call is what makes
+   *  clicking a token actually insert it where the author was last editing. */
+  private savedRange: Range | null = null;
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
@@ -69,9 +78,54 @@ export class TemplateEditorComponent implements OnInit, AfterViewInit {
   }
 
   exec(command: string, value?: string): void {
-    this.editorElRef?.nativeElement.focus();
+    const el = this.editorElRef?.nativeElement;
+    if (!el) {
+      return;
+    }
+
+    el.focus();
+    this.restoreSelection(el);
     document.execCommand(command, false, value);
+    this.captureSelection(el);
     this.onEditorInput();
+  }
+
+  /** Bound to the editor's mouseup/keyup so normal clicking/typing keeps
+   *  savedRange current for the next toolbar action. */
+  captureSelection(el?: HTMLDivElement): void {
+    const target = el ?? this.editorElRef?.nativeElement;
+    const selection = window.getSelection();
+
+    if (!target || !selection || selection.rangeCount === 0) {
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    if (target.contains(range.commonAncestorContainer)) {
+      this.savedRange = range.cloneRange();
+    }
+  }
+
+  private restoreSelection(el: HTMLDivElement): void {
+    const selection = window.getSelection();
+    if (!selection) {
+      return;
+    }
+
+    if (this.savedRange && el.contains(this.savedRange.commonAncestorContainer)) {
+      selection.removeAllRanges();
+      selection.addRange(this.savedRange);
+      return;
+    }
+
+    // No usable saved position (e.g. the very first toolbar action before the
+    // author has clicked into or typed in the editor yet) — default the
+    // cursor to the end of whatever content is already there.
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
 
   setHeading(style: HeadingStyle): void {
