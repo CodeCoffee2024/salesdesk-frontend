@@ -1,0 +1,140 @@
+import { Component } from '@angular/core';
+
+type PreviewDocType = 'Quote' | 'Invoice';
+
+interface PreviewLineItem {
+  description: string;
+  amount: string;
+}
+
+interface FeatureHighlight {
+  id: string;
+  label: string;
+  title: string;
+  description: string;
+}
+
+interface PricingPlan {
+  name: string;
+  price: string;
+  cadence: string;
+  description: string;
+  quota: string;
+  features: string[];
+  highlighted: boolean;
+}
+
+/**
+ * Public marketing page served at "/" for unauthenticated visitors (TASK-018).
+ * homeGuard keeps an already-authenticated visitor from ever landing here — see
+ * app-routing.module.ts.
+ */
+@Component({
+  selector: 'app-landing',
+  templateUrl: './landing.component.html',
+  styleUrls: ['./landing.component.scss']
+})
+export class LandingComponent {
+  readonly previewDocTypes: PreviewDocType[] = ['Quote', 'Invoice'];
+  activePreviewDocType: PreviewDocType = 'Quote';
+
+  private readonly previewLineItems: Record<PreviewDocType, PreviewLineItem[]> = {
+    Quote: [
+      { description: 'Brand identity sprint', amount: '$4,200.00' },
+      { description: 'Web design & build', amount: '$6,800.00' }
+    ],
+    Invoice: [
+      { description: 'Monthly creative retainer', amount: '$2,400.00' },
+      { description: 'Art direction (3 days)', amount: '$2,850.00' }
+    ]
+  };
+
+  private readonly previewNumbers: Record<PreviewDocType, string> = {
+    Quote: 'QUO-2026-041',
+    Invoice: 'INV-2026-018'
+  };
+
+  readonly features: FeatureHighlight[] = [
+    {
+      id: 'documents',
+      label: 'Multi-line documents',
+      title: 'Build quotes and invoices line by line',
+      description: 'Add products, services, and one-off line items, with subtotals and totals calculated as you type.'
+    },
+    {
+      id: 'catalog',
+      label: 'Catalog integration',
+      title: 'A living catalog of what you sell',
+      description: 'Save products and services once, then drop them into any document with pricing already filled in.'
+    },
+    {
+      id: 'pdf',
+      label: 'PDF export',
+      title: 'Client-ready PDFs in one click',
+      description: 'Every quote and invoice exports to a polished, branded PDF your clients can open anywhere.'
+    },
+    {
+      id: 'templates',
+      label: 'Custom templates',
+      title: 'Templates that match your studio',
+      description: 'Choose a layout and accent color once, and every document you send carries your look.'
+    }
+  ];
+
+  activeFeatureId = this.features[0].id;
+
+  readonly plans: PricingPlan[] = [
+    {
+      name: 'Starter',
+      price: 'Free',
+      cadence: '',
+      description: 'For freelancers just getting started.',
+      quota: '10 documents / month',
+      features: ['1 workspace user', '10 documents per month', 'PDF export', 'Studio Standard template'],
+      highlighted: false
+    },
+    {
+      name: 'Studio',
+      price: '$24',
+      cadence: '/ month',
+      description: 'For small studios billing clients regularly.',
+      quota: '100 documents / month',
+      features: ['Up to 5 workspace users', '100 documents per month', 'Custom templates', 'Priority support'],
+      highlighted: true
+    },
+    {
+      name: 'Agency',
+      price: '$59',
+      cadence: '/ month',
+      description: 'For agencies managing many clients at once.',
+      quota: 'Unlimited documents',
+      features: ['Unlimited workspace users', 'Unlimited documents', 'Role-based permissions', 'Dedicated support'],
+      highlighted: false
+    }
+  ];
+
+  get activeFeature(): FeatureHighlight {
+    return this.features.find(feature => feature.id === this.activeFeatureId) ?? this.features[0];
+  }
+
+  get activePreviewLineItems(): PreviewLineItem[] {
+    return this.previewLineItems[this.activePreviewDocType];
+  }
+
+  get activePreviewNumber(): string {
+    return this.previewNumbers[this.activePreviewDocType];
+  }
+
+  get activePreviewTotal(): string {
+    const total = this.activePreviewLineItems.reduce((sum, item) => sum + Number(item.amount.replace(/[^0-9.]/g, '')), 0);
+    return total.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+
+  selectPreviewDocType(type: PreviewDocType): void {
+    this.activePreviewDocType = type;
+  }
+
+  selectFeature(id: string): void {
+    this.activeFeatureId = id;
+  }
+}

@@ -1,1 +1,127 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles + SalesDesk design tokens. */
+
+:root {
+  --sd-bg: #faf7f1;
+  --sd-surface: #ffffff;
+  --sd-sidebar-bg: #14201d;
+  --sd-sidebar-fg: #d7ded9;
+  --sd-sidebar-fg-muted: #8b9891;
+  --sd-sidebar-active-bg: #223531;
+
+  --sd-primary: #2d6a63;
+  --sd-primary-dark: #1f4a45;
+  --sd-accent: #e0722f;
+  --sd-accent-dark: #c25f22;
+
+  --sd-ink: #1c2321;
+  --sd-muted: #6b7370;
+  --sd-border: #e7e1d6;
+
+  --sd-success: #3c8f6b;
+  --sd-success-bg: #e3f1ea;
+  --sd-danger: #c4523b;
+  --sd-danger-bg: #fbe9e5;
+
+  /* Document status pills — one pale bg/fg pair per DocumentStatus value. */
+  --sd-status-draft-bg: #ede7da;
+  --sd-status-draft-fg: #8a7a54;
+  --sd-status-sent-bg: #dfe9f5;
+  --sd-status-sent-fg: #3f6a96;
+  --sd-status-overdue-bg: #fbe6d8;
+  --sd-status-overdue-fg: #b1602c;
+  --sd-status-accepted-bg: #dcefe8;
+  --sd-status-accepted-fg: #2c7a63;
+  --sd-status-paid-bg: #e1f2df;
+  --sd-status-paid-fg: #3f7a37;
+
+  --sd-font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --sd-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --sd-radius-sm: 6px;
+  --sd-radius-md: 10px;
+  --sd-radius-lg: 16px;
+
+  --sd-shadow-sm: 0 1px 2px rgba(28, 35, 33, 0.06);
+  --sd-shadow-md: 0 4px 16px rgba(28, 35, 33, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--sd-bg);
+  color: var(--sd-ink);
+  font-family: var(--sd-font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--sd-font-display);
+  font-weight: 600;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Shared by the stub pages awaiting their real feature build-out. */
+.page-placeholder {
+  padding: 32px;
+
+  h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--sd-muted);
+    max-width: 520px;
+  }
+}
+
+/*
+ * Clean "Print / Save PDF" output (document-preview page): the app shell
+ * (sidebar, top bar, breadcrumb) and any element marked .no-print disappear,
+ * leaving only the document card. Elements opt in via .no-print rather than the
+ * page opting the whole shell out, so this stays a two-line rule here instead of
+ * print-specific markup scattered across every shell component.
+ */
+@media print {
+  app-sidebar,
+  app-topbar,
+  app-breadcrumb,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell,
+  .app-shell__main,
+  .app-shell__content {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+}
+

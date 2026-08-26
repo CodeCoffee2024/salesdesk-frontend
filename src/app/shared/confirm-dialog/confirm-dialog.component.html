@@ -1,0 +1,18 @@
+<div class="confirm-dialog__backdrop" (click)="cancelled.emit()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()" role="alertdialog" aria-modal="true">
+    <h2>{{ heading }}</h2>
+    <p>{{ message }}</p>
+
+    <div class="confirm-dialog__actions">
+      <button type="button" class="confirm-dialog__cancel" (click)="cancelled.emit()">Cancel</button>
+      <button
+        type="button"
+        class="confirm-dialog__confirm"
+        [class.confirm-dialog__confirm--destructive]="destructive"
+        (click)="confirmed.emit()"
+      >
+        {{ confirmLabel }}
+      </button>
+    </div>
+  </div>
+</div>

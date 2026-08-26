@@ -1,0 +1,117 @@
+<div class="products" *ngIf="!loading && !loadError">
+  <div class="products__header">
+    <div>
+      <h1>Products &amp; services</h1>
+      <p>The billable catalog your documents pull line items from.</p>
+    </div>
+    <button
+      type="button"
+      class="btn-primary"
+      *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+      (click)="openAddModal()"
+    >+ Add product/service</button>
+  </div>
+
+  <div class="search-input">
+    <input
+      type="text"
+      placeholder="Search by name, category, or description"
+      [value]="searchTerm"
+      (input)="searchTerm = $any($event.target).value"
+    />
+  </div>
+
+  <app-empty-state
+    *ngIf="products.length === 0"
+    icon="not-found"
+    heading="Nothing in your catalog yet"
+    description="Use the &ldquo;Add product/service&rdquo; button above to start building it out."
+  ></app-empty-state>
+
+  <p class="no-matches" *ngIf="products.length > 0 && filteredProducts.length === 0">
+    No items match &ldquo;{{ searchTerm }}&rdquo;.
+  </p>
+
+  <div class="product-list" *ngIf="filteredProducts.length > 0">
+    <div class="product-row" *ngFor="let product of filteredProducts">
+      <div class="product-row__main">
+        <p class="product-row__name">{{ product.name }}</p>
+        <p class="product-row__description" *ngIf="product.description">{{ product.description }}</p>
+      </div>
+
+      <span class="product-row__category" *ngIf="product.category">{{ product.category }}</span>
+
+      <span class="product-row__price">{{ product.price | currency }} <span class="product-row__unit">/ {{ product.unit.toLowerCase() }}</span></span>
+
+      <button
+        type="button"
+        class="product-row__edit"
+        *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+        (click)="openEditModal(product, $event)"
+        [attr.aria-label]="'Edit ' + product.name"
+      >
+        &#9998;
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Products &amp; services</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Products &amp; services</h1>
+  <p>Something went wrong loading the catalog. Try refreshing the page.</p>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <h2>{{ modalMode === 'edit' ? 'Edit product/service' : 'Add product/service' }}</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="price">Price</label>
+          <input id="price" type="number" min="0.01" step="0.01" formControlName="price" />
+        </div>
+
+        <div class="field">
+          <label for="unit">Billing unit</label>
+          <select id="unit" formControlName="unit">
+            <option *ngFor="let unit of unitOptions" [value]="unit">{{ unit }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="category">Category <span class="field__optional">(optional)</span></label>
+        <input id="category" type="text" formControlName="category" placeholder="e.g. Branding" />
+      </div>
+
+      <div class="field">
+        <label for="description">Description <span class="field__optional">(optional)</span></label>
+        <textarea id="description" formControlName="description" rows="3"></textarea>
+      </div>
+
+      <ul class="validation-summary" *ngIf="form.touched && formErrors.length > 0">
+        <li *ngFor="let error of formErrors">{{ error }}</li>
+      </ul>
+
+      <p class="modal__error" *ngIf="saveError">{{ saveError }}</p>
+
+      <div class="modal__actions">
+        <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving…' : modalMode === 'edit' ? 'Save changes' : 'Add product/service' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="admin-dashboard" *ngIf="!loading && !loadError && metrics as m">
+  <div class="admin-dashboard__header">
+    <h1>System Admin Console</h1>
+    <p>Platform-wide metrics across every workspace.</p>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <p class="metric-card__label">Active workspaces</p>
+      <p class="metric-card__value">{{ m.totalActiveWorkspaces }}</p>
+      <p class="metric-card__sub">{{ m.totalWorkspaces }} total registered</p>
+    </div>
+
+    <div class="metric-card">
+      <p class="metric-card__label">Document quota usage</p>
+      <p class="metric-card__value">{{ m.documentQuotaUsagePercent !== null ? (m.documentQuotaUsagePercent + '%') : '—' }}</p>
+      <p class="metric-card__sub">Across active workspaces with a quota set</p>
+    </div>
+
+    <div class="metric-card">
+      <p class="metric-card__label">Documents issued</p>
+      <p class="metric-card__value">{{ m.totalIssuedDocuments }}</p>
+      <p class="metric-card__sub">{{ m.totalUsers }} users platform-wide</p>
+    </div>
+
+    <div class="metric-card" [class.metric-card--unhealthy]="m.systemHealth !== 'Healthy'">
+      <p class="metric-card__label">System health</p>
+      <p class="metric-card__value">{{ m.systemHealth }}</p>
+    </div>
+  </div>
+
+  <div class="admin-dashboard__links">
+    <a routerLink="/admin/workspaces">Workspace directory →</a>
+    <a routerLink="/admin/users">Users directory →</a>
+    <a routerLink="/admin/audit-log">Global audit log →</a>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>System Admin Console</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>System Admin Console</h1>
+  <p>Something went wrong loading platform metrics. Try refreshing the page.</p>
+</div>

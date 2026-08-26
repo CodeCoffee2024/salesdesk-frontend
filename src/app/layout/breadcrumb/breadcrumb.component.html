@@ -1,0 +1,9 @@
+<nav class="breadcrumb" aria-label="Breadcrumb" *ngIf="breadcrumbs$ | async as breadcrumbs">
+  <span class="breadcrumb__item breadcrumb__item--root">Workspace</span>
+
+  <ng-container *ngFor="let crumb of breadcrumbs">
+    <span class="breadcrumb__separator" aria-hidden="true">/</span>
+    <a *ngIf="crumb.url" class="breadcrumb__item breadcrumb__item--link" [routerLink]="crumb.url">{{ crumb.label }}</a>
+    <span *ngIf="!crumb.url" class="breadcrumb__item breadcrumb__item--current">{{ crumb.label }}</span>
+  </ng-container>
+</nav>

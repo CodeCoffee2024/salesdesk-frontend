@@ -1,0 +1,134 @@
+<div class="landing">
+  <header class="landing-header">
+    <div class="landing-header__brand">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor" />
+        </svg>
+      </span>
+      <span class="brand__name">SalesDesk</span>
+    </div>
+
+    <nav class="landing-header__actions">
+      <a routerLink="/login" class="btn-text">Sign in</a>
+      <a routerLink="/register" class="btn-primary">Start free trial</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero__copy">
+      <h1>Professional quotes &amp; invoices, built for creative studios</h1>
+      <p class="hero__subhead">
+        SalesDesk gives your studio one place to build documents, manage your catalog, and get paid — without
+        fighting a spreadsheet.
+      </p>
+
+      <div class="hero__cta">
+        <a routerLink="/register" class="btn-primary btn-primary--lg">Start free trial</a>
+        <a routerLink="/login" class="btn-secondary btn-secondary--lg">Sign in</a>
+      </div>
+    </div>
+
+    <div class="hero__preview">
+      <div class="preview-card">
+        <div class="preview-card__tabs">
+          <button
+            type="button"
+            *ngFor="let type of previewDocTypes"
+            class="preview-card__tab"
+            [class.preview-card__tab--active]="activePreviewDocType === type"
+            (click)="selectPreviewDocType(type)"
+          >
+            {{ type }}
+          </button>
+        </div>
+
+        <div class="preview-card__body">
+          <div class="preview-card__meta">
+            <div>
+              <p class="preview-card__label">{{ activePreviewDocType }}</p>
+              <p class="preview-card__number">{{ activePreviewNumber }}</p>
+            </div>
+            <span class="preview-card__pill">Live preview</span>
+          </div>
+
+          <div class="preview-card__lines">
+            <div class="preview-card__line" *ngFor="let item of activePreviewLineItems">
+              <span>{{ item.description }}</span>
+              <span>{{ item.amount }}</span>
+            </div>
+          </div>
+
+          <div class="preview-card__total">
+            <span>Total</span>
+            <span>{{ activePreviewTotal }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="features__header">
+      <h2>Everything your studio needs to bill clients well</h2>
+      <p>Click a feature to see what it does.</p>
+    </div>
+
+    <div class="features__body">
+      <div class="features__tabs">
+        <button
+          type="button"
+          *ngFor="let feature of features"
+          class="features__tab"
+          [class.features__tab--active]="activeFeatureId === feature.id"
+          (click)="selectFeature(feature.id)"
+        >
+          {{ feature.label }}
+        </button>
+      </div>
+
+      <div class="features__panel">
+        <h3>{{ activeFeature.title }}</h3>
+        <p>{{ activeFeature.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing">
+    <div class="pricing__header">
+      <h2>Simple pricing that grows with you</h2>
+      <p>Start free. Upgrade when your studio needs more room.</p>
+    </div>
+
+    <div class="pricing__grid">
+      <div class="plan-card" *ngFor="let plan of plans" [class.plan-card--highlighted]="plan.highlighted">
+        <p class="plan-card__badge" *ngIf="plan.highlighted">Most popular</p>
+        <h3>{{ plan.name }}</h3>
+        <p class="plan-card__price">
+          {{ plan.price }}
+          <span *ngIf="plan.cadence">{{ plan.cadence }}</span>
+        </p>
+        <p class="plan-card__description">{{ plan.description }}</p>
+        <p class="plan-card__quota">{{ plan.quota }}</p>
+
+        <ul class="plan-card__features">
+          <li *ngFor="let feature of plan.features">
+            <span aria-hidden="true">✓</span> {{ feature }}
+          </li>
+        </ul>
+
+        <a routerLink="/register" class="btn-primary" [class.btn-secondary]="!plan.highlighted">Start free trial</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing-cta">
+    <h2>Send your next quote in minutes</h2>
+    <a routerLink="/register" class="btn-primary btn-primary--lg">Start free trial</a>
+  </section>
+
+  <footer class="landing-footer">
+    <span>© 2026 SalesDesk. Built for creative studios.</span>
+    <a routerLink="/login">Sign in</a>
+  </footer>
+</div>

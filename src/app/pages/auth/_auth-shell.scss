@@ -1,0 +1,139 @@
+// Shared "warm editorial" layout for the three public auth pages (login,
+// register, forgot-password) — imported by each page's own .scss rather than
+// declared as an Angular component, since there's no shared behavior, only a
+// shared look.
+
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background: var(--sd-bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-lg);
+  box-shadow: var(--sd-shadow-md);
+  padding: 40px 36px;
+}
+
+.auth-brand {
+  font-family: var(--sd-font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--sd-primary-dark);
+  margin-bottom: 28px;
+}
+
+.auth-heading {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.auth-subtext {
+  color: var(--sd-muted);
+  margin-bottom: 28px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sd-ink);
+  }
+
+  input {
+    font-family: var(--sd-font-body);
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--sd-border);
+    border-radius: var(--sd-radius-sm);
+    background: var(--sd-surface);
+    color: var(--sd-ink);
+
+    &:focus {
+      outline: none;
+      border-color: var(--sd-primary);
+    }
+
+    &.is-invalid {
+      border-color: var(--sd-danger);
+    }
+  }
+}
+
+.auth-field-error {
+  font-size: 12px;
+  color: var(--sd-danger);
+}
+
+.auth-error-banner {
+  background: var(--sd-danger-bg);
+  color: var(--sd-danger);
+  border-radius: var(--sd-radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.auth-success-banner {
+  background: var(--sd-success-bg);
+  color: var(--sd-success);
+  border-radius: var(--sd-radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.auth-submit {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--sd-primary);
+  border: none;
+  border-radius: var(--sd-radius-sm);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--sd-primary-dark);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.auth-footer {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--sd-muted);
+  text-align: center;
+
+  a {
+    color: var(--sd-accent);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--sd-accent-dark);
+      text-decoration: underline;
+    }
+  }
+}

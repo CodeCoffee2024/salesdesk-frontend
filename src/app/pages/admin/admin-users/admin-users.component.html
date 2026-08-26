@@ -1,0 +1,69 @@
+<div class="admin-users" *ngIf="!loading && !loadError">
+  <div class="admin-users__header">
+    <h1>Users directory</h1>
+    <p *ngIf="!workspaceId">Every user across every workspace on the platform.</p>
+    <p *ngIf="workspaceId">
+      Users in <strong>{{ workspaceName || 'this workspace' }}</strong>.
+      <button type="button" class="link-button" (click)="clearWorkspaceFilter()">Show everyone</button>
+    </p>
+  </div>
+
+  <div class="search-input">
+    <input
+      type="text"
+      placeholder="Search by name or email"
+      [value]="searchTerm"
+      (input)="searchTerm = $any($event.target).value"
+      (keyup.enter)="search()"
+    />
+    <button type="button" class="btn-secondary" (click)="search()">Search</button>
+  </div>
+
+  <p class="admin-users__error" *ngIf="impersonateError">{{ impersonateError }}</p>
+
+  <app-empty-state
+    *ngIf="users.length === 0"
+    icon="not-found"
+    heading="No users found"
+    description="Try a different search term."
+  ></app-empty-state>
+
+  <div class="user-list" *ngIf="users.length > 0">
+    <div class="user-row" *ngFor="let user of users">
+      <div class="user-row__main">
+        <p class="user-row__name">
+          {{ user.fullName }}
+          <span class="role-pill">{{ user.role }}</span>
+        </p>
+        <p class="user-row__email">{{ user.email }}</p>
+        <p class="user-row__meta">
+          <button type="button" class="link-button" (click)="filterToWorkspace(user)">{{ user.workspaceName }}</button>
+          · joined {{ user.createdAt | date: 'mediumDate' }}
+        </p>
+      </div>
+
+      <div class="user-row__actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          *ngIf="user.role !== 'SystemAdmin'"
+          [disabled]="impersonatingId === user.id"
+          (click)="impersonate(user)"
+        >
+          {{ impersonatingId === user.id ? 'Starting…' : 'View as' }}
+        </button>
+        <span class="user-row__protected" *ngIf="user.role === 'SystemAdmin'">Platform admin</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Users directory</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Users directory</h1>
+  <p>Something went wrong loading users. Try refreshing the page.</p>
+</div>

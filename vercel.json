@@ -1,0 +1,7 @@
+{
+  "buildCommand": "sed -i \"s|__API_BASE_URL__|$API_BASE_URL|\" src/environments/environment.prod.ts && npm run build -- --configuration production",
+  "outputDirectory": "dist/sales-desk.front-end",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

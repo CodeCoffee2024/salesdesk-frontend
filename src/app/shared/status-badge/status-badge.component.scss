@@ -1,0 +1,33 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge--draft {
+  background: var(--sd-status-draft-bg);
+  color: var(--sd-status-draft-fg);
+}
+
+.status-badge--sent {
+  background: var(--sd-status-sent-bg);
+  color: var(--sd-status-sent-fg);
+}
+
+.status-badge--overdue {
+  background: var(--sd-status-overdue-bg);
+  color: var(--sd-status-overdue-fg);
+}
+
+.status-badge--accepted {
+  background: var(--sd-status-accepted-bg);
+  color: var(--sd-status-accepted-fg);
+}
+
+.status-badge--paid {
+  background: var(--sd-status-paid-bg);
+  color: var(--sd-status-paid-fg);
+}

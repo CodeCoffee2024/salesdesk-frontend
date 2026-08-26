@@ -1,0 +1,40 @@
+.impersonation-banner {
+  // Sticky (not fixed): stays pinned to the viewport top while scrolling without
+  // needing every page layout to reserve space for a fixed-position overlay — it
+  // simply occupies its own row at the very top of AppComponent's template, above
+  // both the public-route and app-shell branches, so it's visible everywhere.
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 16px;
+  background: var(--sd-accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--sd-shadow-md);
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.impersonation-banner__text strong {
+  font-weight: 800;
+}
+
+.impersonation-banner__exit {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  color: #ffffff;
+  border-radius: var(--sd-radius-sm);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}

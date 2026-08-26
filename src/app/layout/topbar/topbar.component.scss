@@ -1,0 +1,93 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  flex: 0 0 56px;
+  padding: 0 24px;
+  background: var(--sd-surface);
+  border-bottom: 1px solid var(--sd-border);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sd-muted);
+}
+
+.status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sd-success);
+}
+
+.status--down .status__dot {
+  background: var(--sd-danger);
+}
+
+.status--checking .status__dot {
+  background: var(--sd-border);
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+}
+
+.new-document-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--sd-primary-dark);
+  }
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 16px;
+}
+
+.account__name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.account__role {
+  padding: 2px 8px;
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-status-draft-bg);
+  color: var(--sd-status-draft-fg);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.account__logout {
+  border: none;
+  background: transparent;
+  color: var(--sd-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+
+  &:hover {
+    color: var(--sd-ink);
+  }
+}

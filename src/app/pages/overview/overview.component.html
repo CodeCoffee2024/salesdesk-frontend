@@ -1,0 +1,87 @@
+<div class="overview" *ngIf="!loading && !loadError">
+  <section class="kpi-row">
+    <article class="kpi-tile">
+      <p class="kpi-tile__label">Revenue this year</p>
+      <p class="kpi-tile__value">{{ summary?.revenueThisYear ?? 0 | currency }}</p>
+      <p class="kpi-tile__caption">Collected across all invoices</p>
+    </article>
+    <article class="kpi-tile">
+      <p class="kpi-tile__label">Outstanding</p>
+      <p class="kpi-tile__value">{{ summary?.outstanding ?? 0 | currency }}</p>
+      <p class="kpi-tile__caption">Across sent invoices</p>
+    </article>
+    <article class="kpi-tile">
+      <p class="kpi-tile__label">Quote pipeline</p>
+      <p class="kpi-tile__value">{{ summary?.quotePipeline ?? 0 | currency }}</p>
+      <p class="kpi-tile__caption">Waiting for a decision</p>
+    </article>
+    <article class="kpi-tile">
+      <p class="kpi-tile__label">Active customers</p>
+      <p class="kpi-tile__value">{{ summary?.activeCustomers ?? 0 }}</p>
+      <p class="kpi-tile__caption">With activity this quarter</p>
+    </article>
+  </section>
+
+  <section class="mid-row">
+    <article class="revenue-pulse">
+      <p class="panel-label">Revenue pulse</p>
+      <h2>The steady climb</h2>
+
+      <div class="revenue-pulse__chart">
+        <div class="revenue-pulse__bar-wrap" *ngFor="let point of monthlyRevenue">
+          <div
+            class="revenue-pulse__bar"
+            [style.height.%]="(point.amount / maxMonthlyRevenue) * 100"
+            [title]="point.label + ': ' + (point.amount | currency)"
+          ></div>
+          <span class="revenue-pulse__bar-label">{{ point.label }}</span>
+        </div>
+      </div>
+
+      <p class="revenue-pulse__footnote">Last {{ monthlyRevenue.length }} months &middot; USD</p>
+    </article>
+
+    <article class="next-best-action">
+      <p class="panel-label panel-label--inverse">Next best action</p>
+      <h2>{{ nextBestActionMessage }}</h2>
+      <p>You have {{ summary?.quotePipeline ?? 0 | currency }} in the pipeline. A thoughtful follow-up today could move it forward.</p>
+      <a class="next-best-action__button" routerLink="/documents" [queryParams]="{ type: 'quote' }">Review pipeline</a>
+    </article>
+  </section>
+
+  <section class="recent-documents">
+    <div class="recent-documents__header">
+      <div>
+        <p class="panel-label">Recent activity</p>
+        <h2>Documents in motion</h2>
+      </div>
+      <a routerLink="/documents">View all</a>
+    </div>
+
+    <p class="recent-documents__empty" *ngIf="recentDocuments.length === 0">No documents yet.</p>
+
+    <table class="recent-documents__table" *ngIf="recentDocuments.length > 0">
+      <tbody>
+        <tr *ngFor="let document of recentDocuments" [routerLink]="['/documents', document.id, 'preview']">
+          <td>
+            <span class="recent-documents__number">{{ document.documentNumber }}</span>
+            <span class="recent-documents__customer">{{ document.customerName }} &middot; {{ document.customerCompany }}</span>
+          </td>
+          <td>{{ document.issueDate | date: 'MMM d, y' }}</td>
+          <td><app-status-badge [status]="document.status"></app-status-badge></td>
+          <td class="recent-documents__total">{{ document.total | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Overview</h1>
+  <p>Loading your workspace&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Overview</h1>
+  <p>Something went wrong loading the dashboard. Try refreshing the page.</p>
+</div>

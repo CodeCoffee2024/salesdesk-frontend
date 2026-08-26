@@ -1,0 +1,22 @@
+<header class="topbar">
+  <span class="status" [class.status--down]="status === 'down'" [class.status--checking]="status === 'checking'">
+    <span class="status__dot" aria-hidden="true"></span>
+    <ng-container [ngSwitch]="status">
+      <ng-container *ngSwitchCase="'up'">All systems operational</ng-container>
+      <ng-container *ngSwitchCase="'down'">Connection issue</ng-container>
+      <ng-container *ngSwitchDefault>Checking status&hellip;</ng-container>
+    </ng-container>
+  </span>
+
+  <div class="topbar__actions">
+    <a class="new-document-button" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']" routerLink="/documents/new">
+      <span aria-hidden="true">+</span> New document
+    </a>
+
+    <div class="account" *ngIf="currentUser as user">
+      <span class="account__name">{{ user.fullName }}</span>
+      <span class="account__role">{{ user.role }}</span>
+      <button type="button" class="account__logout" (click)="logout()">Log out</button>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,6 @@
+<div class="impersonation-banner" *ngIf="isImpersonating$ | async">
+  <span class="impersonation-banner__text">
+    Viewing as <strong>{{ (currentUser$ | async)?.email }}</strong>
+  </span>
+  <button type="button" class="impersonation-banner__exit" (click)="exit()">Exit impersonation</button>
+</div>

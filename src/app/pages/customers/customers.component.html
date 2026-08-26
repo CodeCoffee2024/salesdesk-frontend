@@ -1,0 +1,142 @@
+<div class="customers" *ngIf="!loading && !loadError">
+  <div class="customers__header">
+    <div>
+      <h1>Customers</h1>
+      <p>Everyone you've quoted or invoiced, in one place.</p>
+    </div>
+    <button
+      type="button"
+      class="btn-primary"
+      *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+      (click)="openAddModal()"
+    >+ Add customer</button>
+  </div>
+
+  <div class="search-input">
+    <input
+      type="text"
+      placeholder="Search by name, company, or email"
+      [value]="searchTerm"
+      (input)="searchTerm = $any($event.target).value"
+    />
+  </div>
+
+  <app-empty-state
+    *ngIf="customers.length === 0"
+    icon="not-found"
+    heading="No customers yet"
+    description="Use the &ldquo;Add customer&rdquo; button above to start building quotes and invoices for them."
+  ></app-empty-state>
+
+  <p class="no-matches" *ngIf="customers.length > 0 && filteredCustomers.length === 0">
+    No customers match &ldquo;{{ searchTerm }}&rdquo;.
+  </p>
+
+  <div class="customer-grid" *ngIf="filteredCustomers.length > 0">
+    <button type="button" class="customer-card" *ngFor="let customer of filteredCustomers" (click)="viewProfile(customer)">
+      <div class="customer-card__header">
+        <h3>{{ customer.name }}</h3>
+        <span class="customer-card__value">{{ customer.lifetimeValue | currency }}</span>
+      </div>
+      <p class="customer-card__company">{{ customer.company }}</p>
+      <p class="customer-card__meta">{{ customer.email }}</p>
+      <p class="customer-card__meta" *ngIf="customer.phone">{{ customer.phone }}</p>
+      <p class="customer-card__since">Customer since {{ customer.createdAt | date: 'MMM y' }}</p>
+      <span class="customer-card__view">View profile &rarr;</span>
+    </button>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Customers</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Customers</h1>
+  <p>Something went wrong loading customers. Try refreshing the page.</p>
+</div>
+
+<div class="modal-backdrop" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <h2>Add customer</h2>
+
+    <form [formGroup]="addForm" (ngSubmit)="submitAdd()">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" />
+      </div>
+
+      <div class="field">
+        <label for="company">Company</label>
+        <input id="company" type="text" formControlName="company" />
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" />
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone <span class="field__optional">(optional)</span></label>
+        <input id="phone" type="tel" formControlName="phone" />
+      </div>
+
+      <ul class="validation-summary" *ngIf="addForm.touched && formErrors.length > 0">
+        <li *ngFor="let error of formErrors">{{ error }}</li>
+      </ul>
+
+      <p class="modal__error" *ngIf="addError">{{ addError }}</p>
+
+      <div class="modal__actions">
+        <button type="button" class="btn-secondary" (click)="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">{{ saving ? 'Adding…' : 'Add customer' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="selectedCustomer as customer" (click)="closeProfile()">
+  <div class="modal modal--profile" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <div class="profile__header">
+      <div>
+        <h2>{{ customer.name }}</h2>
+        <p>{{ customer.company }}</p>
+      </div>
+      <button type="button" class="modal__close" (click)="closeProfile()" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="profile__meta">
+      <div>
+        <p class="profile__label">Email</p>
+        <p>{{ customer.email }}</p>
+      </div>
+      <div *ngIf="customer.phone">
+        <p class="profile__label">Phone</p>
+        <p>{{ customer.phone }}</p>
+      </div>
+      <div>
+        <p class="profile__label">Customer since</p>
+        <p>{{ customer.createdAt | date: 'MMM d, y' }}</p>
+      </div>
+      <div>
+        <p class="profile__label">Lifetime value</p>
+        <p class="profile__value">{{ customer.lifetimeValue | currency }}</p>
+      </div>
+    </div>
+
+    <div class="profile__documents">
+      <p class="profile__label">Documents</p>
+
+      <p class="profile__empty" *ngIf="!profileLoading && selectedCustomerDocuments.length === 0">
+        No quotes or invoices yet for this customer.
+      </p>
+
+      <div class="profile__document-row" *ngFor="let doc of selectedCustomerDocuments">
+        <span>{{ doc.documentNumber }}</span>
+        <app-status-badge [status]="doc.status"></app-status-badge>
+        <span class="profile__document-total">{{ doc.total | currency }}</span>
+      </div>
+    </div>
+  </div>
+</div>

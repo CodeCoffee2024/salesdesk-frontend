@@ -1,0 +1,48 @@
+<div class="admin-audit-log" *ngIf="!loading && !loadError">
+  <div class="admin-audit-log__header">
+    <h1>Global audit log</h1>
+    <p>Critical platform events, newest first.</p>
+  </div>
+
+  <div class="search-input">
+    <input
+      type="text"
+      placeholder="Search by event type or message"
+      [value]="searchTerm"
+      (input)="searchTerm = $any($event.target).value"
+      (keyup.enter)="search()"
+    />
+    <button type="button" class="btn-secondary" (click)="search()">Search</button>
+  </div>
+
+  <app-empty-state
+    *ngIf="entries.length === 0"
+    icon="not-found"
+    heading="No events found"
+    description="Try a different search term."
+  ></app-empty-state>
+
+  <div class="audit-list" *ngIf="entries.length > 0">
+    <div class="audit-row" *ngFor="let entry of entries">
+      <span class="audit-row__type">{{ entry.eventType }}</span>
+      <p class="audit-row__message">{{ entry.message }}</p>
+      <span class="audit-row__time">{{ entry.occurredAtUtc | date: 'medium' }}</span>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="entries.length > 0">
+    <button type="button" class="btn-secondary" [disabled]="page <= 1" (click)="previousPage()">Previous</button>
+    <span>Page {{ page }} of {{ totalPages }}</span>
+    <button type="button" class="btn-secondary" [disabled]="page >= totalPages" (click)="nextPage()">Next</button>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Global audit log</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Global audit log</h1>
+  <p>Something went wrong loading the audit log. Try refreshing the page.</p>
+</div>

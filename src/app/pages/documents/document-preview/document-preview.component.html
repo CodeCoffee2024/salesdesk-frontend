@@ -1,0 +1,113 @@
+<app-empty-state
+  *ngIf="!loading && notFound"
+  icon="document"
+  heading="Document not found"
+  description="This document may have been removed, or the link is incorrect."
+  actionLabel="Back to documents"
+  actionLink="/documents"
+></app-empty-state>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Document preview</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="document-preview" *ngIf="!loading && !notFound && document as doc">
+  <div class="document-preview__actions no-print">
+    <div class="document-preview__lifecycle">
+      <ng-container *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
+        <button
+          type="button"
+          *ngFor="let action of lifecycleActions"
+          class="btn-secondary"
+          [disabled]="updatingStatus"
+          (click)="action.run()"
+        >
+          {{ action.label }}
+        </button>
+
+        <button type="button" class="btn-secondary" *ngIf="canConvertToInvoice" [disabled]="converting" (click)="convertToInvoice()">
+          {{ converting ? 'Converting…' : 'Convert to invoice' }}
+        </button>
+      </ng-container>
+
+      <button
+        type="button"
+        class="btn-danger"
+        *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
+        (click)="requestDelete()"
+      >Void / Delete</button>
+    </div>
+
+    <div class="document-preview__export">
+      <button type="button" class="btn-secondary" (click)="printDocument()">Print / Save PDF</button>
+      <button type="button" class="btn-primary" (click)="downloadPdf()">Download PDF</button>
+    </div>
+  </div>
+
+  <p class="document-preview__error no-print" *ngIf="actionError">{{ actionError }}</p>
+
+  <div class="document-card" id="printable-document" [style.border-top-color]="'#2D6A63'">
+    <div class="document-card__header">
+      <div>
+        <p class="document-card__eyebrow">{{ doc.templateName }}</p>
+        <h1>{{ doc.type }}</h1>
+      </div>
+      <div class="document-card__meta">
+        <p class="document-card__number">{{ doc.documentNumber }}</p>
+        <p>Issued {{ doc.issueDate | date: 'MMM d, y' }}</p>
+        <p>Due {{ doc.dueDate | date: 'MMM d, y' }}</p>
+        <app-status-badge [status]="doc.status"></app-status-badge>
+      </div>
+    </div>
+
+    <div class="document-card__parties">
+      <div>
+        <p class="document-card__label">Prepared for</p>
+        <p class="document-card__customer-name">{{ doc.customerName }}</p>
+        <p>{{ doc.customerCompany }}</p>
+      </div>
+    </div>
+
+    <table class="document-card__items">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          <th class="align-right">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of doc.lineItems">
+          <td>{{ item.description }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unitPrice | currency }}</td>
+          <td class="align-right">{{ item.lineTotal | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="document-card__totals">
+      <div class="document-card__totals-row">
+        <span>Subtotal</span>
+        <span>{{ doc.subtotal | currency }}</span>
+      </div>
+      <div class="document-card__totals-row document-card__totals-row--grand">
+        <span>Total due</span>
+        <span>{{ doc.total | currency }}</span>
+      </div>
+    </div>
+
+    <p class="document-card__footnote">Thank you for the opportunity to work together.</p>
+  </div>
+</div>
+
+<app-confirm-dialog
+  *ngIf="showDeleteConfirm"
+  heading="Delete this document?"
+  message="This permanently deletes the document. This cannot be undone."
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+></app-confirm-dialog>

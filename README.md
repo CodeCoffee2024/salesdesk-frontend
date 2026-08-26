@@ -1,27 +1,35 @@
-# SalesDeskFrontEnd
+# SalesDesk Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.11.
+Standalone Angular SPA for SalesDesk. This repository contains no backend code or C# dependencies — it talks to [salesdesk-backend](../salesdesk-backend) exclusively over its REST API.
 
-## Development server
+## Running locally
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+```bash
+npm install
+npm start
+```
 
-## Code scaffolding
+`npm start` runs `ng serve --proxy-config proxy.conf.json`, which forwards any `/api/*` request to `http://localhost:5187` (the backend's default local port — see `proxy.conf.json`). Point it at a different backend by editing that file; nothing in application code hardcodes a backend port (see below).
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## How the API base URL works
 
-## Build
+No component or service ever hardcodes `localhost:<port>`. Every HTTP call goes through `environment.apiBaseUrl`:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- **`src/environments/environment.ts`** (dev, used by `ng serve`) — `apiBaseUrl: ''`, so calls resolve to relative `/api/...` URLs and go through the dev-server proxy above.
+- **`src/environments/environment.prod.ts`** (production, swapped in via `angular.json`'s `fileReplacements` on `ng build --configuration production`) — `apiBaseUrl` starts as the literal placeholder `__API_BASE_URL__`, which the deploy pipeline replaces with the real backend URL at build time (Angular's equivalent of Vite's `VITE_API_BASE_URL` / Next's `NEXT_PUBLIC_API_URL`, since Angular has no built-in `.env` support — see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
-## Running unit tests
+Every service under `src/app/core/services/` builds its request URL from `` `${environment.apiBaseUrl}/api/...` ``.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Auth
 
-## Running end-to-end tests
+`src/app/core/interceptors/auth.interceptor.ts` attaches the stored bearer token to every outgoing request automatically and logs out + redirects to `/login` on a 401 — no per-call auth wiring needed in services.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Tests
 
-## Further help
+```bash
+npm test
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the Vercel setup and how the production API URL gets injected.

@@ -1,0 +1,104 @@
+<div class="admin-workspaces" *ngIf="!loading && !loadError">
+  <div class="admin-workspaces__header">
+    <h1>Workspace directory</h1>
+    <p>Every registered tenant on the platform.</p>
+  </div>
+
+  <div class="search-input">
+    <input
+      type="text"
+      placeholder="Search by workspace name or email"
+      [value]="searchTerm"
+      (input)="searchTerm = $any($event.target).value"
+      (keyup.enter)="search()"
+    />
+    <button type="button" class="btn-secondary" (click)="search()">Search</button>
+  </div>
+
+  <app-empty-state
+    *ngIf="workspaces.length === 0"
+    icon="not-found"
+    heading="No workspaces found"
+    description="Try a different search term."
+  ></app-empty-state>
+
+  <div class="workspace-list" *ngIf="workspaces.length > 0">
+    <div class="workspace-row" *ngFor="let workspace of workspaces">
+      <div class="workspace-row__main">
+        <p class="workspace-row__name">
+          {{ workspace.name }}
+          <span class="status-pill" [class.status-pill--suspended]="!workspace.isActive">
+            {{ workspace.isActive ? 'Active' : 'Suspended' }}
+          </span>
+        </p>
+        <p class="workspace-row__email">{{ workspace.email }}</p>
+        <p class="workspace-row__meta">
+          <a [routerLink]="['/admin/users']" [queryParams]="{ workspaceId: workspace.id }">
+            {{ workspace.userCount }} user{{ workspace.userCount === 1 ? '' : 's' }}
+          </a>
+          ·
+          {{ workspace.documentCount }} document{{ workspace.documentCount === 1 ? '' : 's' }} ·
+          registered {{ workspace.createdAt | date: 'mediumDate' }}
+        </p>
+      </div>
+
+      <div class="workspace-row__quota">
+        <label [for]="'quota-' + workspace.id">Document quota</label>
+        <div class="workspace-row__quota-input">
+          <input
+            [id]="'quota-' + workspace.id"
+            type="number"
+            min="0"
+            placeholder="Unlimited"
+            [value]="quotaDraft[workspace.id]"
+            (input)="onQuotaInput(workspace.id, $event)"
+            [disabled]="savingId === workspace.id"
+          />
+          <button type="button" class="btn-secondary" [disabled]="savingId === workspace.id" (click)="saveQuota(workspace)">
+            Save
+          </button>
+        </div>
+      </div>
+
+      <div class="workspace-row__actions">
+        <button
+          *ngIf="workspace.isActive"
+          type="button"
+          class="btn-secondary btn-secondary--danger"
+          [disabled]="savingId === workspace.id"
+          (click)="confirmSuspend(workspace)"
+        >
+          Suspend
+        </button>
+        <button
+          *ngIf="!workspace.isActive"
+          type="button"
+          class="btn-primary"
+          [disabled]="savingId === workspace.id"
+          (click)="activate(workspace)"
+        >
+          Activate
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Workspace directory</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Workspace directory</h1>
+  <p>Something went wrong loading workspaces. Try refreshing the page.</p>
+</div>
+
+<app-confirm-dialog
+  *ngIf="workspacePendingSuspend as workspace"
+  heading="Suspend this workspace?"
+  [message]="'Every user in ' + workspace.name + ' will be unable to sign in until this workspace is reactivated.'"
+  confirmLabel="Suspend"
+  (confirmed)="suspend()"
+  (cancelled)="cancelSuspend()"
+></app-confirm-dialog>

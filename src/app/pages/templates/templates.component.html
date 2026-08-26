@@ -1,0 +1,113 @@
+<div class="templates" *ngIf="!loading && !loadError">
+  <div class="templates__header">
+    <div>
+      <h1>Templates</h1>
+      <p>Visual presets your quotes and invoices are built with.</p>
+    </div>
+    <button
+      type="button"
+      class="btn-primary"
+      *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+      (click)="openAddModal()"
+    >+ Add template</button>
+  </div>
+
+  <app-empty-state
+    *ngIf="templates.length === 0"
+    icon="not-found"
+    heading="No templates yet"
+    description="Use the &ldquo;Add template&rdquo; button above to create your first one."
+  ></app-empty-state>
+
+  <div class="template-grid" *ngIf="templates.length > 0">
+    <div class="template-card" *ngFor="let template of templates">
+      <div class="template-card__swatch" [style.background]="template.accentColor || 'var(--sd-primary)'"></div>
+
+      <div class="template-card__body">
+        <div class="template-card__title-row">
+          <h3>{{ template.name }}</h3>
+          <span class="template-card__default-badge" *ngIf="template.isDefault">Default</span>
+        </div>
+
+        <p class="template-card__target">{{ targetTypeLabel(template.targetType) }}</p>
+        <p class="template-card__description" *ngIf="template.description">{{ template.description }}</p>
+
+        <div class="template-card__footer">
+          <span class="template-card__usage">Used {{ template.usageCount }} time{{ template.usageCount === 1 ? '' : 's' }}</span>
+
+          <button
+            type="button"
+            class="template-card__default-toggle"
+            *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+            [class.template-card__default-toggle--active]="template.isDefault"
+            [disabled]="template.isDefault || settingDefaultForId === template.id"
+            (click)="setDefault(template)"
+          >
+            {{ template.isDefault ? 'Default template' : settingDefaultForId === template.id ? 'Setting…' : 'Set as default' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Templates</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Templates</h1>
+  <p>Something went wrong loading templates. Try refreshing the page.</p>
+</div>
+
+<div class="modal-backdrop" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <h2>Add template</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" />
+      </div>
+
+      <div class="field">
+        <label for="targetType">Applies to</label>
+        <select id="targetType" formControlName="targetType">
+          <option *ngFor="let type of targetTypeOptions" [value]="type">{{ targetTypeLabel(type) }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="description">Description <span class="field__optional">(optional)</span></label>
+        <textarea id="description" formControlName="description" rows="2"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Accent color</label>
+        <div class="swatch-picker">
+          <button
+            type="button"
+            class="swatch-picker__option"
+            *ngFor="let color of swatches"
+            [style.background]="color"
+            [class.swatch-picker__option--selected]="form.value.accentColor === color"
+            (click)="selectSwatch(color)"
+            [attr.aria-label]="'Choose ' + color"
+          ></button>
+        </div>
+      </div>
+
+      <ul class="validation-summary" *ngIf="form.touched && formErrors.length > 0">
+        <li *ngFor="let error of formErrors">{{ error }}</li>
+      </ul>
+
+      <p class="modal__error" *ngIf="saveError">{{ saveError }}</p>
+
+      <div class="modal__actions">
+        <button type="button" class="btn-secondary" (click)="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">{{ saving ? 'Adding…' : 'Add template' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<div class="documents-page">
+  <div class="documents-page__header">
+    <div>
+      <h1>Documents</h1>
+      <p>Quotes and invoices, moving at the pace of your business.</p>
+    </div>
+    <a
+      class="documents-page__new-button"
+      *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+      routerLink="/documents/new"
+    >+ New document</a>
+  </div>
+
+  <div class="documents-page__toolbar">
+    <div class="search-input">
+      <input
+        type="text"
+        placeholder="Search by number or customer"
+        [value]="searchTerm"
+        (input)="onSearchInput($any($event.target).value)"
+      />
+    </div>
+
+    <div class="tabs">
+      <button type="button" [class.tabs__item--active]="activeTab === 'all'" class="tabs__item" (click)="setTab('all')">All documents</button>
+      <button type="button" [class.tabs__item--active]="activeTab === 'quote'" class="tabs__item" (click)="setTab('quote')">Quotes</button>
+      <button type="button" [class.tabs__item--active]="activeTab === 'invoice'" class="tabs__item" (click)="setTab('invoice')">Invoices</button>
+    </div>
+  </div>
+
+  <p class="documents-page__status" *ngIf="loading">Loading documents&hellip;</p>
+  <p class="documents-page__status" *ngIf="loadError">Something went wrong loading documents.</p>
+  <p class="documents-page__status" *ngIf="!loading && !loadError && documents.length === 0">
+    No documents match your search yet.
+  </p>
+
+  <table class="documents-table" *ngIf="!loading && !loadError && documents.length > 0">
+    <thead>
+      <tr>
+        <th>Document</th>
+        <th>Issued</th>
+        <th>Status</th>
+        <th class="documents-table__total-col">Total</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let document of documents" [class.documents-table__row--highlighted]="document.id === highlightedDocumentId">
+        <td (click)="preview(document.id)">
+          <span class="documents-table__number">{{ document.documentNumber }}</span>
+          <span class="documents-table__customer">{{ document.customerName }} &middot; {{ document.customerCompany }}</span>
+        </td>
+        <td (click)="preview(document.id)">{{ document.issueDate | date: 'MMM d, y' }}</td>
+        <td (click)="preview(document.id)"><app-status-badge [status]="document.status"></app-status-badge></td>
+        <td class="documents-table__total-col" (click)="preview(document.id)">{{ document.total | currency }}</td>
+        <td class="documents-table__menu-col">
+          <button type="button" class="kebab-button" (click)="toggleMenu(document.id, $event)" aria-label="Row actions">&hellip;</button>
+
+          <div class="kebab-menu" *ngIf="openMenuForId === document.id" (click)="$event.stopPropagation()">
+            <button type="button" (click)="preview(document.id)">Preview</button>
+            <button type="button" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']" (click)="edit(document.id)">Edit</button>
+
+            <div class="kebab-menu__status" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
+              <button type="button" (click)="toggleStatusMenu($event)">
+                Change status
+                <span aria-hidden="true">&rsaquo;</span>
+              </button>
+
+              <div class="kebab-menu__status-options" *ngIf="statusMenuOpen">
+                <button
+                  type="button"
+                  *ngFor="let status of statusOptions"
+                  [disabled]="status === document.status"
+                  (click)="changeStatus(document, status)"
+                >
+                  {{ status }}
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="kebab-menu__delete" *appHasRole="['SystemAdmin', 'WorkspaceAdmin']" (click)="requestDelete(document)">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<app-confirm-dialog
+  *ngIf="documentPendingDelete"
+  heading="Delete this document?"
+  [message]="'This permanently deletes ' + documentPendingDelete.documentNumber + '. This cannot be undone.'"
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+></app-confirm-dialog>

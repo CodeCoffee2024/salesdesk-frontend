@@ -1,0 +1,153 @@
+<div class="document-form" *ngIf="!loading && !loadError">
+  <div class="document-form__header">
+    <h1>{{ isEditMode ? 'Edit document' : 'Make it clear.' }}</h1>
+    <p>{{ isEditMode ? 'Update the details below.' : 'Build a customer-ready document from the pieces you already use.' }}</p>
+  </div>
+
+  <div class="document-form__layout">
+    <form class="document-form__panel" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="type-toggle" *ngIf="!isEditMode">
+        <button
+          type="button"
+          class="type-toggle__option"
+          [class.type-toggle__option--active]="form.value.type === 'Quote'"
+          (click)="form.patchValue({ type: 'Quote' })"
+        >
+          Quote
+        </button>
+        <button
+          type="button"
+          class="type-toggle__option"
+          [class.type-toggle__option--active]="form.value.type === 'Invoice'"
+          (click)="form.patchValue({ type: 'Invoice' })"
+        >
+          Invoice
+        </button>
+      </div>
+      <div class="field-static" *ngIf="isEditMode">
+        <label>Document type</label>
+        <p>{{ form.value.type }} (can't be changed)</p>
+      </div>
+
+      <div class="field">
+        <label for="customerId">Customer</label>
+        <select id="customerId" formControlName="customerId">
+          <option value="" disabled>Select a customer</option>
+          <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }} &middot; {{ customer.company }}</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <div class="field-static">
+          <label>Issue date</label>
+          <p>{{ issueDateDisplay | date: 'MMM d, y' }}</p>
+        </div>
+
+        <div class="field">
+          <label for="dueDate">Due date</label>
+          <input id="dueDate" type="date" formControlName="dueDate" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="templateId">Template</label>
+        <select id="templateId" formControlName="templateId">
+          <option value="" disabled>Select a template</option>
+          <option *ngFor="let template of templates" [value]="template.id">{{ template.name }}</option>
+        </select>
+      </div>
+
+      <div class="line-items">
+        <label>Line items</label>
+
+        <div class="line-item-row" *ngFor="let item of lineItems.controls; let i = index" [formGroup]="$any(item)">
+          <div class="line-item-row__description">
+            <input
+              type="text"
+              placeholder="Describe the work"
+              formControlName="description"
+              (focus)="openSuggestions(i)"
+              (input)="onDescriptionEdited(i)"
+              (blur)="closeSuggestionsSoon()"
+              autocomplete="off"
+            />
+            <ul class="suggestions" *ngIf="openSuggestionsForIndex === i && productSuggestions(i).length > 0">
+              <li *ngFor="let product of productSuggestions(i)" (mousedown)="selectProduct(i, product)">
+                <span>{{ product.name }}</span>
+                <span class="suggestions__price">{{ product.price | currency }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <input type="number" min="0.01" step="0.01" placeholder="Qty" formControlName="quantity" class="line-item-row__qty" />
+          <input type="number" min="0" step="0.01" placeholder="Unit price" formControlName="unitPrice" class="line-item-row__price" />
+          <span class="line-item-row__total">{{ lineTotal(i) | currency }}</span>
+
+          <button type="button" class="line-item-row__remove" (click)="removeLineItem(i)" aria-label="Remove line item">&times;</button>
+        </div>
+
+        <button type="button" class="add-line-item" (click)="addLineItem()">+ Add line item</button>
+      </div>
+
+      <p class="document-form__error" *ngIf="saveError">{{ saveError }}</p>
+
+      <div class="document-form__actions">
+        <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving…' : isEditMode ? 'Save changes' : 'Create ' + (form.value.type === 'Invoice' ? 'invoice' : 'quote') }}
+        </button>
+      </div>
+    </form>
+
+    <aside class="document-preview-pane">
+      <p class="panel-label">Live preview</p>
+
+      <div class="preview-card" [style.border-top-color]="selectedTemplate?.accentColor || 'var(--sd-primary)'">
+        <div class="preview-card__header">
+          <div>
+            <p class="preview-card__customer-label">Customer</p>
+            <h3>{{ selectedCustomer?.name || 'Customer name' }}</h3>
+            <p>{{ selectedCustomer?.company || 'Customer company' }}</p>
+          </div>
+          <span class="preview-card__type-badge">{{ form.value.type }}</span>
+        </div>
+
+        <table class="preview-card__items">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of lineItems.controls; let i = index">
+              <td>{{ item.get('description')?.value || 'Your line item' }}</td>
+              <td>{{ lineTotal(i) | currency }}</td>
+            </tr>
+            <tr *ngIf="lineItems.length === 0">
+              <td>Your line item</td>
+              <td>{{ 0 | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="preview-card__total">
+          <span>Total due</span>
+          <span>{{ subtotal | currency }}</span>
+        </div>
+      </div>
+
+      <p class="document-preview-pane__hint">Your customer will see a clear, considered document with this information.</p>
+    </aside>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>{{ isEditMode ? 'Edit document' : 'New document' }}</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>{{ isEditMode ? 'Edit document' : 'New document' }}</h1>
+  <p>Something went wrong loading this form. Try refreshing the page.</p>
+</div>

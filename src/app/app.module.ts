@@ -1,18 +1,71 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { SidebarComponent } from './layout/sidebar/sidebar.component';
+import { TopbarComponent } from './layout/topbar/topbar.component';
+import { BreadcrumbComponent } from './layout/breadcrumb/breadcrumb.component';
+import { EmptyStateComponent } from './shared/empty-state/empty-state.component';
+import { LandingComponent } from './pages/landing/landing.component';
+import { OverviewComponent } from './pages/overview/overview.component';
+import { DocumentsListComponent } from './pages/documents/documents-list/documents-list.component';
+import { DocumentPreviewComponent } from './pages/documents/document-preview/document-preview.component';
+import { CustomersComponent } from './pages/customers/customers.component';
+import { ProductsComponent } from './pages/products/products.component';
+import { TemplatesComponent } from './pages/templates/templates.component';
+import { NotFoundPageComponent } from './pages/not-found-page/not-found-page.component';
+import { StatusBadgeComponent } from './shared/status-badge/status-badge.component';
+import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
+import { DocumentFormComponent } from './pages/documents/document-form/document-form.component';
+import { LoginComponent } from './pages/auth/login/login.component';
+import { RegisterComponent } from './pages/auth/register/register.component';
+import { ForgotPasswordComponent } from './pages/auth/forgot-password/forgot-password.component';
+import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard.component';
+import { AdminWorkspacesComponent } from './pages/admin/admin-workspaces/admin-workspaces.component';
+import { AdminUsersComponent } from './pages/admin/admin-users/admin-users.component';
+import { AdminAuditLogComponent } from './pages/admin/admin-audit-log/admin-audit-log.component';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { HasRoleDirective } from './shared/has-role.directive';
+import { ImpersonationBannerComponent } from './shared/impersonation-banner/impersonation-banner.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SidebarComponent,
+    TopbarComponent,
+    BreadcrumbComponent,
+    EmptyStateComponent,
+    LandingComponent,
+    OverviewComponent,
+    DocumentsListComponent,
+    DocumentPreviewComponent,
+    CustomersComponent,
+    ProductsComponent,
+    TemplatesComponent,
+    NotFoundPageComponent,
+    StatusBadgeComponent,
+    ConfirmDialogComponent,
+    DocumentFormComponent,
+    LoginComponent,
+    RegisterComponent,
+    ForgotPasswordComponent,
+    AdminDashboardComponent,
+    AdminWorkspacesComponent,
+    AdminUsersComponent,
+    AdminAuditLogComponent,
+    HasRoleDirective,
+    ImpersonationBannerComponent
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
+    ReactiveFormsModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

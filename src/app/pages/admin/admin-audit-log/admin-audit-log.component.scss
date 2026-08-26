@@ -1,0 +1,128 @@
+.admin-audit-log {
+  padding: 32px;
+}
+
+.admin-audit-log__header {
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 26px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: var(--sd-muted);
+  }
+}
+
+.search-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  max-width: 480px;
+
+  input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--sd-radius-sm);
+    border: 1px solid var(--sd-border);
+    background: var(--sd-surface);
+    font-size: 13px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--sd-primary);
+    }
+  }
+}
+
+.audit-list {
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.audit-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--sd-border);
+  flex-wrap: wrap;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.audit-row__type {
+  flex-shrink: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--sd-status-sent-bg);
+  color: var(--sd-status-sent-fg);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.audit-row__message {
+  flex: 1;
+  min-width: 200px;
+}
+
+.audit-row__time {
+  flex-shrink: 0;
+  color: var(--sd-muted);
+  font-size: 12px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+
+  span {
+    color: var(--sd-muted);
+    font-size: 13px;
+  }
+}
+
+.btn-secondary {
+  padding: 9px 16px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+
+  &:hover:not(:disabled) {
+    background: var(--sd-bg);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-audit-log {
+    padding: 20px 16px;
+  }
+
+  .search-input {
+    flex-direction: column;
+    max-width: none;
+  }
+
+  .audit-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}

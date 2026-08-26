@@ -1,0 +1,32 @@
+name: CI
+
+# Deployment itself is handled by Vercel's native GitHub integration (see
+# DEPLOYMENT.md) — it deploys automatically on every push to main using
+# vercel.json's buildCommand, which injects the production API URL from a
+# Vercel project env var. This workflow is the required-status-check gate:
+# it must pass before that push is considered good.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Lint, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Unit tests (headless Chrome)
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+
+      - name: Production build
+        run: npx ng build --configuration production

@@ -1,0 +1,88 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-brand">SalesDesk</div>
+    <h1 class="auth-heading">Create your workspace</h1>
+    <p class="auth-subtext">Set up your studio in a minute — quotes and invoices, ready to send.</p>
+
+    <div class="auth-error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="auth-field">
+        <label for="fullName">Your name</label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          autocomplete="name"
+          [class.is-invalid]="form.controls.fullName.invalid && form.controls.fullName.touched"
+        />
+        <span class="auth-field-error" *ngIf="form.controls.fullName.invalid && form.controls.fullName.touched">
+          Your name is required.
+        </span>
+      </div>
+
+      <div class="auth-field">
+        <label for="workspaceName">Studio / workspace name</label>
+        <input
+          id="workspaceName"
+          type="text"
+          formControlName="workspaceName"
+          [class.is-invalid]="form.controls.workspaceName.invalid && form.controls.workspaceName.touched"
+        />
+        <span class="auth-field-error" *ngIf="form.controls.workspaceName.invalid && form.controls.workspaceName.touched">
+          Workspace name is required.
+        </span>
+      </div>
+
+      <div class="auth-field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [class.is-invalid]="form.controls.email.invalid && form.controls.email.touched"
+        />
+        <span class="auth-field-error" *ngIf="form.controls.email.invalid && form.controls.email.touched">
+          Enter a valid email address.
+        </span>
+      </div>
+
+      <div class="auth-field">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+        />
+        <span class="auth-field-error" *ngIf="form.controls.password.invalid && form.controls.password.touched">
+          Password must be at least 8 characters.
+        </span>
+      </div>
+
+      <div class="auth-field">
+        <label for="confirmPassword">Confirm password</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          autocomplete="new-password"
+          [class.is-invalid]="form.errors?.['passwordMismatch'] && form.controls.confirmPassword.touched"
+        />
+        <span class="auth-field-error" *ngIf="form.errors?.['passwordMismatch'] && form.controls.confirmPassword.touched">
+          Passwords don't match.
+        </span>
+      </div>
+
+      <button type="submit" class="auth-submit" [disabled]="submitting">
+        {{ submitting ? 'Creating workspace…' : 'Start free trial' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a routerLink="/login">Sign in</a></p>
+    </div>
+  </div>
+</div>
