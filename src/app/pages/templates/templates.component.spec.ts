@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 
 import { TemplatesComponent } from './templates.component';
@@ -16,6 +17,7 @@ function makeTemplate(overrides: Partial<Template> = {}): Template {
     description: 'Warm, editorial layout for polished client work.',
     targetType: 'QuotesAndInvoices',
     accentColor: '#D9A441',
+    contentHtml: null,
     isDefault: true,
     usageCount: 4,
     ...overrides
@@ -34,7 +36,7 @@ describe('TemplatesComponent', () => {
     templateServiceSpy.setDefault.and.returnValue(of(makeTemplate({ id: 'tpl-2', isDefault: true })));
 
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule],
       declarations: [TemplatesComponent, EmptyStateComponent, HasRoleDirective],
       providers: [{ provide: TemplateService, useValue: templateServiceSpy }]
     });
@@ -55,7 +57,7 @@ describe('TemplatesComponent', () => {
     templateServiceSpy.getAll.and.returnValue(throwError(() => new Error('down')));
 
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule],
       declarations: [TemplatesComponent, EmptyStateComponent, HasRoleDirective],
       providers: [{ provide: TemplateService, useValue: templateServiceSpy }]
     });

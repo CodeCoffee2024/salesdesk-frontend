@@ -9,6 +9,7 @@ import { DocumentPreviewComponent } from './pages/documents/document-preview/doc
 import { CustomersComponent } from './pages/customers/customers.component';
 import { ProductsComponent } from './pages/products/products.component';
 import { TemplatesComponent } from './pages/templates/templates.component';
+import { TemplateEditorComponent } from './pages/templates/template-editor/template-editor.component';
 import { NotFoundPageComponent } from './pages/not-found-page/not-found-page.component';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
@@ -53,6 +54,11 @@ const routes: Routes = [
       { path: 'customers', component: CustomersComponent, data: { breadcrumb: [{ label: 'Customers' }] } },
       { path: 'products', component: ProductsComponent, data: { breadcrumb: [{ label: 'Products & services' }] } },
       { path: 'templates', component: TemplatesComponent, data: { breadcrumb: [{ label: 'Templates' }] } },
+      {
+        path: 'templates/:id/edit',
+        component: TemplateEditorComponent,
+        data: { breadcrumb: [{ label: 'Templates', url: '/templates' }, { label: 'Edit content' }] }
+      },
       {
         path: 'admin',
         canActivate: [adminGuard],

@@ -1,0 +1,93 @@
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Template editor</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="!loading && notFound">
+  <h1>Template not found</h1>
+  <p>This template doesn't exist or may have been deleted.</p>
+  <button type="button" class="btn-secondary" (click)="backToTemplates()">Back to templates</button>
+</div>
+
+<div class="editor" *ngIf="!loading && !notFound && template">
+  <div class="editor__header">
+    <div>
+      <label class="editor__name-label" for="templateName">Template name</label>
+      <input id="templateName" class="editor__name" type="text" [(ngModel)]="name" />
+      <span class="editor__meta-badge">{{ template.targetType }}</span>
+    </div>
+
+    <div class="editor__header-actions">
+      <button type="button" class="btn-secondary" (click)="backToTemplates()">Cancel</button>
+      <button type="button" class="btn-primary" [disabled]="saving" (click)="save()">
+        {{ saving ? 'Saving…' : 'Save template' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="field editor__description">
+    <label for="templateDescription">Description <span class="field__optional">(optional)</span></label>
+    <textarea id="templateDescription" rows="2" [(ngModel)]="description"></textarea>
+  </div>
+
+  <p class="editor__saved" *ngIf="saved">Saved.</p>
+  <p class="editor__error" *ngIf="saveError">{{ saveError }}</p>
+
+  <div class="toolbar" role="toolbar" aria-label="Formatting">
+    <button type="button" title="Bold" (mousedown)="preventFocusLoss($event)" (click)="exec('bold')"><strong>B</strong></button>
+    <button type="button" title="Italic" (mousedown)="preventFocusLoss($event)" (click)="exec('italic')"><em>I</em></button>
+    <button type="button" title="Underline" (mousedown)="preventFocusLoss($event)" (click)="exec('underline')"><u>U</u></button>
+
+    <span class="toolbar__divider"></span>
+
+    <button type="button" title="Align left" (mousedown)="preventFocusLoss($event)" (click)="exec('justifyLeft')">&#8676;</button>
+    <button type="button" title="Align center" (mousedown)="preventFocusLoss($event)" (click)="exec('justifyCenter')">&#8676;&#8677;</button>
+    <button type="button" title="Align right" (mousedown)="preventFocusLoss($event)" (click)="exec('justifyRight')">&#8677;</button>
+
+    <span class="toolbar__divider"></span>
+
+    <select title="Heading style" (mousedown)="preventFocusLoss($event)" (change)="setHeading($any($event.target).value)">
+      <option *ngFor="let opt of headingOptions" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+
+    <select title="Font size" (mousedown)="preventFocusLoss($event)" (change)="setFontSize($any($event.target).value)">
+      <option *ngFor="let opt of fontSizeOptions" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+
+    <span class="toolbar__divider"></span>
+
+    <div class="insert-field">
+      <details>
+        <summary title="Insert a merge field">+ Insert field</summary>
+        <div class="insert-field__menu">
+          <div class="insert-field__group" *ngFor="let group of tokensByGroup">
+            <span class="insert-field__group-label">{{ group.group }}</span>
+            <button
+              type="button"
+              *ngFor="let def of group.tokens"
+              (mousedown)="preventFocusLoss($event)"
+              (click)="insertToken(def.token)"
+            >{{ def.label }} <code>{{ '{{' + def.token + '}}' }}</code></button>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="editor__panes">
+    <div class="editor__pane">
+      <h2>Edit</h2>
+      <div
+        #editorEl
+        class="editor__body"
+        contenteditable="true"
+        (input)="onEditorInput()"
+      ></div>
+    </div>
+
+    <div class="editor__pane">
+      <h2>Live preview <span class="editor__preview-hint">(merge fields shown with sample data)</span></h2>
+      <div class="editor__body editor__body--preview" [innerHTML]="previewHtml"></div>
+    </div>
+  </div>
+</div>

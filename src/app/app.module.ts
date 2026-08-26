@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +16,7 @@ import { DocumentPreviewComponent } from './pages/documents/document-preview/doc
 import { CustomersComponent } from './pages/customers/customers.component';
 import { ProductsComponent } from './pages/products/products.component';
 import { TemplatesComponent } from './pages/templates/templates.component';
+import { TemplateEditorComponent } from './pages/templates/template-editor/template-editor.component';
 import { NotFoundPageComponent } from './pages/not-found-page/not-found-page.component';
 import { StatusBadgeComponent } from './shared/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
@@ -45,6 +46,7 @@ import { ImpersonationBannerComponent } from './shared/impersonation-banner/impe
     CustomersComponent,
     ProductsComponent,
     TemplatesComponent,
+    TemplateEditorComponent,
     NotFoundPageComponent,
     StatusBadgeComponent,
     ConfirmDialogComponent,
@@ -63,6 +65,7 @@ import { ImpersonationBannerComponent } from './shared/impersonation-banner/impe
     BrowserModule,
     HttpClientModule,
     ReactiveFormsModule,
+    FormsModule,
     AppRoutingModule
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],

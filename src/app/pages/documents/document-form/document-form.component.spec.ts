@@ -17,8 +17,8 @@ const customers: Customer[] = [
   { id: 'cust-1', name: 'Maya Chen', company: 'Northstar Studio', email: 'maya@northstar.studio', phone: null, createdAt: '2026-01-01', lifetimeValue: 0 }
 ];
 const templates: Template[] = [
-  { id: 'tpl-1', name: 'Modern Minimal', description: null, targetType: 'QuotesAndInvoices', accentColor: '#2F6F6C', isDefault: false, usageCount: 0 },
-  { id: 'tpl-2', name: 'Studio Standard', description: null, targetType: 'QuotesAndInvoices', accentColor: '#D9A441', isDefault: true, usageCount: 10 }
+  { id: 'tpl-1', name: 'Modern Minimal', description: null, targetType: 'QuotesAndInvoices', accentColor: '#2F6F6C', contentHtml: null, isDefault: false, usageCount: 0 },
+  { id: 'tpl-2', name: 'Studio Standard', description: null, targetType: 'QuotesAndInvoices', accentColor: '#D9A441', contentHtml: null, isDefault: true, usageCount: 10 }
 ];
 const products: Product[] = [
   { id: 'prod-1', name: 'SEO Audit', description: null, price: 750, unit: 'Project', category: null },
