@@ -18,7 +18,7 @@
       <ng-container *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
         <button
           type="button"
-          *ngFor="let action of lifecycleActions"
+          *ngFor="let action of lifecycleActions; trackBy: trackByLabel"
           class="btn-secondary"
           [disabled]="updatingStatus"
           (click)="action.run()"

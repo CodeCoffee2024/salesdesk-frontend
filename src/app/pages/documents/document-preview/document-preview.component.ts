@@ -56,6 +56,18 @@ export class DocumentPreviewComponent implements OnInit {
     });
   }
 
+  /** trackBy for the *ngFor below: lifecycleActions is a getter that builds
+   *  fresh {label, run} objects (with fresh closures) on every read, so
+   *  without this Angular's default per-item identity check sees "different"
+   *  objects on every change-detection cycle and destroys/recreates the
+   *  buttons — exactly the bug that silently broke the template editor's
+   *  "Insert field" dropdown (see template-editor.component.ts). Tracking by
+   *  the stable label keeps the DOM nodes (and their listeners) alive across
+   *  re-renders instead of swapping them out from under an in-flight click. */
+  trackByLabel(_index: number, action: LifecycleAction): string {
+    return action.label;
+  }
+
   /** Only the transitions that make sense for this document's current type/status. */
   get lifecycleActions(): LifecycleAction[] {
     if (!this.document) {
