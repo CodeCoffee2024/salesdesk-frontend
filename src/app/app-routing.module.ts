@@ -14,6 +14,7 @@ import { NotFoundPageComponent } from './pages/not-found-page/not-found-page.com
 import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
 import { ForgotPasswordComponent } from './pages/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard.component';
 import { AdminWorkspacesComponent } from './pages/admin/admin-workspaces/admin-workspaces.component';
 import { AdminUsersComponent } from './pages/admin/admin-users/admin-users.component';
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { title: 'Sign in' } },
   { path: 'register', component: RegisterComponent, data: { title: 'Create your account' } },
   { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Reset your password' } },
+  { path: 'reset-password', component: ResetPasswordComponent, data: { title: 'Set a new password' } },
   // TASK-023/024: the unauthenticated link a client opens from their quote/invoice
   // — never behind authGuard, since the whole point is that the client has no
   // SalesDesk account.

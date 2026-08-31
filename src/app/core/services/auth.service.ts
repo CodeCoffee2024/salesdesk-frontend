@@ -8,6 +8,7 @@ import {
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
+  ResetPasswordRequest,
   UserRole
 } from '../models/auth.model';
 
@@ -49,6 +50,10 @@ export class AuthService {
 
   forgotPassword(request: ForgotPasswordRequest): Observable<void> {
     return this.http.post<void>(`${BASE_URL}/forgot-password`, request);
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${BASE_URL}/reset-password`, request).pipe(tap(response => this.storeSession(response)));
   }
 
   me(): Observable<CurrentUser> {

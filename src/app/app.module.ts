@@ -24,6 +24,7 @@ import { DocumentFormComponent } from './pages/documents/document-form/document-
 import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
 import { ForgotPasswordComponent } from './pages/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard.component';
 import { AdminWorkspacesComponent } from './pages/admin/admin-workspaces/admin-workspaces.component';
 import { AdminUsersComponent } from './pages/admin/admin-users/admin-users.component';
@@ -58,6 +59,7 @@ import { ReminderSettingsComponent } from './pages/settings/reminder-settings/re
     LoginComponent,
     RegisterComponent,
     ForgotPasswordComponent,
+    ResetPasswordComponent,
     AdminDashboardComponent,
     AdminWorkspacesComponent,
     AdminUsersComponent,
