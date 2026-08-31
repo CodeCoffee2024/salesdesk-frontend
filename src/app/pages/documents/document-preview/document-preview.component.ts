@@ -195,6 +195,26 @@ export class DocumentPreviewComponent implements OnInit {
     });
   }
 
+  /** Web Share API isn't available on every browser (notably most desktop browsers) — shown only where it is, with "Copy client link" as the universal fallback. */
+  get canShare(): boolean {
+    return typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+  }
+
+  shareDocument(): void {
+    if (!this.document || !this.publicLink) {
+      return;
+    }
+
+    navigator
+      .share({
+        title: `${this.document.type} ${this.document.documentNumber}`,
+        text: `Here's your ${this.document.type.toLowerCase()}: ${this.document.documentNumber}`,
+        url: this.publicLink
+      })
+      // A user cancelling the native share sheet rejects with AbortError — not an error worth surfacing.
+      .catch(() => undefined);
+  }
+
   private fetch(): void {
     this.loading = true;
 

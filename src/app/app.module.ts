@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -36,6 +36,7 @@ import { SignatureCanvasComponent } from './shared/signature-canvas/signature-ca
 import { SignatureAcceptanceModalComponent } from './shared/signature-acceptance-modal/signature-acceptance-modal.component';
 import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
 import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -76,7 +77,13 @@ import { ReminderSettingsComponent } from './pages/settings/reminder-settings/re
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ServiceWorkerModule.register('custom-sw.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]

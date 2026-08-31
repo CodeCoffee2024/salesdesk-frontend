@@ -20,4 +20,8 @@ export class PublicDocumentService {
   sign(token: string, request: SignDocumentRequest): Observable<PublicDocument> {
     return this.http.post<PublicDocument>(`${BASE_URL}/${token}/signature`, request);
   }
+
+  requestRevision(token: string, feedback: string): Observable<PublicDocument> {
+    return this.http.post<PublicDocument>(`${BASE_URL}/${token}/request-revision`, { feedback });
+  }
 }

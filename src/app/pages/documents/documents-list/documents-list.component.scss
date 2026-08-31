@@ -33,6 +33,15 @@
   }
 }
 
+.offline-save-banner {
+  background: var(--sd-status-sent-bg);
+  color: var(--sd-status-sent-fg);
+  padding: 10px 14px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
 .documents-page__toolbar {
   display: flex;
   align-items: center;

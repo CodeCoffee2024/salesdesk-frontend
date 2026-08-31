@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NEVER, Observable, of } from 'rxjs';
 
 import { TopbarComponent } from './topbar.component';
@@ -26,7 +27,7 @@ describe('TopbarComponent', () => {
     authServiceSpy.hasRole.and.callFake((...roles: string[]) => !!user && roles.includes(user.role));
 
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       declarations: [TopbarComponent, HasRoleDirective],
       providers: [
         { provide: HealthService, useValue: { status: () => status$ } },

@@ -1,6 +1,6 @@
 export type DocumentType = 'Quote' | 'Invoice';
 
-export type DocumentStatus = 'Draft' | 'Sent' | 'Overdue' | 'Accepted' | 'Paid';
+export type DocumentStatus = 'Draft' | 'Sent' | 'Overdue' | 'Accepted' | 'Paid' | 'RevisionRequested';
 
 export interface DocumentLineItem {
   id: string;

@@ -16,7 +16,7 @@ const HIGHLIGHT_DURATION_MS = 4000;
   styleUrls: ['./documents-list.component.scss']
 })
 export class DocumentsListComponent implements OnInit {
-  readonly statusOptions: DocumentStatus[] = ['Draft', 'Sent', 'Overdue', 'Accepted', 'Paid'];
+  readonly statusOptions: DocumentStatus[] = ['Draft', 'Sent', 'Overdue', 'Accepted', 'Paid', 'RevisionRequested'];
 
   documents: DocumentModel[] = [];
   loading = true;
@@ -32,6 +32,9 @@ export class DocumentsListComponent implements OnInit {
   /** The document a create/edit flow just navigated here from, briefly highlighted. */
   highlightedDocumentId: string | null = null;
 
+  /** Set when the document-form couldn't reach the API and queued the create offline instead (TASK-027) — shown as a banner, not an error, since the work wasn't lost. */
+  savedOffline = false;
+
   private readonly searchInput$ = new Subject<string>();
 
   constructor(
@@ -40,8 +43,11 @@ export class DocumentsListComponent implements OnInit {
   ) {
     // Only readable during construction of the component a navigation targets —
     // this is how the document-form's `{ state: { highlightId } }` extra arrives.
-    const state = this.router.getCurrentNavigation()?.extras.state as { highlightId?: string } | undefined;
+    const state = this.router.getCurrentNavigation()?.extras.state as
+      | { highlightId?: string; savedOffline?: boolean }
+      | undefined;
     this.highlightedDocumentId = state?.highlightId ?? null;
+    this.savedOffline = state?.savedOffline ?? false;
   }
 
   ngOnInit(): void {
@@ -54,6 +60,10 @@ export class DocumentsListComponent implements OnInit {
 
     if (this.highlightedDocumentId) {
       setTimeout(() => (this.highlightedDocumentId = null), HIGHLIGHT_DURATION_MS);
+    }
+
+    if (this.savedOffline) {
+      setTimeout(() => (this.savedOffline = false), HIGHLIGHT_DURATION_MS);
     }
   }
 

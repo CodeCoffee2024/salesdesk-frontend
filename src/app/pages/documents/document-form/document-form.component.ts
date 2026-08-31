@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 
 import { DocumentService } from '../../../core/services/document.service';
 import { CustomerService } from '../../../core/services/customer.service';
 import { TemplateService } from '../../../core/services/template.service';
 import { ProductService } from '../../../core/services/product.service';
+import { OfflineQueueService } from '../../../core/services/offline-queue.service';
 import { Customer } from '../../../core/models/customer.model';
 import { Template } from '../../../core/models/template.model';
 import { Product } from '../../../core/models/product.model';
@@ -55,7 +57,8 @@ export class DocumentFormComponent implements OnInit {
     private readonly documentService: DocumentService,
     private readonly customerService: CustomerService,
     private readonly templateService: TemplateService,
-    private readonly productService: ProductService
+    private readonly productService: ProductService,
+    private readonly offlineQueue: OfflineQueueService
   ) {
     this.form = this.fb.group({
       type: ['Quote' as DocumentType, Validators.required],
@@ -217,12 +220,33 @@ export class DocumentFormComponent implements OnInit {
       lineItems
     };
 
+    // No point even trying the request while the browser already knows it's
+    // offline (TASK-027) — go straight to the offline queue.
+    if (!navigator.onLine) {
+      this.saveOffline(request);
+      return;
+    }
+
     this.documentService.create(request).subscribe({
       next: (created) => this.router.navigate(['/documents'], { state: { highlightId: created.id } }),
-      error: () => {
+      error: (error: HttpErrorResponse) => {
+        // status 0 means the request never reached the server at all (dropped
+        // connection, DNS failure, etc.) — navigator.onLine can be wrong, so
+        // this catches what that check above misses.
+        if (error.status === 0) {
+          this.saveOffline(request);
+          return;
+        }
+
         this.saving = false;
         this.saveError = 'Could not create the document. Please try again.';
       }
+    });
+  }
+
+  private saveOffline(request: CreateDocumentRequest): void {
+    void this.offlineQueue.enqueue(request).then(() => {
+      this.router.navigate(['/documents'], { state: { savedOffline: true } });
     });
   }
 

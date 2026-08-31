@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { DocumentFormComponent } from './document-form.component';
@@ -8,6 +9,7 @@ import { DocumentService } from '../../../core/services/document.service';
 import { CustomerService } from '../../../core/services/customer.service';
 import { TemplateService } from '../../../core/services/template.service';
 import { ProductService } from '../../../core/services/product.service';
+import { OfflineQueueService } from '../../../core/services/offline-queue.service';
 import { Customer } from '../../../core/models/customer.model';
 import { Template } from '../../../core/models/template.model';
 import { Product } from '../../../core/models/product.model';
@@ -52,6 +54,7 @@ describe('DocumentFormComponent', () => {
   let fixture: ComponentFixture<DocumentFormComponent>;
   let component: DocumentFormComponent;
   let documentServiceSpy: jasmine.SpyObj<DocumentService>;
+  let offlineQueueSpy: jasmine.SpyObj<OfflineQueueService>;
   let router: Router;
 
   function setup(routeId: string | null) {
@@ -59,6 +62,9 @@ describe('DocumentFormComponent', () => {
     documentServiceSpy.getById.and.returnValue(of(makeDocument()));
     documentServiceSpy.create.and.returnValue(of(makeDocument({ id: 'new-doc' })));
     documentServiceSpy.update.and.returnValue(of(makeDocument()));
+
+    offlineQueueSpy = jasmine.createSpyObj('OfflineQueueService', ['enqueue']);
+    offlineQueueSpy.enqueue.and.returnValue(Promise.resolve());
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule],
@@ -68,6 +74,7 @@ describe('DocumentFormComponent', () => {
         { provide: CustomerService, useValue: { getAll: () => of(customers) } },
         { provide: TemplateService, useValue: { getAll: () => of(templates) } },
         { provide: ProductService, useValue: { getAll: () => of(products) } },
+        { provide: OfflineQueueService, useValue: offlineQueueSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap(routeId ? { id: routeId } : {}) } } },
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }
       ]
@@ -175,6 +182,31 @@ describe('DocumentFormComponent', () => {
 
       expect(component.saving).toBeFalse();
       expect(component.saveError).toContain('Could not create');
+    });
+
+    it('queues the document offline instead of calling the API when the browser is offline', async () => {
+      spyOnProperty(navigator, 'onLine').and.returnValue(false);
+      component.form.patchValue({ customerId: 'cust-1' });
+      component.lineItems.at(0).patchValue({ description: 'Research', quantity: 1, unitPrice: 500 });
+
+      component.submit();
+      await fixture.whenStable();
+
+      expect(documentServiceSpy.create).not.toHaveBeenCalled();
+      expect(offlineQueueSpy.enqueue).toHaveBeenCalledWith(jasmine.objectContaining({ customerId: 'cust-1' }));
+      expect(router.navigate).toHaveBeenCalledWith(['/documents'], { state: { savedOffline: true } });
+    });
+
+    it('queues the document offline when the API call fails with a network error (status 0)', async () => {
+      documentServiceSpy.create.and.returnValue(throwError(() => new HttpErrorResponse({ status: 0 })));
+      component.form.patchValue({ customerId: 'cust-1' });
+      component.lineItems.at(0).patchValue({ description: 'Research', quantity: 1, unitPrice: 500 });
+
+      component.submit();
+      await fixture.whenStable();
+
+      expect(offlineQueueSpy.enqueue).toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalledWith(['/documents'], { state: { savedOffline: true } });
     });
   });
 

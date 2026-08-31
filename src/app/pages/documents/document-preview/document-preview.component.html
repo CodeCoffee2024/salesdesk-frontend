@@ -40,6 +40,7 @@
     </div>
 
     <div class="document-preview__export">
+      <button type="button" class="btn-secondary" *ngIf="canShare" (click)="shareDocument()">Share</button>
       <button type="button" class="btn-secondary" (click)="copyPublicLink()">{{ linkCopied ? 'Link copied!' : 'Copy client link' }}</button>
       <button type="button" class="btn-secondary" (click)="printDocument()">Print / Save PDF</button>
       <button type="button" class="btn-primary" (click)="downloadPdf()">Download PDF</button>

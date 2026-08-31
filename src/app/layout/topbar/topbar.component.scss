@@ -18,6 +18,34 @@
   color: var(--sd-muted);
 }
 
+.pending-sync {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--sd-status-sent-bg);
+  color: var(--sd-status-sent-fg);
+}
+
+.notify-toggle {
+  border: 1px solid var(--sd-border);
+  background: var(--sd-surface);
+  border-radius: var(--sd-radius-sm);
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &--on {
+    border-color: var(--sd-primary);
+  }
+}
+
 .status__dot {
   width: 8px;
   height: 8px;

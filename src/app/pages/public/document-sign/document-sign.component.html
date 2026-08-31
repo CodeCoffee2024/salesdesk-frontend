@@ -17,11 +17,17 @@
     <div class="public-doc__actions">
       <button type="button" class="btn-secondary" (click)="downloadPdf()">Download PDF</button>
 
+      <button type="button" class="btn-secondary" *ngIf="!doc.isSigned" (click)="openRevisionModal()">Request changes</button>
+
       <button type="button" class="btn-primary" *ngIf="!doc.isSigned" (click)="openSignModal()">Review &amp; sign</button>
     </div>
 
     <p class="public-doc__signed-banner" *ngIf="doc.isSigned">
       ✅ Signed by {{ doc.signedByName }} on {{ doc.signedAtUtc | date: 'MMM d, y, h:mm a' }}
+    </p>
+
+    <p class="public-doc__revision-banner" *ngIf="!doc.isSigned && doc.status === 'RevisionRequested'">
+      ✏️ We've sent your request for changes — the studio will follow up with an updated version.
     </p>
 
     <div class="document-card">
@@ -87,4 +93,29 @@
     (submitted)="submitSignature($event)"
     (cancelled)="closeSignModal()"
   ></app-signature-acceptance-modal>
+
+  <div class="revision-modal__backdrop" *ngIf="showRevisionModal" (click)="closeRevisionModal()">
+    <div class="revision-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <h2>What would you like changed?</h2>
+      <p>Let the studio know what to update — they'll follow up with a revised version.</p>
+
+      <textarea
+        rows="4"
+        placeholder="e.g. Could we see this with a different color scheme?"
+        [(ngModel)]="revisionFeedback"
+      ></textarea>
+
+      <p class="revision-modal__error" *ngIf="revisionError">{{ revisionError }}</p>
+
+      <div class="revision-modal__actions">
+        <button type="button" class="btn-secondary" (click)="closeRevisionModal()">Cancel</button>
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="requestingRevision || !revisionFeedback.trim()"
+          (click)="submitRevisionRequest()"
+        >{{ requestingRevision ? 'Sending…' : 'Send request' }}</button>
+      </div>
+    </div>
+  </div>
 </div>

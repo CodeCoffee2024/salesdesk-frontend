@@ -11,6 +11,10 @@
     >+ New document</a>
   </div>
 
+  <p class="offline-save-banner" *ngIf="savedOffline">
+    📴 No connection — your document was saved on this device and will sync automatically once you're back online.
+  </p>
+
   <div class="documents-page__toolbar">
     <div class="search-input">
       <input
@@ -79,7 +83,7 @@
                   [disabled]="status === document.status"
                   (click)="changeStatus(document, status)"
                 >
-                  {{ status }}
+                  {{ status === 'RevisionRequested' ? 'Revision requested' : status }}
                 </button>
               </div>
             </div>

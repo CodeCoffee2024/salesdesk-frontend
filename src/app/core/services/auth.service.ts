@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { offlineDb } from '../offline/offline-db';
 import {
   AuthResponse,
   CurrentUser,
@@ -11,6 +12,8 @@ import {
   ResetPasswordRequest,
   UserRole
 } from '../models/auth.model';
+
+const AUTH_TOKEN_MIRROR_ID = 'current';
 
 const BASE_URL = `${environment.apiBaseUrl}/api/auth`;
 const TOKEN_KEY = 'sd_auth_token';
@@ -67,6 +70,7 @@ export class AuthService {
     localStorage.removeItem(IMPERSONATOR_USER_KEY);
     this.currentUserSubject.next(null);
     this.impersonatingSubject.next(false);
+    void offlineDb.authToken.delete(AUTH_TOKEN_MIRROR_ID);
   }
 
   /**
@@ -137,6 +141,11 @@ export class AuthService {
     localStorage.setItem(TOKEN_KEY, response.token);
     localStorage.setItem(USER_KEY, JSON.stringify(response.user));
     this.currentUserSubject.next(response.user);
+
+    // Mirrored into IndexedDB because the Service Worker's background-sync
+    // handler (ngsw-sync.js) can't reach localStorage — only IndexedDB — but
+    // needs the token to authenticate the offline-queue POST it makes (TASK-027).
+    void offlineDb.authToken.put({ id: AUTH_TOKEN_MIRROR_ID, value: response.token });
   }
 
   private readStoredUser(): CurrentUser | null {

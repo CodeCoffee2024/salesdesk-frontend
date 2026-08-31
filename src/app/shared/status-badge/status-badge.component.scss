@@ -31,3 +31,8 @@
   background: var(--sd-status-paid-bg);
   color: var(--sd-status-paid-fg);
 }
+
+.status-badge--revisionrequested {
+  background: var(--sd-danger-bg);
+  color: var(--sd-danger);
+}

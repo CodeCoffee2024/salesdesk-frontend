@@ -24,6 +24,11 @@ export class DocumentSignComponent implements OnInit {
   signing = false;
   signError = '';
 
+  showRevisionModal = false;
+  revisionFeedback = '';
+  requestingRevision = false;
+  revisionError = '';
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly publicDocumentService: PublicDocumentService,
@@ -57,6 +62,37 @@ export class DocumentSignComponent implements OnInit {
       error: () => {
         this.signing = false;
         this.signError = 'We could not record your signature. Please try again.';
+      }
+    });
+  }
+
+  openRevisionModal(): void {
+    this.revisionError = '';
+    this.revisionFeedback = '';
+    this.showRevisionModal = true;
+  }
+
+  closeRevisionModal(): void {
+    this.showRevisionModal = false;
+  }
+
+  submitRevisionRequest(): void {
+    if (!this.revisionFeedback.trim()) {
+      return;
+    }
+
+    this.requestingRevision = true;
+    this.revisionError = '';
+
+    this.publicDocumentService.requestRevision(this.token, this.revisionFeedback.trim()).subscribe({
+      next: (updated) => {
+        this.document = updated;
+        this.requestingRevision = false;
+        this.showRevisionModal = false;
+      },
+      error: () => {
+        this.requestingRevision = false;
+        this.revisionError = 'We could not send your request. Please try again.';
       }
     });
   }
