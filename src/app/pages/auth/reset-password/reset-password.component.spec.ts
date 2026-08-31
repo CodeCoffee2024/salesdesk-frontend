@@ -12,7 +12,7 @@ function makeAuthResponse(): AuthResponse {
   return {
     token: 'fake-token',
     expiresAt: new Date().toISOString(),
-    user: { id: 'u1', email: 'maya@northstar.studio', fullName: 'Maya Chen', role: 'WorkspaceAdmin', workspaceId: 'w1' }
+    user: { id: 'u1', email: 'maya@northstar.studio', fullName: 'Maya Chen', role: 'WorkspaceAdmin', workspaceId: 'w1', hasCompletedOnboarding: true }
   };
 }
 

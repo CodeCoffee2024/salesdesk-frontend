@@ -1,0 +1,55 @@
+<div class="onboarding-backdrop">
+  <div class="onboarding-card" role="dialog" aria-modal="true">
+    <button type="button" class="onboarding-card__close" aria-label="Dismiss" (click)="dismiss()">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+
+    <h1>Welcome to SalesDesk</h1>
+    <p class="onboarding-card__subtitle">A few quick things to get your studio set up.</p>
+
+    <ng-container *ngIf="!loading">
+      <ul class="checklist">
+        <li class="checklist__item" [class.checklist__item--done]="status.profileComplete" (click)="goToStep(1)">
+          <span class="checklist__icon" aria-hidden="true">
+            <i class="bi" [ngClass]="status.profileComplete ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+          </span>
+          <span class="checklist__text">
+            <strong>Upload your logo &amp; business info</strong>
+            <small>Shows up on every quote and invoice you send.</small>
+          </span>
+          <i class="bi bi-chevron-right checklist__arrow" aria-hidden="true"></i>
+        </li>
+
+        <li class="checklist__item" [class.checklist__item--done]="status.catalogStarted" (click)="goToStep(2)">
+          <span class="checklist__icon" aria-hidden="true">
+            <i class="bi" [ngClass]="status.catalogStarted ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+          </span>
+          <span class="checklist__text">
+            <strong>Add your first catalog item</strong>
+            <small>Products and services you can drop into any document.</small>
+          </span>
+          <i class="bi bi-chevron-right checklist__arrow" aria-hidden="true"></i>
+        </li>
+
+        <li class="checklist__item" [class.checklist__item--done]="status.firstQuoteSent" (click)="goToStep(3)">
+          <span class="checklist__icon" aria-hidden="true">
+            <i class="bi" [ngClass]="status.firstQuoteSent ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+          </span>
+          <span class="checklist__text">
+            <strong>Draft &amp; send your first quote</strong>
+            <small>See the whole flow, end to end.</small>
+          </span>
+          <i class="bi bi-chevron-right checklist__arrow" aria-hidden="true"></i>
+        </li>
+      </ul>
+
+      <div class="onboarding-card__actions">
+        <button type="button" class="btn-secondary" (click)="startTour()">
+          <i class="bi bi-signpost-2" aria-hidden="true"></i> Take a quick tour
+        </button>
+        <button type="button" class="btn-primary" *ngIf="allStepsComplete" (click)="dismiss()">Finish</button>
+        <button type="button" class="btn-link" *ngIf="!allStepsComplete" (click)="dismiss()">Skip for now</button>
+      </div>
+    </ng-container>
+  </div>
+</div>

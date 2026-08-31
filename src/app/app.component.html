@@ -16,5 +16,8 @@
         <router-outlet></router-outlet>
       </main>
     </div>
+
+    <app-onboarding-checklist *ngIf="showOnboarding" (closed)="onOnboardingClosed()"></app-onboarding-checklist>
+    <app-floating-help-widget></app-floating-help-widget>
   </div>
 </ng-template>

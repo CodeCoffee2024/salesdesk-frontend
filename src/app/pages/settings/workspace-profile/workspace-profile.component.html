@@ -1,0 +1,54 @@
+<div class="workspace-profile" *ngIf="!loading && !loadError">
+  <div class="workspace-profile__header">
+    <div>
+      <h1>Business profile</h1>
+      <p>This appears on every quote and invoice you send.</p>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <div class="form-group">
+      <label for="logoUrl">Logo URL</label>
+      <input id="logoUrl" type="url" placeholder="https://example.com/logo.png" [(ngModel)]="logoUrl" />
+      <small>Paste a link to an already-hosted image (there's no file upload yet — use any image host you like).</small>
+      <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo preview" class="form-group__logo-preview" />
+    </div>
+
+    <div class="form-group">
+      <label for="name">Business name</label>
+      <input id="name" type="text" [(ngModel)]="name" />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Business email</label>
+      <input id="email" type="email" [(ngModel)]="email" />
+    </div>
+
+    <div class="form-group">
+      <label for="tagline">Tagline <span class="form-group__optional">(optional)</span></label>
+      <input id="tagline" type="text" placeholder="Creative studio" [(ngModel)]="tagline" />
+    </div>
+
+    <div class="form-group">
+      <label for="address">Address <span class="form-group__optional">(optional)</span></label>
+      <input id="address" type="text" [(ngModel)]="address" />
+    </div>
+
+    <div class="settings-card__actions">
+      <button type="button" class="btn-primary" [disabled]="saving" (click)="save()">
+        {{ saving ? 'Saving…' : 'Save changes' }}
+      </button>
+      <span class="save-status save-status--ok" *ngIf="saved">Saved.</span>
+      <span class="save-status save-status--error" *ngIf="saveError">Couldn't save — try again.</span>
+    </div>
+  </div>
+</div>
+
+<div class="workspace-profile__loading" *ngIf="loading">Loading&hellip;</div>
+
+<app-empty-state
+  *ngIf="!loading && loadError"
+  icon="not-found"
+  heading="Couldn't load your business profile"
+  description="Something went wrong fetching it. Please try again."
+></app-empty-state>

@@ -1,0 +1,40 @@
+<div class="help-widget">
+  <div class="help-widget__panel" *ngIf="open">
+    <div class="help-widget__header">
+      <h2>Help &amp; tutorials</h2>
+      <button type="button" class="help-widget__close" aria-label="Close" (click)="toggle()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="help-widget__quick-links">
+      <button type="button" (click)="restartTour()">
+        <i class="bi bi-signpost-2" aria-hidden="true"></i> Restart product tour
+      </button>
+      <button type="button" (click)="jumpToFaq('e-sign')">
+        <i class="bi bi-pen" aria-hidden="true"></i> How to accept e-signatures
+      </button>
+      <button type="button" (click)="jumpToFaq('color')">
+        <i class="bi bi-palette" aria-hidden="true"></i> Setting up custom colors
+      </button>
+    </div>
+
+    <div class="help-widget__search">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input type="text" placeholder="Search help topics" [(ngModel)]="searchTerm" />
+    </div>
+
+    <div class="help-widget__faq">
+      <details class="help-widget__faq-item" *ngFor="let entry of filteredFaq">
+        <summary>{{ entry.question }}</summary>
+        <p>{{ entry.answer }}</p>
+      </details>
+
+      <p class="help-widget__no-results" *ngIf="filteredFaq.length === 0">No topics match "{{ searchTerm }}".</p>
+    </div>
+  </div>
+
+  <button type="button" class="help-widget__toggle" [class.help-widget__toggle--open]="open" aria-label="Help" (click)="toggle()">
+    <i class="bi" [ngClass]="open ? 'bi-x-lg' : 'bi-question-lg'"></i>
+  </button>
+</div>

@@ -14,7 +14,8 @@ const adminUser: CurrentUser = {
   email: 'admin@northline.studio',
   fullName: 'Nora Admin',
   role: 'WorkspaceAdmin',
-  workspaceId: 'workspace-1'
+  workspaceId: 'workspace-1',
+  hasCompletedOnboarding: true
 };
 
 describe('TopbarComponent', () => {

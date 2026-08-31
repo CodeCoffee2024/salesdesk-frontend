@@ -31,9 +31,13 @@
   </div>
 
   <div class="nav-section" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
-    <p class="nav-section__label">Automations</p>
+    <p class="nav-section__label">Settings</p>
 
     <nav class="nav-list">
+      <a class="nav-item" routerLink="/settings/workspace" routerLinkActive="nav-item--active">
+        <span class="nav-item__icon" aria-hidden="true"><i class="bi bi-building"></i></span>
+        <span class="nav-item__label">Business profile</span>
+      </a>
       <a class="nav-item" routerLink="/settings/reminders" routerLinkActive="nav-item--active">
         <span class="nav-item__icon" aria-hidden="true"><i class="bi bi-bell"></i></span>
         <span class="nav-item__label">Reminders</span>

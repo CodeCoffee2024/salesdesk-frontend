@@ -63,6 +63,19 @@ export class AuthService {
     return this.http.get<CurrentUser>(`${BASE_URL}/me`);
   }
 
+  /** Called once the onboarding checklist/tour (TASK-029) is finished, skipped, or dismissed — persists so it never shows again, on any device. */
+  completeOnboarding(): Observable<void> {
+    return this.http.post<void>(`${BASE_URL}/onboarding/complete`, {}).pipe(
+      tap(() => {
+        const user = this.currentUser;
+        if (user) {
+          this.currentUserSubject.next({ ...user, hasCompletedOnboarding: true });
+          localStorage.setItem(USER_KEY, JSON.stringify({ ...user, hasCompletedOnboarding: true }));
+        }
+      })
+    );
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

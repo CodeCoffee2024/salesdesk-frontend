@@ -6,6 +6,7 @@ export interface CurrentUser {
   fullName: string;
   role: UserRole;
   workspaceId: string;
+  hasCompletedOnboarding: boolean;
 }
 
 export interface LoginRequest {

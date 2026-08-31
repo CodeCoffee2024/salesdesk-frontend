@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule } from '@angular/forms';
@@ -40,7 +41,11 @@ describe('TemplateEditorComponent', () => {
       providers: [
         { provide: TemplateService, useValue: templateServiceSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ id }) } } }
-      ]
+      ],
+      // app-info-tooltip (TASK-029) is a real standalone-ish child component from
+      // another module — stub it here rather than declaring it, matching the
+      // pattern used for the app-shell's own child components in app.component.spec.ts.
+      schemas: [NO_ERRORS_SCHEMA]
     });
 
     fixture = TestBed.createComponent(TemplateEditorComponent);

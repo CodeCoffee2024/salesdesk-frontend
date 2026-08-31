@@ -2,6 +2,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EMPTY } from 'rxjs';
 import { AppComponent, isPublicRoute } from './app.component';
 
@@ -11,6 +12,7 @@ describe('isPublicRoute', () => {
     expect(isPublicRoute('/login')).toBeTrue();
     expect(isPublicRoute('/register')).toBeTrue();
     expect(isPublicRoute('/forgot-password')).toBeTrue();
+    expect(isPublicRoute('/reset-password')).toBeTrue();
     expect(isPublicRoute('/view/abc123')).toBeTrue();
   });
 
@@ -24,7 +26,7 @@ describe('isPublicRoute', () => {
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       declarations: [AppComponent],
       // The shell's children (sidebar/topbar/breadcrumb) have their own specs —
       // stub them here so this stays a lean "does the shell assemble" smoke test.

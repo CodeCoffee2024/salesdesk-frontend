@@ -36,6 +36,10 @@ import { SignatureCanvasComponent } from './shared/signature-canvas/signature-ca
 import { SignatureAcceptanceModalComponent } from './shared/signature-acceptance-modal/signature-acceptance-modal.component';
 import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
 import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
+import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/workspace-profile.component';
+import { OnboardingChecklistComponent } from './shared/onboarding-checklist/onboarding-checklist.component';
+import { FloatingHelpWidgetComponent } from './shared/floating-help-widget/floating-help-widget.component';
+import { InfoTooltipComponent } from './shared/info-tooltip/info-tooltip.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
@@ -70,7 +74,11 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     SignatureCanvasComponent,
     SignatureAcceptanceModalComponent,
     DocumentSignComponent,
-    ReminderSettingsComponent
+    ReminderSettingsComponent,
+    WorkspaceProfileComponent,
+    OnboardingChecklistComponent,
+    FloatingHelpWidgetComponent,
+    InfoTooltipComponent
   ],
   imports: [
     BrowserModule,

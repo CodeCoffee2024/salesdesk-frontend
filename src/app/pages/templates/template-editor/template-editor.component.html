@@ -63,6 +63,7 @@
         (mousedown)="preventFocusLoss($event)"
         (click)="toggleInsertMenu()"
       >+ Insert field</button>
+      <app-info-tooltip text="Merge fields pull real data (like the customer's name or the document total) into this template when a document is generated — insert one anywhere you'd normally type a value."></app-info-tooltip>
 
       <div class="insert-field__menu" *ngIf="showInsertMenu">
         <div class="insert-field__group" *ngFor="let group of tokensByGroup">
