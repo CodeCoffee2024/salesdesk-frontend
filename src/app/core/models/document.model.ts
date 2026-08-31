@@ -11,8 +11,18 @@ export interface DocumentLineItem {
   lineTotal: number;
 }
 
+export interface DocumentSignatureSummary {
+  signerName: string;
+  signerEmail: string;
+  signedAtUtc: string;
+  signatureImageDataUrl: string;
+}
+
 export interface Document {
   id: string;
+  publicToken: string;
+  isLocked: boolean;
+  signature: DocumentSignatureSummary | null;
   documentNumber: string;
   type: DocumentType;
   status: DocumentStatus;

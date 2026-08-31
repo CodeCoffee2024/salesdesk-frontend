@@ -12,6 +12,9 @@ import { DashboardSummary } from '../../core/models/dashboard.model';
 function makeDocument(overrides: Partial<DocumentModel>): DocumentModel {
   return {
     id: 'doc-1',
+    publicToken: 'pub-token-1',
+    isLocked: false,
+    signature: null,
     documentNumber: 'QUO-2026-001',
     type: 'Quote',
     status: 'Draft',

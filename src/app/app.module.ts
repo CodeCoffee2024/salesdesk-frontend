@@ -31,6 +31,10 @@ import { AdminAuditLogComponent } from './pages/admin/admin-audit-log/admin-audi
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { HasRoleDirective } from './shared/has-role.directive';
 import { ImpersonationBannerComponent } from './shared/impersonation-banner/impersonation-banner.component';
+import { SignatureCanvasComponent } from './shared/signature-canvas/signature-canvas.component';
+import { SignatureAcceptanceModalComponent } from './shared/signature-acceptance-modal/signature-acceptance-modal.component';
+import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
+import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +63,11 @@ import { ImpersonationBannerComponent } from './shared/impersonation-banner/impe
     AdminUsersComponent,
     AdminAuditLogComponent,
     HasRoleDirective,
-    ImpersonationBannerComponent
+    ImpersonationBannerComponent,
+    SignatureCanvasComponent,
+    SignatureAcceptanceModalComponent,
+    DocumentSignComponent,
+    ReminderSettingsComponent
   ],
   imports: [
     BrowserModule,

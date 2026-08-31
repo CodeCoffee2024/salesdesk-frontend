@@ -40,10 +40,15 @@
     </div>
 
     <div class="document-preview__export">
+      <button type="button" class="btn-secondary" (click)="copyPublicLink()">{{ linkCopied ? 'Link copied!' : 'Copy client link' }}</button>
       <button type="button" class="btn-secondary" (click)="printDocument()">Print / Save PDF</button>
       <button type="button" class="btn-primary" (click)="downloadPdf()">Download PDF</button>
     </div>
   </div>
+
+  <p class="document-preview__locked no-print" *ngIf="doc.isLocked && doc.signature">
+    🔒 Signed by {{ doc.signature.signerName }} on {{ doc.signature.signedAtUtc | date: 'MMM d, y, h:mm a' }} — this document is locked from further edits.
+  </p>
 
   <p class="document-preview__error no-print" *ngIf="actionError">{{ actionError }}</p>
 

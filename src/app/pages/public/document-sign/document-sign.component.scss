@@ -1,0 +1,55 @@
+@import '../../../shared/styles/document-card';
+
+:host {
+  display: block;
+  min-height: 100%;
+  background: var(--sd-bg);
+}
+
+.public-doc {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.public-doc__loading {
+  padding: 80px 0;
+  text-align: center;
+  color: var(--sd-muted);
+}
+
+.public-doc__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.public-doc__logo {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--sd-radius-sm);
+  object-fit: cover;
+}
+
+.public-doc__workspace-name {
+  font-family: var(--sd-font-display);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.public-doc__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.public-doc__signed-banner {
+  background: var(--sd-status-accepted-bg);
+  color: var(--sd-status-accepted-fg);
+  padding: 10px 14px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}

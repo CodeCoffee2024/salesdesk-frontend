@@ -1,11 +1,33 @@
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
-import { Document as DocumentModel } from '../models/document.model';
 
 const PAGE_WIDTH_PT = 595;
 const MARGIN_X = 48;
 const RIGHT_EDGE = PAGE_WIDTH_PT - MARGIN_X;
 const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+/**
+ * The document fields the PDF layout actually reads — a structural subset both the
+ * authenticated `Document` and the public `PublicDocument` shape satisfy, so one
+ * PdfService serves the internal preview page and the anonymous /view/:token page.
+ */
+export interface PdfDocumentSource {
+  type: string;
+  documentNumber: string;
+  issueDate: string;
+  dueDate: string;
+  customerName: string;
+  customerCompany: string;
+  total: number;
+  lineItems: { description: string; quantity: number; unitPrice: number; lineTotal: number }[];
+}
+
+/** Rendered onto the PDF's final page (TASK-024 AC4) when the document has been e-signed. */
+export interface PdfSignatureInfo {
+  signerName: string;
+  signedAtUtc: string;
+  signatureImageDataUrl: string;
+}
 
 /**
  * Generates a downloadable PDF blob for a document, laid out directly with
@@ -16,7 +38,7 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', c
   providedIn: 'root'
 })
 export class PdfService {
-  download(document: DocumentModel): void {
+  download(document: PdfDocumentSource, signature?: PdfSignatureInfo | null): void {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     let y = 56;
 
@@ -76,6 +98,27 @@ export class PdfService {
     doc.setFontSize(13);
     doc.text('Total due', 410, y);
     doc.text(CURRENCY_FORMATTER.format(document.total), RIGHT_EDGE, y, { align: 'right' });
+
+    if (signature) {
+      y += 50;
+      doc.setDrawColor(200);
+      doc.line(MARGIN_X, y, RIGHT_EDGE, y);
+      y += 20;
+
+      // The signature PNG (drawn stroke trace or rasterized cursive text) is
+      // embedded as-is — both signature types are already the same image format
+      // by the time they reach here, see SignatureCanvasComponent.
+      if (signature.signatureImageDataUrl) {
+        doc.addImage(signature.signatureImageDataUrl, 'PNG', MARGIN_X, y, 160, 60);
+      }
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(107, 115, 112);
+      doc.text(`Signed by ${signature.signerName}`, MARGIN_X, y + 74);
+      doc.text(`on ${new Date(signature.signedAtUtc).toLocaleString()}`, MARGIN_X, y + 87);
+      doc.setTextColor(0, 0, 0);
+    }
 
     doc.save(`${document.documentNumber}.pdf`);
   }

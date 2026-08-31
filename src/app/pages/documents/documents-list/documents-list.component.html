@@ -58,15 +58,21 @@
 
           <div class="kebab-menu" *ngIf="openMenuForId === document.id" (click)="$event.stopPropagation()">
             <button type="button" (click)="preview(document.id)">Preview</button>
-            <button type="button" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']" (click)="edit(document.id)">Edit</button>
+            <button
+              type="button"
+              *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+              [disabled]="document.isLocked"
+              [title]="document.isLocked ? 'Signed documents cannot be edited' : ''"
+              (click)="edit(document.id)"
+            >Edit</button>
 
             <div class="kebab-menu__status" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
-              <button type="button" (click)="toggleStatusMenu($event)">
+              <button type="button" [disabled]="document.isLocked" (click)="toggleStatusMenu($event)">
                 Change status
                 <span aria-hidden="true">&rsaquo;</span>
               </button>
 
-              <div class="kebab-menu__status-options" *ngIf="statusMenuOpen">
+              <div class="kebab-menu__status-options" *ngIf="statusMenuOpen && !document.isLocked">
                 <button
                   type="button"
                   *ngFor="let status of statusOptions"
@@ -78,7 +84,14 @@
               </div>
             </div>
 
-            <button type="button" class="kebab-menu__delete" *appHasRole="['SystemAdmin', 'WorkspaceAdmin']" (click)="requestDelete(document)">Delete</button>
+            <button
+              type="button"
+              class="kebab-menu__delete"
+              *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
+              [disabled]="document.isLocked"
+              [title]="document.isLocked ? 'Signed documents cannot be deleted' : ''"
+              (click)="requestDelete(document)"
+            >Delete</button>
           </div>
         </td>
       </tr>

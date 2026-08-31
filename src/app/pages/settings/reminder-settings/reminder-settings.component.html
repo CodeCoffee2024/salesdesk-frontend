@@ -1,0 +1,77 @@
+<div class="reminder-settings" *ngIf="!loading && !loadError">
+  <div class="reminder-settings__header">
+    <div>
+      <h1>Automated reminders</h1>
+      <p>Follow up on pending quotes and nudge clients about invoices — without you having to remember to.</p>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <label class="toggle-row toggle-row--master">
+      <input type="checkbox" [(ngModel)]="isEnabled" />
+      <span>
+        <strong>Enable automated reminders</strong>
+        <small>Master switch — turn this on to let any of the rules below actually send.</small>
+      </span>
+    </label>
+
+    <div class="settings-card__rules">
+      <label class="toggle-row">
+        <input type="checkbox" [(ngModel)]="quoteFollowUpEnabled" />
+        <span>
+          <strong>Quote follow-up</strong>
+          <small>3 days after a quote is sent and still awaiting a response.</small>
+        </span>
+      </label>
+
+      <label class="toggle-row">
+        <input type="checkbox" [(ngModel)]="invoiceDueWarningEnabled" />
+        <span>
+          <strong>Invoice due-soon warning</strong>
+          <small>2 days before an unpaid invoice's due date.</small>
+        </span>
+      </label>
+
+      <label class="toggle-row">
+        <input type="checkbox" [(ngModel)]="overdueNoticesEnabled" />
+        <span>
+          <strong>Overdue notices</strong>
+          <small>1 day and 7 days after an invoice's due date has passed.</small>
+        </span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="cc-email">CC email <span class="form-group__optional">(optional)</span></label>
+      <input
+        id="cc-email"
+        type="email"
+        placeholder="you@yourstudio.com"
+        [(ngModel)]="ccEmail"
+      />
+      <small>Copied on every reminder sent to a client, alongside the client's own address — handy for keeping an eye on what's going out.</small>
+    </div>
+
+    <p class="hint">
+      Reminders are logged, not sent yet — no email provider is connected. See
+      <code>docs/research/TASK-DEPLOYMENT.md</code> for how to wire one up.
+    </p>
+
+    <div class="settings-card__actions" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
+      <button type="button" class="btn-primary" [disabled]="saving" (click)="save()">
+        {{ saving ? 'Saving…' : 'Save changes' }}
+      </button>
+      <span class="save-status save-status--ok" *ngIf="saved">Saved.</span>
+      <span class="save-status save-status--error" *ngIf="saveError">Couldn't save — try again.</span>
+    </div>
+  </div>
+</div>
+
+<div class="reminder-settings__loading" *ngIf="loading">Loading&hellip;</div>
+
+<app-empty-state
+  *ngIf="!loading && loadError"
+  icon="not-found"
+  heading="Couldn't load reminder settings"
+  description="Something went wrong fetching your settings. Please try again."
+></app-empty-state>

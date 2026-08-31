@@ -16,6 +16,9 @@ import { Document as DocumentModel } from '../../../core/models/document.model';
 function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
   return {
     id: '3a94928f-7367-4206-a02f-b2fc9884b087',
+    publicToken: 'b1e2c3d4-0000-0000-0000-000000000000',
+    isLocked: false,
+    signature: null,
     documentNumber: 'QUO-2026-028',
     type: 'Quote',
     status: 'Sent',
@@ -166,6 +169,6 @@ describe('DocumentPreviewComponent', () => {
     const doc = makeDocument();
     setup('3a94928f-7367-4206-a02f-b2fc9884b087', doc);
     component.downloadPdf();
-    expect(pdfServiceSpy.download).toHaveBeenCalledWith(jasmine.objectContaining({ documentNumber: doc.documentNumber }));
+    expect(pdfServiceSpy.download).toHaveBeenCalledWith(jasmine.objectContaining({ documentNumber: doc.documentNumber }), null);
   });
 });

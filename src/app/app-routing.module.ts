@@ -18,6 +18,8 @@ import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-das
 import { AdminWorkspacesComponent } from './pages/admin/admin-workspaces/admin-workspaces.component';
 import { AdminUsersComponent } from './pages/admin/admin-users/admin-users.component';
 import { AdminAuditLogComponent } from './pages/admin/admin-audit-log/admin-audit-log.component';
+import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
+import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { homeGuard } from './core/guards/home.guard';
@@ -29,6 +31,10 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { title: 'Sign in' } },
   { path: 'register', component: RegisterComponent, data: { title: 'Create your account' } },
   { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Reset your password' } },
+  // TASK-023/024: the unauthenticated link a client opens from their quote/invoice
+  // — never behind authGuard, since the whole point is that the client has no
+  // SalesDesk account.
+  { path: 'view/:token', component: DocumentSignComponent, data: { title: 'Your document' } },
   {
     path: '',
     canActivate: [authGuard],
@@ -58,6 +64,11 @@ const routes: Routes = [
         path: 'templates/:id/edit',
         component: TemplateEditorComponent,
         data: { breadcrumb: [{ label: 'Templates', url: '/templates' }, { label: 'Edit content' }] }
+      },
+      {
+        path: 'settings/reminders',
+        component: ReminderSettingsComponent,
+        data: { breadcrumb: [{ label: 'Automated reminders' }] }
       },
       {
         path: 'admin',

@@ -11,6 +11,7 @@ describe('isPublicRoute', () => {
     expect(isPublicRoute('/login')).toBeTrue();
     expect(isPublicRoute('/register')).toBeTrue();
     expect(isPublicRoute('/forgot-password')).toBeTrue();
+    expect(isPublicRoute('/view/abc123')).toBeTrue();
   });
 
   it('treats every dashboard route as non-public', () => {

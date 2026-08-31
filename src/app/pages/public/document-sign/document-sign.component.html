@@ -1,0 +1,90 @@
+<div class="public-doc">
+  <div class="public-doc__loading" *ngIf="loading">Loading&hellip;</div>
+
+  <app-empty-state
+    *ngIf="!loading && notFound"
+    icon="document"
+    heading="This link isn't valid"
+    description="The document link may be incorrect or no longer active. Please check with whoever sent it to you."
+  ></app-empty-state>
+
+  <ng-container *ngIf="!loading && !notFound && document as doc">
+    <header class="public-doc__header">
+      <img *ngIf="doc.workspaceLogoUrl" [src]="doc.workspaceLogoUrl" [alt]="doc.workspaceName" class="public-doc__logo" />
+      <span class="public-doc__workspace-name">{{ doc.workspaceName }}</span>
+    </header>
+
+    <div class="public-doc__actions">
+      <button type="button" class="btn-secondary" (click)="downloadPdf()">Download PDF</button>
+
+      <button type="button" class="btn-primary" *ngIf="!doc.isSigned" (click)="openSignModal()">Review &amp; sign</button>
+    </div>
+
+    <p class="public-doc__signed-banner" *ngIf="doc.isSigned">
+      ✅ Signed by {{ doc.signedByName }} on {{ doc.signedAtUtc | date: 'MMM d, y, h:mm a' }}
+    </p>
+
+    <div class="document-card">
+      <div class="document-card__header">
+        <div>
+          <h1>{{ doc.type }}</h1>
+        </div>
+        <div class="document-card__meta">
+          <p class="document-card__number">{{ doc.documentNumber }}</p>
+          <p>Issued {{ doc.issueDate | date: 'MMM d, y' }}</p>
+          <p>Due {{ doc.dueDate | date: 'MMM d, y' }}</p>
+          <app-status-badge [status]="doc.status"></app-status-badge>
+        </div>
+      </div>
+
+      <div class="document-card__parties">
+        <div>
+          <p class="document-card__label">Prepared for</p>
+          <p class="document-card__customer-name">{{ doc.customerName }}</p>
+          <p>{{ doc.customerCompany }}</p>
+        </div>
+      </div>
+
+      <table class="document-card__items">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th class="align-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of doc.lineItems">
+            <td>{{ item.description }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice | currency }}</td>
+            <td class="align-right">{{ item.lineTotal | currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="document-card__totals">
+        <div class="document-card__totals-row">
+          <span>Subtotal</span>
+          <span>{{ doc.subtotal | currency }}</span>
+        </div>
+        <div class="document-card__totals-row document-card__totals-row--grand">
+          <span>Total due</span>
+          <span>{{ doc.total | currency }}</span>
+        </div>
+      </div>
+
+      <p class="document-card__footnote">Thank you for the opportunity to work together.</p>
+    </div>
+  </ng-container>
+
+  <app-signature-acceptance-modal
+    *ngIf="showSignModal && document"
+    [documentNumber]="document.documentNumber"
+    [submitting]="signing"
+    [errorMessage]="signError"
+    (submitted)="submitSignature($event)"
+    (cancelled)="closeSignModal()"
+  ></app-signature-acceptance-modal>
+</div>

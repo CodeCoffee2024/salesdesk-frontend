@@ -1,0 +1,109 @@
+.sig-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 32, 29, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.sig-modal {
+  width: 440px;
+  max-width: 100%;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: var(--sd-surface);
+  border-radius: var(--sd-radius-lg);
+  padding: 24px;
+  box-shadow: var(--sd-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  h2 {
+    font-size: 19px;
+  }
+}
+
+.sig-modal__subtitle {
+  color: var(--sd-muted);
+  font-size: 13px;
+  margin-top: -6px;
+}
+
+.sig-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sd-muted);
+
+  input[type='text'],
+  input[type='email'] {
+    padding: 10px 12px;
+    border-radius: var(--sd-radius-sm);
+    border: 1px solid var(--sd-border);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--sd-ink);
+    font-weight: 400;
+  }
+}
+
+.sig-modal__checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--sd-ink);
+
+  input {
+    margin-top: 3px;
+  }
+}
+
+.sig-modal__error {
+  color: var(--sd-danger);
+  font-size: 12px;
+  margin-top: -6px;
+}
+
+.sig-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.sig-modal__cancel,
+.sig-modal__submit {
+  padding: 9px 16px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.sig-modal__cancel {
+  background: var(--sd-bg);
+  color: var(--sd-ink);
+  border: 1px solid var(--sd-border);
+}
+
+.sig-modal__submit {
+  background: var(--sd-primary);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: var(--sd-primary-dark);
+  }
+}

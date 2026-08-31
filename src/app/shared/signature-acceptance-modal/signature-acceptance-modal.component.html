@@ -1,0 +1,41 @@
+<div class="sig-modal__backdrop" (click)="cancelled.emit()">
+  <div class="sig-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <h2>Review &amp; sign {{ documentNumber }}</h2>
+    <p class="sig-modal__subtitle">By signing below you're formally accepting this document.</p>
+
+    <label class="sig-modal__field">
+      <span>Full name</span>
+      <input type="text" [(ngModel)]="signerName" placeholder="Jane Client" maxlength="200" />
+    </label>
+
+    <p class="sig-modal__error" *ngIf="touched && !signerName.trim()">Full name is required.</p>
+
+    <label class="sig-modal__field">
+      <span>Email address</span>
+      <input type="email" [(ngModel)]="signerEmail" placeholder="jane@example.com" maxlength="320" />
+    </label>
+
+    <p class="sig-modal__error" *ngIf="touched && signerEmail.trim() && !isValid && signerName.trim()">
+      Enter a valid email address.
+    </p>
+
+    <label class="sig-modal__field">
+      <span>Signature</span>
+      <app-signature-canvas (signatureChange)="onSignatureChange($event)"></app-signature-canvas>
+    </label>
+
+    <label class="sig-modal__checkbox">
+      <input type="checkbox" [(ngModel)]="agreedToTerms" />
+      <span>I have reviewed this document and agree to its terms.</span>
+    </label>
+
+    <p class="sig-modal__error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="sig-modal__actions">
+      <button type="button" class="sig-modal__cancel" (click)="cancelled.emit()" [disabled]="submitting">Cancel</button>
+      <button type="button" class="sig-modal__submit" (click)="submit()" [disabled]="submitting">
+        {{ submitting ? 'Signing…' : 'Accept & sign' }}
+      </button>
+    </div>
+  </div>
+</div>

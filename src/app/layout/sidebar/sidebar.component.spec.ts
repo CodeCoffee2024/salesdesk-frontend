@@ -32,10 +32,11 @@ describe('SidebarComponent', () => {
   });
 
   it('renders one link per nav item, in order', () => {
-    // Default role is WorkspaceAdmin, so the SystemAdmin-only Admin console link
-    // isn't rendered — a.nav-item matches only the workspace nav items here.
+    // Scoped to the first .nav-list (the Workspace section) so this stays
+    // unaffected by the Automations/Platform sections' own nav-item links.
     setup();
-    const links = fixture.nativeElement.querySelectorAll('a.nav-item');
+    const workspaceNavList = fixture.nativeElement.querySelector('.nav-section .nav-list');
+    const links = workspaceNavList.querySelectorAll('a.nav-item');
     expect(links.length).toBe(component.navItems.length);
 
     component.navItems.forEach((item, index) => {
@@ -59,5 +60,17 @@ describe('SidebarComponent', () => {
     const link = fixture.nativeElement.querySelector('a[routerLink="/admin"]');
     expect(link).not.toBeNull();
     expect(link.textContent).toContain('Admin console');
+  });
+
+  it('shows the Reminders link for a WorkspaceAdmin', () => {
+    setup('WorkspaceAdmin');
+    const link = fixture.nativeElement.querySelector('a[routerLink="/settings/reminders"]');
+    expect(link).not.toBeNull();
+    expect(link.textContent).toContain('Reminders');
+  });
+
+  it('hides the Reminders link for a Viewer', () => {
+    setup('Viewer');
+    expect(fixture.nativeElement.querySelector('a[routerLink="/settings/reminders"]')).toBeNull();
   });
 });

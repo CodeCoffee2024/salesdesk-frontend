@@ -27,6 +27,7 @@ export class DocumentPreviewComponent implements OnInit {
   showDeleteConfirm = false;
   converting = false;
   actionError = '';
+  linkCopied = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -70,7 +71,10 @@ export class DocumentPreviewComponent implements OnInit {
 
   /** Only the transitions that make sense for this document's current type/status. */
   get lifecycleActions(): LifecycleAction[] {
-    if (!this.document) {
+    // TASK-024 guardrail: nothing about a signed document can change anymore —
+    // the backend enforces this too (409), but hiding the actions avoids a
+    // pointless round trip that would just fail.
+    if (!this.document || this.document.isLocked) {
       return [];
     }
 
@@ -160,9 +164,35 @@ export class DocumentPreviewComponent implements OnInit {
   }
 
   downloadPdf(): void {
-    if (this.document) {
-      this.pdfService.download(this.document);
+    if (!this.document) {
+      return;
     }
+
+    this.pdfService.download(
+      this.document,
+      this.document.signature
+        ? {
+            signerName: this.document.signature.signerName,
+            signedAtUtc: this.document.signature.signedAtUtc,
+            signatureImageDataUrl: this.document.signature.signatureImageDataUrl
+          }
+        : null
+    );
+  }
+
+  get publicLink(): string {
+    return this.document ? `${window.location.origin}/view/${this.document.publicToken}` : '';
+  }
+
+  copyPublicLink(): void {
+    if (!this.publicLink) {
+      return;
+    }
+
+    navigator.clipboard.writeText(this.publicLink).then(() => {
+      this.linkCopied = true;
+      setTimeout(() => (this.linkCopied = false), 2000);
+    });
   }
 
   private fetch(): void {

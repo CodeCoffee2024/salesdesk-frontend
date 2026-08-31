@@ -49,6 +49,27 @@
     </nav>
   </div>
 
+  <div class="nav-section" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
+    <p class="nav-section__label">Automations</p>
+
+    <nav class="nav-list">
+      <a class="nav-item" routerLink="/settings/reminders" routerLinkActive="nav-item--active">
+        <span class="nav-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 4.5c-1 0-1.8.8-1.8 1.8v.6C7.8 7.5 6 9.7 6 12.3v3.2l-1.6 1.9c-.3.4 0 1 .5 1h14.2c.5 0 .8-.6.5-1L18 15.5v-3.2c0-2.6-1.8-4.8-4.2-5.4v-.6c0-1-.8-1.8-1.8-1.8Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+            <path d="M9.8 19.5a2.2 2.2 0 0 0 4.4 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span class="nav-item__label">Reminders</span>
+      </a>
+    </nav>
+  </div>
+
   <div class="nav-section" *appHasRole="['SystemAdmin']">
     <p class="nav-section__label">Platform</p>
 

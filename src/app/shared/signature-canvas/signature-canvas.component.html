@@ -1,0 +1,35 @@
+<div class="signature-canvas">
+  <div class="signature-canvas__tabs">
+    <button type="button" [class.signature-canvas__tab--active]="mode === 'Drawn'" (click)="setMode('Drawn')">
+      Draw
+    </button>
+    <button type="button" [class.signature-canvas__tab--active]="mode === 'Typed'" (click)="setMode('Typed')">
+      Type
+    </button>
+  </div>
+
+  <input
+    *ngIf="mode === 'Typed'"
+    type="text"
+    class="signature-canvas__name-input"
+    placeholder="Type your full name"
+    [ngModel]="typedName"
+    (ngModelChange)="onTypedNameChange($event)"
+    maxlength="200"
+  />
+
+  <canvas
+    #canvas
+    class="signature-canvas__pad"
+    [class.signature-canvas__pad--typed]="mode === 'Typed'"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="onPointerUp()"
+    (pointerleave)="onPointerUp()"
+  ></canvas>
+
+  <div class="signature-canvas__footer">
+    <span class="signature-canvas__hint">{{ mode === 'Drawn' ? 'Draw your signature above' : 'Rendered in cursive above' }}</span>
+    <button type="button" class="signature-canvas__clear" (click)="clear()">Clear</button>
+  </div>
+</div>

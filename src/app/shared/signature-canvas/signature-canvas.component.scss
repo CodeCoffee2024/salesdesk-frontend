@@ -1,0 +1,71 @@
+.signature-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.signature-canvas__tabs {
+  display: flex;
+  gap: 6px;
+
+  button {
+    padding: 6px 14px;
+    border-radius: var(--sd-radius-sm);
+    border: 1px solid var(--sd-border);
+    background: var(--sd-bg);
+    color: var(--sd-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+.signature-canvas__tab--active {
+  background: var(--sd-primary) !important;
+  color: #fff !important;
+  border-color: var(--sd-primary) !important;
+}
+
+.signature-canvas__name-input {
+  padding: 10px 12px;
+  border-radius: var(--sd-radius-sm);
+  border: 1px solid var(--sd-border);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.signature-canvas__pad {
+  width: 100%;
+  height: 160px;
+  border-radius: var(--sd-radius-md);
+  border: 1.5px dashed var(--sd-border);
+  background: var(--sd-surface);
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.signature-canvas__pad--typed {
+  cursor: default;
+}
+
+.signature-canvas__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.signature-canvas__hint {
+  font-size: 12px;
+  color: var(--sd-muted);
+}
+
+.signature-canvas__clear {
+  padding: 6px 12px;
+  border-radius: var(--sd-radius-sm);
+  border: 1px solid var(--sd-border);
+  background: var(--sd-bg);
+  color: var(--sd-ink);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}

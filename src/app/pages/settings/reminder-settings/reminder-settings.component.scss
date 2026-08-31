@@ -1,0 +1,159 @@
+.reminder-settings {
+  padding: 32px;
+  max-width: 640px;
+}
+
+.reminder-settings__header {
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 26px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: var(--sd-muted);
+  }
+}
+
+.reminder-settings__loading {
+  padding: 32px;
+  color: var(--sd-muted);
+}
+
+.settings-card {
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-lg);
+  padding: 24px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  cursor: pointer;
+
+  input {
+    margin-top: 3px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--sd-primary);
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  strong {
+    font-size: 14px;
+  }
+
+  small {
+    color: var(--sd-muted);
+    font-size: 12px;
+  }
+}
+
+.toggle-row--master {
+  border-bottom: 1px solid var(--sd-border);
+  padding-bottom: 16px;
+}
+
+.settings-card__rules {
+  padding-left: 4px;
+  border-bottom: 1px solid var(--sd-border);
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin: 16px 0;
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  input {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: var(--sd-radius-sm);
+    border: 1px solid var(--sd-border);
+    background: var(--sd-bg);
+    font-size: 13px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--sd-primary);
+    }
+  }
+
+  small {
+    display: block;
+    color: var(--sd-muted);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}
+
+.form-group__optional {
+  font-weight: 400;
+  color: var(--sd-muted);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--sd-muted);
+  background: var(--sd-bg);
+  border-radius: var(--sd-radius-sm);
+  padding: 10px 12px;
+
+  code {
+    font-size: 11px;
+  }
+}
+
+.settings-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-primary {
+  padding: 9px 18px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: var(--sd-primary);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: var(--sd-primary-dark);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.save-status {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.save-status--ok {
+  color: var(--sd-success);
+}
+
+.save-status--error {
+  color: var(--sd-danger);
+}
