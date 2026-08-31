@@ -48,7 +48,7 @@
   </div>
 
   <p class="document-preview__locked no-print" *ngIf="doc.isLocked && doc.signature">
-    🔒 Signed by {{ doc.signature.signerName }} on {{ doc.signature.signedAtUtc | date: 'MMM d, y, h:mm a' }} — this document is locked from further edits.
+    <i class="bi bi-lock-fill" aria-hidden="true"></i> Signed by {{ doc.signature.signerName }} on {{ doc.signature.signedAtUtc | date: 'MMM d, y, h:mm a' }} — this document is locked from further edits.
   </p>
 
   <p class="document-preview__error no-print" *ngIf="actionError">{{ actionError }}</p>
@@ -75,6 +75,7 @@
       </div>
     </div>
 
+    <div class="document-card__items-scroll">
     <table class="document-card__items">
       <thead>
         <tr>
@@ -93,6 +94,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
 
     <div class="document-card__totals">
       <div class="document-card__totals-row">

@@ -18,6 +18,21 @@
   }
 }
 
+@media (max-width: 640px) {
+  .customers {
+    padding: 16px;
+  }
+
+  .customers__header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-input {
+    max-width: none;
+  }
+}
+
 .search-input {
   margin-bottom: 24px;
   max-width: 360px;

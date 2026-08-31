@@ -5,6 +5,7 @@ import { HealthService } from '../../core/services/health.service';
 import { AuthService } from '../../core/services/auth.service';
 import { OfflineQueueService } from '../../core/services/offline-queue.service';
 import { PushNotificationService } from '../../core/services/push-notification.service';
+import { NavStateService } from '../nav-state.service';
 import { CurrentUser } from '../../core/models/auth.model';
 
 type ApiStatus = 'checking' | 'up' | 'down';
@@ -39,6 +40,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
     private readonly authService: AuthService,
     private readonly offlineQueue: OfflineQueueService,
     private readonly pushNotifications: PushNotificationService,
+    private readonly navState: NavStateService,
     private readonly router: Router
   ) {}
 
@@ -59,6 +61,10 @@ export class TopbarComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
     this.userSubscription?.unsubscribe();
     this.pendingSyncSubscription?.unsubscribe();
+  }
+
+  toggleSidebar(): void {
+    this.navState.toggle();
   }
 
   async toggleNotifications(): Promise<void> {

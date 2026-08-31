@@ -12,7 +12,7 @@
   </div>
 
   <p class="offline-save-banner" *ngIf="savedOffline">
-    📴 No connection — your document was saved on this device and will sync automatically once you're back online.
+    <i class="bi bi-cloud-slash" aria-hidden="true"></i> No connection — your document was saved on this device and will sync automatically once you're back online.
   </p>
 
   <div class="documents-page__toolbar">
@@ -38,7 +38,8 @@
     No documents match your search yet.
   </p>
 
-  <table class="documents-table" *ngIf="!loading && !loadError && documents.length > 0">
+  <div class="documents-table-scroll" *ngIf="!loading && !loadError && documents.length > 0">
+  <table class="documents-table">
     <thead>
       <tr>
         <th>Document</th>
@@ -101,6 +102,7 @@
       </tr>
     </tbody>
   </table>
+  </div>
 </div>
 
 <app-confirm-dialog

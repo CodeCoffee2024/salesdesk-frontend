@@ -170,3 +170,31 @@
   font-size: 12px;
   color: var(--sd-muted);
 }
+
+.document-card__items-scroll {
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .document-card {
+    padding: 20px;
+  }
+
+  .document-card__header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .document-card__meta {
+    text-align: left;
+  }
+
+  .document-card__items {
+    min-width: 480px;
+  }
+
+  .document-card__totals {
+    width: 100%;
+    max-width: 240px;
+  }
+}

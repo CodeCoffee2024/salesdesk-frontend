@@ -6,6 +6,12 @@
   margin: 0 auto;
 }
 
+@media (max-width: 640px) {
+  .document-preview {
+    padding: 16px;
+  }
+}
+
 .document-preview__actions {
   display: flex;
   justify-content: space-between;

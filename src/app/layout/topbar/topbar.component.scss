@@ -2,11 +2,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   height: 56px;
   flex: 0 0 56px;
   padding: 0 24px;
   background: var(--sd-surface);
   border-bottom: 1px solid var(--sd-border);
+}
+
+.hamburger {
+  display: none;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--sd-ink);
+  padding: 4px;
+  cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .status {
@@ -16,18 +29,26 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--sd-muted);
+  min-width: 0;
 }
 
 .pending-sync {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
   background: var(--sd-status-sent-bg);
   color: var(--sd-status-sent-fg);
+  white-space: nowrap;
 }
 
 .notify-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--sd-border);
   background: var(--sd-surface);
   border-radius: var(--sd-radius-sm);
@@ -43,6 +64,7 @@
 
   &--on {
     border-color: var(--sd-primary);
+    color: var(--sd-primary);
   }
 }
 
@@ -51,6 +73,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--sd-success);
+  flex: 0 0 auto;
 }
 
 .status--down .status__dot {
@@ -64,6 +87,7 @@
 .topbar__actions {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .new-document-button {
@@ -78,6 +102,7 @@
   font-size: 13px;
   text-decoration: none;
   transition: background-color 0.15s ease;
+  white-space: nowrap;
 
   &:hover {
     background: var(--sd-primary-dark);
@@ -88,12 +113,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: 16px;
+  margin-left: 6px;
 }
 
 .account__name {
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .account__role {
@@ -105,17 +131,64 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .account__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   border: none;
   background: transparent;
   color: var(--sd-muted);
   font-size: 13px;
   cursor: pointer;
   padding: 4px 0;
+  white-space: nowrap;
 
   &:hover {
     color: var(--sd-ink);
+  }
+}
+
+// Below this width the sidebar becomes an off-canvas drawer (see
+// sidebar.component.scss's matching breakpoint) — the hamburger is what opens it.
+@media (max-width: 900px) {
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .status__label {
+    display: none;
+  }
+}
+
+// Tight phone widths: keep every control tappable but icon-only, and drop the
+// account name/role text so the row never wraps or overflows.
+@media (max-width: 520px) {
+  .topbar {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .pending-sync {
+    padding: 4px 8px;
+  }
+
+  .new-document-button__label,
+  .account__logout-label,
+  .account__name,
+  .account__role {
+    display: none;
+  }
+
+  .new-document-button {
+    padding: 8px 10px;
+  }
+
+  .account {
+    margin-left: 0;
   }
 }

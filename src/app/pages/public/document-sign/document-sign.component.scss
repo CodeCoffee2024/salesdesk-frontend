@@ -12,6 +12,12 @@
   padding: 40px 24px 80px;
 }
 
+@media (max-width: 480px) {
+  .public-doc {
+    padding: 20px 12px 60px;
+  }
+}
+
 .public-doc__loading {
   padding: 80px 0;
   text-align: center;

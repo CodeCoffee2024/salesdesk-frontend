@@ -23,11 +23,11 @@
     </div>
 
     <p class="public-doc__signed-banner" *ngIf="doc.isSigned">
-      ✅ Signed by {{ doc.signedByName }} on {{ doc.signedAtUtc | date: 'MMM d, y, h:mm a' }}
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Signed by {{ doc.signedByName }} on {{ doc.signedAtUtc | date: 'MMM d, y, h:mm a' }}
     </p>
 
     <p class="public-doc__revision-banner" *ngIf="!doc.isSigned && doc.status === 'RevisionRequested'">
-      ✏️ We've sent your request for changes — the studio will follow up with an updated version.
+      <i class="bi bi-pencil-square" aria-hidden="true"></i> We've sent your request for changes — the studio will follow up with an updated version.
     </p>
 
     <div class="document-card">
@@ -51,6 +51,7 @@
         </div>
       </div>
 
+      <div class="document-card__items-scroll">
       <table class="document-card__items">
         <thead>
           <tr>
@@ -69,6 +70,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
 
       <div class="document-card__totals">
         <div class="document-card__totals-row">

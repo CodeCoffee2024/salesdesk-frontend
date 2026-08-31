@@ -98,8 +98,13 @@
   padding: 24px 0;
 }
 
+.documents-table-scroll {
+  overflow-x: auto;
+}
+
 .documents-table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
   background: var(--sd-surface);
   border: 1px solid var(--sd-border);
@@ -241,4 +246,19 @@
 
 .kebab-menu__delete {
   color: var(--sd-danger);
+}
+
+@media (max-width: 640px) {
+  .documents-page {
+    padding: 16px;
+  }
+
+  .documents-page__header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-input {
+    max-width: none;
+  }
 }

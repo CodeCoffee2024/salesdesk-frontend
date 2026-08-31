@@ -274,3 +274,14 @@
   gap: 10px;
   margin-top: 6px;
 }
+
+@media (max-width: 640px) {
+  .templates {
+    padding: 16px;
+  }
+
+  .templates__header {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

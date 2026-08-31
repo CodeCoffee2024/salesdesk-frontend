@@ -12,6 +12,13 @@
   box-shadow: var(--sd-shadow-sm);
 }
 
+@media (max-width: 480px) {
+  .empty-state {
+    margin: 40px auto;
+    padding: 28px 20px;
+  }
+}
+
 .empty-state__icon {
   display: flex;
   align-items: center;
@@ -22,11 +29,7 @@
   background: var(--sd-bg);
   color: var(--sd-muted);
   margin-bottom: 20px;
-
-  svg {
-    width: 32px;
-    height: 32px;
-  }
+  font-size: 28px;
 }
 
 .empty-state__heading {

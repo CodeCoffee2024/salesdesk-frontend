@@ -3,6 +3,12 @@
   max-width: 640px;
 }
 
+@media (max-width: 640px) {
+  .reminder-settings {
+    padding: 16px;
+  }
+}
+
 .reminder-settings__header {
   margin-bottom: 20px;
 

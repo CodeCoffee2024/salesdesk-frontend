@@ -1,15 +1,21 @@
 <header class="topbar">
+  <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleSidebar()">
+    <i class="bi bi-list" aria-hidden="true"></i>
+  </button>
+
   <span class="status" [class.status--down]="status === 'down'" [class.status--checking]="status === 'checking'">
     <span class="status__dot" aria-hidden="true"></span>
-    <ng-container [ngSwitch]="status">
-      <ng-container *ngSwitchCase="'up'">All systems operational</ng-container>
-      <ng-container *ngSwitchCase="'down'">Connection issue</ng-container>
-      <ng-container *ngSwitchDefault>Checking status&hellip;</ng-container>
-    </ng-container>
+    <span class="status__label">
+      <ng-container [ngSwitch]="status">
+        <ng-container *ngSwitchCase="'up'">All systems operational</ng-container>
+        <ng-container *ngSwitchCase="'down'">Connection issue</ng-container>
+        <ng-container *ngSwitchDefault>Checking status&hellip;</ng-container>
+      </ng-container>
+    </span>
   </span>
 
   <span class="pending-sync" *ngIf="pendingSyncCount > 0" [title]="pendingSyncCount + ' document(s) saved offline, waiting to sync'">
-    📴 {{ pendingSyncCount }} pending sync
+    <i class="bi bi-cloud-slash" aria-hidden="true"></i> {{ pendingSyncCount }} pending sync
   </span>
 
   <div class="topbar__actions">
@@ -21,16 +27,19 @@
       [disabled]="pushBusy"
       [title]="pushSubscribed ? 'Notifications on — click to turn off' : 'Get notified when a client views, signs, or requests changes'"
       (click)="toggleNotifications()"
-    >{{ pushSubscribed ? '🔔' : '🔕' }}</button>
+    ><i class="bi" [ngClass]="pushSubscribed ? 'bi-bell-fill' : 'bi-bell-slash'" aria-hidden="true"></i></button>
 
     <a class="new-document-button" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']" routerLink="/documents/new">
-      <span aria-hidden="true">+</span> New document
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> <span class="new-document-button__label">New document</span>
     </a>
 
     <div class="account" *ngIf="currentUser as user">
       <span class="account__name">{{ user.fullName }}</span>
       <span class="account__role">{{ user.role }}</span>
-      <button type="button" class="account__logout" (click)="logout()">Log out</button>
+      <button type="button" class="account__logout" (click)="logout()">
+        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+        <span class="account__logout-label">Log out</span>
+      </button>
     </div>
   </div>
 </header>

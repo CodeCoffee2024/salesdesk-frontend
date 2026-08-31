@@ -22,6 +22,12 @@
   padding: 40px 36px;
 }
 
+@media (max-width: 420px) {
+  .auth-card {
+    padding: 28px 20px;
+  }
+}
+
 .auth-brand {
   font-family: var(--sd-font-display);
   font-size: 20px;

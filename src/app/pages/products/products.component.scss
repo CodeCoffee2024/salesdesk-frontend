@@ -51,7 +51,8 @@
 .product-row {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 12px 20px;
   padding: 16px 20px;
   border-bottom: 1px solid var(--sd-border);
 
@@ -151,6 +152,27 @@
 
   &:hover:not(:disabled) {
     background: var(--sd-bg);
+  }
+}
+
+@media (max-width: 640px) {
+  .products {
+    padding: 16px;
+  }
+
+  .products__header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-input {
+    max-width: none;
+  }
+
+  // No hover on touch devices — the edit button must stay visible rather
+  // than relying on a hover state nothing on mobile can trigger.
+  .product-row__edit {
+    opacity: 1;
   }
 }
 
