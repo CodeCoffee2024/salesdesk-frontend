@@ -13,6 +13,10 @@ export interface PublicDocument {
   workspaceLogoUrl: string | null;
   subtotal: number;
   total: number;
+  /** ISO 4217 code the portal formats amounts in via Intl.NumberFormat (TASK-029). */
+  currency: string;
+  /** Optional ISO 3166-1 alpha-2 target country used to pick the display locale alongside currency (TASK-029). */
+  clientCountry: string | null;
   lineItems: DocumentLineItem[];
   isSigned: boolean;
   signedByName: string | null;

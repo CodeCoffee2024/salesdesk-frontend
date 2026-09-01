@@ -65,8 +65,8 @@
           <tr *ngFor="let item of doc.lineItems">
             <td>{{ item.description }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.unitPrice | currency }}</td>
-            <td class="align-right">{{ item.lineTotal | currency }}</td>
+            <td>{{ item.unitPrice | currencyLocale:doc.currency:doc.clientCountry }}</td>
+            <td class="align-right">{{ item.lineTotal | currencyLocale:doc.currency:doc.clientCountry }}</td>
           </tr>
         </tbody>
       </table>
@@ -75,11 +75,11 @@
       <div class="document-card__totals">
         <div class="document-card__totals-row">
           <span>Subtotal</span>
-          <span>{{ doc.subtotal | currency }}</span>
+          <span>{{ doc.subtotal | currencyLocale:doc.currency:doc.clientCountry }}</span>
         </div>
         <div class="document-card__totals-row document-card__totals-row--grand">
           <span>Total due</span>
-          <span>{{ doc.total | currency }}</span>
+          <span>{{ doc.total | currencyLocale:doc.currency:doc.clientCountry }}</span>
         </div>
       </div>
 

@@ -5,9 +5,22 @@ import { of, throwError } from 'rxjs';
 
 import { ProductsComponent } from './products.component';
 import { ProductService } from '../../core/services/product.service';
+import { WorkspaceProfileService } from '../../core/services/workspace-profile.service';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { HasRoleDirective } from '../../shared/has-role.directive';
+import { CurrencyLocalePipe } from '../../core/pipes/currency-locale.pipe';
 import { Product } from '../../core/models/product.model';
+import { WorkspaceProfile } from '../../core/models/workspace-profile.model';
+
+const workspaceProfile: WorkspaceProfile = {
+  name: 'Northline',
+  email: 'hello@northline.studio',
+  tagline: null,
+  address: null,
+  logoUrl: null,
+  country: 'US',
+  defaultCurrency: 'USD'
+};
 
 function makeProduct(overrides: Partial<Product> = {}): Product {
   return {
@@ -34,8 +47,11 @@ describe('ProductsComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, HttpClientTestingModule],
-      declarations: [ProductsComponent, EmptyStateComponent, HasRoleDirective],
-      providers: [{ provide: ProductService, useValue: productServiceSpy }]
+      declarations: [ProductsComponent, EmptyStateComponent, HasRoleDirective, CurrencyLocalePipe],
+      providers: [
+        { provide: ProductService, useValue: productServiceSpy },
+        { provide: WorkspaceProfileService, useValue: { getCached: () => of(workspaceProfile) } }
+      ]
     });
 
     fixture = TestBed.createComponent(ProductsComponent);
@@ -65,8 +81,11 @@ describe('ProductsComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, HttpClientTestingModule],
-      declarations: [ProductsComponent, EmptyStateComponent, HasRoleDirective],
-      providers: [{ provide: ProductService, useValue: productServiceSpy }]
+      declarations: [ProductsComponent, EmptyStateComponent, HasRoleDirective, CurrencyLocalePipe],
+      providers: [
+        { provide: ProductService, useValue: productServiceSpy },
+        { provide: WorkspaceProfileService, useValue: { getCached: () => of(workspaceProfile) } }
+      ]
     });
     fixture = TestBed.createComponent(ProductsComponent);
     component = fixture.componentInstance;

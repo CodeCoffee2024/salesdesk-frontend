@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomerService } from '../../core/services/customer.service';
 import { DocumentService } from '../../core/services/document.service';
+import { WorkspaceProfileService } from '../../core/services/workspace-profile.service';
 import { Customer } from '../../core/models/customer.model';
 import { Document as DocumentModel } from '../../core/models/document.model';
+import { ISO_COUNTRIES } from '../../core/constants/locale.constants';
 
 @Component({
   selector: 'app-customers',
@@ -25,21 +27,28 @@ export class CustomersComponent implements OnInit {
   selectedCustomerDocuments: DocumentModel[] = [];
   profileLoading = false;
 
+  readonly countries = ISO_COUNTRIES;
+  /** Workspace's own default currency (TASK-029) — used to format the aggregate LifetimeValue figure, which isn't tied to any single document's currency. */
+  workspaceCurrency = 'USD';
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly customerService: CustomerService,
-    private readonly documentService: DocumentService
+    private readonly documentService: DocumentService,
+    private readonly workspaceProfileService: WorkspaceProfileService
   ) {
     this.addForm = this.fb.group({
       name: ['', Validators.required],
       company: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['']
+      phone: [''],
+      country: [null as string | null]
     });
   }
 
   ngOnInit(): void {
     this.load();
+    this.workspaceProfileService.getCached().subscribe((profile) => (this.workspaceCurrency = profile.defaultCurrency));
   }
 
   get filteredCustomers(): Customer[] {
@@ -88,8 +97,8 @@ export class CustomersComponent implements OnInit {
     this.saving = true;
     this.addError = '';
 
-    const { name, company, email, phone } = this.addForm.value;
-    this.customerService.create({ name, company, email, phone: phone || null }).subscribe({
+    const { name, company, email, phone, country } = this.addForm.value;
+    this.customerService.create({ name, company, email, phone: phone || null, country: country || null }).subscribe({
       next: () => {
         this.saving = false;
         this.showAddModal = false;

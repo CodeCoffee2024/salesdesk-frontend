@@ -57,7 +57,7 @@
         </td>
         <td (click)="preview(document.id)">{{ document.issueDate | date: 'MMM d, y' }}</td>
         <td (click)="preview(document.id)"><app-status-badge [status]="document.status"></app-status-badge></td>
-        <td class="documents-table__total-col" (click)="preview(document.id)">{{ document.total | currency }}</td>
+        <td class="documents-table__total-col" (click)="preview(document.id)">{{ document.total | currencyLocale:document.currency:document.clientCountry }}</td>
         <td class="documents-table__menu-col">
           <button type="button" class="kebab-button" (click)="toggleMenu(document.id, $event)" aria-label="Row actions">&hellip;</button>
 

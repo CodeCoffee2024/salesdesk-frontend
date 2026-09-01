@@ -11,6 +11,7 @@ import { EmptyStateComponent } from '../../../shared/empty-state/empty-state.com
 import { StatusBadgeComponent } from '../../../shared/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 import { HasRoleDirective } from '../../../shared/has-role.directive';
+import { CurrencyLocalePipe } from '../../../core/pipes/currency-locale.pipe';
 import { Document as DocumentModel } from '../../../core/models/document.model';
 
 function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
@@ -31,6 +32,8 @@ function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
     templateName: 'Friendly Quote',
     subtotal: 6800,
     total: 6800,
+    currency: 'USD',
+    clientCountry: null,
     lineItems: [{ id: 'li-1', productId: null, description: 'Web design & build', quantity: 1, unitPrice: 6800, lineTotal: 6800 }],
     ...overrides
   };
@@ -55,7 +58,7 @@ describe('DocumentPreviewComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
-      declarations: [DocumentPreviewComponent, EmptyStateComponent, StatusBadgeComponent, ConfirmDialogComponent, HasRoleDirective],
+      declarations: [DocumentPreviewComponent, EmptyStateComponent, StatusBadgeComponent, ConfirmDialogComponent, HasRoleDirective, CurrencyLocalePipe],
       providers: [
         { provide: DocumentService, useValue: documentServiceSpy },
         { provide: PdfService, useValue: pdfServiceSpy },

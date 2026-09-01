@@ -36,7 +36,7 @@
     <button type="button" class="customer-card" *ngFor="let customer of filteredCustomers" (click)="viewProfile(customer)">
       <div class="customer-card__header">
         <h3>{{ customer.name }}</h3>
-        <span class="customer-card__value">{{ customer.lifetimeValue | currency }}</span>
+        <span class="customer-card__value">{{ customer.lifetimeValue | currencyLocale:workspaceCurrency }}</span>
       </div>
       <p class="customer-card__company">{{ customer.company }}</p>
       <p class="customer-card__meta">{{ customer.email }}</p>
@@ -82,6 +82,14 @@
         <input id="phone" type="tel" formControlName="phone" />
       </div>
 
+      <div class="field">
+        <label for="country">Country <span class="field__optional">(optional)</span></label>
+        <select id="country" formControlName="country">
+          <option [ngValue]="null">Not set</option>
+          <option *ngFor="let option of countries" [value]="option.code">{{ option.name }}</option>
+        </select>
+      </div>
+
       <ul class="validation-summary" *ngIf="addForm.touched && formErrors.length > 0">
         <li *ngFor="let error of formErrors">{{ error }}</li>
       </ul>
@@ -121,7 +129,11 @@
       </div>
       <div>
         <p class="profile__label">Lifetime value</p>
-        <p class="profile__value">{{ customer.lifetimeValue | currency }}</p>
+        <p class="profile__value">{{ customer.lifetimeValue | currencyLocale:workspaceCurrency }}</p>
+      </div>
+      <div *ngIf="customer.country">
+        <p class="profile__label">Country</p>
+        <p>{{ customer.country }}</p>
       </div>
     </div>
 
@@ -135,7 +147,7 @@
       <div class="profile__document-row" *ngFor="let doc of selectedCustomerDocuments">
         <span>{{ doc.documentNumber }}</span>
         <app-status-badge [status]="doc.status"></app-status-badge>
-        <span class="profile__document-total">{{ doc.total | currency }}</span>
+        <span class="profile__document-total">{{ doc.total | currencyLocale:doc.currency:doc.clientCountry }}</span>
       </div>
     </div>
   </div>

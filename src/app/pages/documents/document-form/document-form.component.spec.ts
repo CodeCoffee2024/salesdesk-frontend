@@ -10,13 +10,25 @@ import { CustomerService } from '../../../core/services/customer.service';
 import { TemplateService } from '../../../core/services/template.service';
 import { ProductService } from '../../../core/services/product.service';
 import { OfflineQueueService } from '../../../core/services/offline-queue.service';
+import { WorkspaceProfileService } from '../../../core/services/workspace-profile.service';
+import { CurrencyLocalePipe } from '../../../core/pipes/currency-locale.pipe';
 import { Customer } from '../../../core/models/customer.model';
 import { Template } from '../../../core/models/template.model';
 import { Product } from '../../../core/models/product.model';
 import { Document as DocumentModel } from '../../../core/models/document.model';
+import { WorkspaceProfile } from '../../../core/models/workspace-profile.model';
 
 const customers: Customer[] = [
-  { id: 'cust-1', name: 'Maya Chen', company: 'Northstar Studio', email: 'maya@northstar.studio', phone: null, createdAt: '2026-01-01', lifetimeValue: 0 }
+  {
+    id: 'cust-1',
+    name: 'Maya Chen',
+    company: 'Northstar Studio',
+    email: 'maya@northstar.studio',
+    phone: null,
+    country: null,
+    createdAt: '2026-01-01',
+    lifetimeValue: 0
+  }
 ];
 const templates: Template[] = [
   { id: 'tpl-1', name: 'Modern Minimal', description: null, targetType: 'QuotesAndInvoices', accentColor: '#2F6F6C', contentHtml: null, isDefault: false, usageCount: 0 },
@@ -26,6 +38,15 @@ const products: Product[] = [
   { id: 'prod-1', name: 'SEO Audit', description: null, price: 750, unit: 'Project', category: null },
   { id: 'prod-2', name: 'Brand identity sprint', description: null, price: 4200, unit: 'Project', category: null }
 ];
+const workspaceProfile: WorkspaceProfile = {
+  name: 'Northline',
+  email: 'hello@northline.studio',
+  tagline: null,
+  address: null,
+  logoUrl: null,
+  country: 'US',
+  defaultCurrency: 'USD'
+};
 
 function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
   return {
@@ -45,6 +66,8 @@ function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
     templateName: 'Modern Minimal',
     subtotal: 1000,
     total: 1000,
+    currency: 'USD',
+    clientCountry: null,
     lineItems: [{ id: 'li-1', productId: null, description: 'Research', quantity: 2, unitPrice: 500, lineTotal: 1000 }],
     ...overrides
   };
@@ -68,13 +91,14 @@ describe('DocumentFormComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule],
-      declarations: [DocumentFormComponent],
+      declarations: [DocumentFormComponent, CurrencyLocalePipe],
       providers: [
         { provide: DocumentService, useValue: documentServiceSpy },
         { provide: CustomerService, useValue: { getAll: () => of(customers) } },
         { provide: TemplateService, useValue: { getAll: () => of(templates) } },
         { provide: ProductService, useValue: { getAll: () => of(products) } },
         { provide: OfflineQueueService, useValue: offlineQueueSpy },
+        { provide: WorkspaceProfileService, useValue: { getCached: () => of(workspaceProfile) } },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap(routeId ? { id: routeId } : {}) } } },
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }
       ]

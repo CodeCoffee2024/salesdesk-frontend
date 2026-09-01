@@ -44,7 +44,8 @@
     margin-bottom: 6px;
   }
 
-  input {
+  input,
+  select {
     width: 100%;
     padding: 9px 12px;
     border-radius: var(--sd-radius-sm);
@@ -63,6 +64,23 @@
     color: var(--sd-muted);
     font-size: 12px;
     margin-top: 4px;
+  }
+}
+
+.form-group-row {
+  display: flex;
+  gap: 16px;
+
+  .form-group {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-group-row {
+    flex-direction: column;
+    gap: 0;
   }
 }
 

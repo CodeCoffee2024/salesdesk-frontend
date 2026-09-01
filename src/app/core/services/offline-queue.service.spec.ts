@@ -32,6 +32,8 @@ function makeDocument(): DocumentModel {
     templateName: 'Studio Standard',
     subtotal: 500,
     total: 500,
+    currency: 'USD',
+    clientCountry: null,
     lineItems: [{ id: 'li-1', productId: null, description: 'Research', quantity: 1, unitPrice: 500, lineTotal: 500 }]
   };
 }

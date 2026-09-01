@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WorkspaceProfileService } from '../../../core/services/workspace-profile.service';
 import { WorkspaceProfile } from '../../../core/models/workspace-profile.model';
+import { ISO_COUNTRIES, ISO_CURRENCIES, taxLabelForCountry } from '../../../core/constants/locale.constants';
 
 @Component({
   selector: 'app-workspace-profile',
@@ -19,8 +20,18 @@ export class WorkspaceProfileComponent implements OnInit {
   tagline = '';
   address = '';
   logoUrl = '';
+  country = 'US';
+  defaultCurrency = 'USD';
+
+  readonly countries = ISO_COUNTRIES;
+  readonly currencies = ISO_CURRENCIES;
 
   constructor(private readonly workspaceProfileService: WorkspaceProfileService) {}
+
+  /** Informational only (TASK-029 guardrail: no hardcoded tax rates) — just a label hint next to the Country selector. */
+  get taxLabel(): string {
+    return taxLabelForCountry(this.country);
+  }
 
   ngOnInit(): void {
     this.load();
@@ -52,7 +63,9 @@ export class WorkspaceProfileComponent implements OnInit {
         email: this.email,
         tagline: this.tagline.trim() === '' ? null : this.tagline.trim(),
         address: this.address.trim() === '' ? null : this.address.trim(),
-        logoUrl: this.logoUrl.trim() === '' ? null : this.logoUrl.trim()
+        logoUrl: this.logoUrl.trim() === '' ? null : this.logoUrl.trim(),
+        country: this.country,
+        defaultCurrency: this.defaultCurrency
       })
       .subscribe({
         next: (profile) => {
@@ -73,5 +86,7 @@ export class WorkspaceProfileComponent implements OnInit {
     this.tagline = profile.tagline ?? '';
     this.address = profile.address ?? '';
     this.logoUrl = profile.logoUrl ?? '';
+    this.country = profile.country;
+    this.defaultCurrency = profile.defaultCurrency;
   }
 }

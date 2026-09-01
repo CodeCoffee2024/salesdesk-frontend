@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
+import { formatCurrency } from '../utils/locale.util';
 
 const PAGE_WIDTH_PT = 595;
 const MARGIN_X = 48;
 const RIGHT_EDGE = PAGE_WIDTH_PT - MARGIN_X;
-const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 /**
  * The document fields the PDF layout actually reads — a structural subset both the
@@ -19,6 +19,10 @@ export interface PdfDocumentSource {
   customerName: string;
   customerCompany: string;
   total: number;
+  /** ISO 4217 code this document is priced in (TASK-029) — drives the same Intl.NumberFormat-based rendering used in Live Preview and the Public Client Portal, not a separate hardcoded formatter. */
+  currency: string;
+  /** Optional ISO 3166-1 alpha-2 target country, used alongside currency to pick the display locale (TASK-029). */
+  clientCountry: string | null;
   lineItems: { description: string; quantity: number; unitPrice: number; lineTotal: number }[];
 }
 
@@ -40,6 +44,7 @@ export interface PdfSignatureInfo {
 export class PdfService {
   download(document: PdfDocumentSource, signature?: PdfSignatureInfo | null): void {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const money = (amount: number) => formatCurrency(amount, document.currency, document.clientCountry);
     let y = 56;
 
     doc.setFont('helvetica', 'bold');
@@ -85,8 +90,8 @@ export class PdfService {
     document.lineItems.forEach((item) => {
       doc.text(item.description, MARGIN_X, y, { maxWidth: 270 });
       doc.text(String(item.quantity), 340, y);
-      doc.text(CURRENCY_FORMATTER.format(item.unitPrice), 410, y);
-      doc.text(CURRENCY_FORMATTER.format(item.lineTotal), RIGHT_EDGE, y, { align: 'right' });
+      doc.text(money(item.unitPrice), 410, y);
+      doc.text(money(item.lineTotal), RIGHT_EDGE, y, { align: 'right' });
       y += 22;
     });
 
@@ -97,7 +102,7 @@ export class PdfService {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.text('Total due', 410, y);
-    doc.text(CURRENCY_FORMATTER.format(document.total), RIGHT_EDGE, y, { align: 'right' });
+    doc.text(money(document.total), RIGHT_EDGE, y, { align: 'right' });
 
     if (signature) {
       y += 50;

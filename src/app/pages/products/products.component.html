@@ -41,7 +41,7 @@
 
       <span class="product-row__category" *ngIf="product.category">{{ product.category }}</span>
 
-      <span class="product-row__price">{{ product.price | currency }} <span class="product-row__unit">/ {{ product.unit.toLowerCase() }}</span></span>
+      <span class="product-row__price">{{ product.price | currencyLocale:workspaceCurrency }} <span class="product-row__unit">/ {{ product.unit.toLowerCase() }}</span></span>
 
       <button
         type="button"

@@ -34,6 +34,24 @@
       <input id="address" type="text" [(ngModel)]="address" />
     </div>
 
+    <div class="form-group-row">
+      <div class="form-group">
+        <label for="country">Operating country</label>
+        <select id="country" [(ngModel)]="country">
+          <option *ngFor="let option of countries" [value]="option.code">{{ option.name }}</option>
+        </select>
+        <small>Used to pick a sensible default target country/locale for new documents, and to label local tax as "{{ taxLabel }}".</small>
+      </div>
+
+      <div class="form-group">
+        <label for="defaultCurrency">Default currency</label>
+        <select id="defaultCurrency" [(ngModel)]="defaultCurrency">
+          <option *ngFor="let option of currencies" [value]="option.code">{{ option.code }} &middot; {{ option.name }}</option>
+        </select>
+        <small>New quotes and invoices are priced in this currency unless overridden per document.</small>
+      </div>
+    </div>
+
     <div class="settings-card__actions">
       <button type="button" class="btn-primary" [disabled]="saving" (click)="save()">
         {{ saving ? 'Saving…' : 'Save changes' }}

@@ -31,7 +31,7 @@
 
       <div class="field">
         <label for="customerId">Customer</label>
-        <select id="customerId" formControlName="customerId">
+        <select id="customerId" formControlName="customerId" (change)="onCustomerSelected()">
           <option value="" disabled>Select a customer</option>
           <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }} &middot; {{ customer.company }}</option>
         </select>
@@ -57,6 +57,25 @@
         </select>
       </div>
 
+      <div class="field-row">
+        <div class="field">
+          <label for="currency">Currency</label>
+          <select id="currency" formControlName="currency">
+            <option *ngFor="let option of currencies" [value]="option.code">{{ option.code }} &middot; {{ option.name }}</option>
+          </select>
+          <small *ngIf="form.value.currency !== workspaceDefaultCurrency">Overriding your workspace default ({{ workspaceDefaultCurrency }}).</small>
+        </div>
+
+        <div class="field">
+          <label for="clientCountry">Client country <span class="field__optional">(optional)</span></label>
+          <select id="clientCountry" formControlName="clientCountry">
+            <option [ngValue]="null">Not set</option>
+            <option *ngFor="let option of countries" [value]="option.code">{{ option.name }}</option>
+          </select>
+          <small>Used to pick the amount format shown to this client (e.g. 1.250,00 vs 1,250.00).</small>
+        </div>
+      </div>
+
       <div class="line-items">
         <label>Line items</label>
 
@@ -74,14 +93,14 @@
             <ul class="suggestions" *ngIf="openSuggestionsForIndex === i && productSuggestions(i).length > 0">
               <li *ngFor="let product of productSuggestions(i)" (mousedown)="selectProduct(i, product)">
                 <span>{{ product.name }}</span>
-                <span class="suggestions__price">{{ product.price | currency }}</span>
+                <span class="suggestions__price">{{ product.price | currencyLocale:form.value.currency }}</span>
               </li>
             </ul>
           </div>
 
           <input type="number" min="0.01" step="0.01" placeholder="Qty" formControlName="quantity" class="line-item-row__qty" />
           <input type="number" min="0" step="0.01" placeholder="Unit price" formControlName="unitPrice" class="line-item-row__price" />
-          <span class="line-item-row__total">{{ lineTotal(i) | currency }}</span>
+          <span class="line-item-row__total">{{ lineTotal(i) | currencyLocale:form.value.currency }}</span>
 
           <button type="button" class="line-item-row__remove" (click)="removeLineItem(i)" aria-label="Remove line item">&times;</button>
         </div>
@@ -122,18 +141,18 @@
           <tbody>
             <tr *ngFor="let item of lineItems.controls; let i = index">
               <td>{{ item.get('description')?.value || 'Your line item' }}</td>
-              <td>{{ lineTotal(i) | currency }}</td>
+              <td>{{ lineTotal(i) | currencyLocale:form.value.currency:form.value.clientCountry }}</td>
             </tr>
             <tr *ngIf="lineItems.length === 0">
               <td>Your line item</td>
-              <td>{{ 0 | currency }}</td>
+              <td>{{ 0 | currencyLocale:form.value.currency:form.value.clientCountry }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="preview-card__total">
           <span>Total due</span>
-          <span>{{ subtotal | currency }}</span>
+          <span>{{ subtotal | currencyLocale:form.value.currency:form.value.clientCountry }}</span>
         </div>
       </div>
 

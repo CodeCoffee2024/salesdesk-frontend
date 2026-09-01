@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
+import { WorkspaceProfileService } from '../../core/services/workspace-profile.service';
 import { Product, ProductUnit } from '../../core/models/product.model';
 
 @Component({
@@ -23,9 +24,13 @@ export class ProductsComponent implements OnInit {
   saveError = '';
   saving = false;
 
+  /** Workspace's own default currency (TASK-029) — catalog prices aren't per-document, so they format in the workspace's base currency. */
+  workspaceCurrency = 'USD';
+
   constructor(
     private readonly fb: FormBuilder,
-    private readonly productService: ProductService
+    private readonly productService: ProductService,
+    private readonly workspaceProfileService: WorkspaceProfileService
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -38,6 +43,7 @@ export class ProductsComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.workspaceProfileService.getCached().subscribe((profile) => (this.workspaceCurrency = profile.defaultCurrency));
   }
 
   get filteredProducts(): Product[] {

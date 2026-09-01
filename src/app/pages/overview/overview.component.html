@@ -2,18 +2,18 @@
   <section class="kpi-row">
     <article class="kpi-tile">
       <p class="kpi-tile__label">Revenue this year</p>
-      <p class="kpi-tile__value">{{ summary?.revenueThisYear ?? 0 | currency }}</p>
-      <p class="kpi-tile__caption">Collected across all invoices</p>
+      <p class="kpi-tile__value">{{ summary?.revenueThisYear ?? 0 | currencyLocale:summary?.baseCurrency }}</p>
+      <p class="kpi-tile__caption">Collected across all invoices, normalized to {{ summary?.baseCurrency ?? 'USD' }}</p>
     </article>
     <article class="kpi-tile">
       <p class="kpi-tile__label">Outstanding</p>
-      <p class="kpi-tile__value">{{ summary?.outstanding ?? 0 | currency }}</p>
-      <p class="kpi-tile__caption">Across sent invoices</p>
+      <p class="kpi-tile__value">{{ summary?.outstanding ?? 0 | currencyLocale:summary?.baseCurrency }}</p>
+      <p class="kpi-tile__caption">Across sent invoices, normalized to {{ summary?.baseCurrency ?? 'USD' }}</p>
     </article>
     <article class="kpi-tile">
       <p class="kpi-tile__label">Quote pipeline</p>
-      <p class="kpi-tile__value">{{ summary?.quotePipeline ?? 0 | currency }}</p>
-      <p class="kpi-tile__caption">Waiting for a decision</p>
+      <p class="kpi-tile__value">{{ summary?.quotePipeline ?? 0 | currencyLocale:summary?.baseCurrency }}</p>
+      <p class="kpi-tile__caption">Waiting for a decision, normalized to {{ summary?.baseCurrency ?? 'USD' }}</p>
     </article>
     <article class="kpi-tile">
       <p class="kpi-tile__label">Active customers</p>
@@ -32,19 +32,19 @@
           <div
             class="revenue-pulse__bar"
             [style.height.%]="(point.amount / maxMonthlyRevenue) * 100"
-            [title]="point.label + ': ' + (point.amount | currency)"
+            [title]="point.label + ': ' + (point.amount | currencyLocale:summary?.baseCurrency)"
           ></div>
           <span class="revenue-pulse__bar-label">{{ point.label }}</span>
         </div>
       </div>
 
-      <p class="revenue-pulse__footnote">Last {{ monthlyRevenue.length }} months &middot; USD</p>
+      <p class="revenue-pulse__footnote">Last {{ monthlyRevenue.length }} months &middot; {{ summary?.baseCurrency ?? 'USD' }}</p>
     </article>
 
     <article class="next-best-action">
       <p class="panel-label panel-label--inverse">Next best action</p>
       <h2>{{ nextBestActionMessage }}</h2>
-      <p>You have {{ summary?.quotePipeline ?? 0 | currency }} in the pipeline. A thoughtful follow-up today could move it forward.</p>
+      <p>You have {{ summary?.quotePipeline ?? 0 | currencyLocale:summary?.baseCurrency }} in the pipeline. A thoughtful follow-up today could move it forward.</p>
       <a class="next-best-action__button" routerLink="/documents" [queryParams]="{ type: 'quote' }">Review pipeline</a>
     </article>
   </section>
@@ -69,7 +69,7 @@
           </td>
           <td>{{ document.issueDate | date: 'MMM d, y' }}</td>
           <td><app-status-badge [status]="document.status"></app-status-badge></td>
-          <td class="recent-documents__total">{{ document.total | currency }}</td>
+          <td class="recent-documents__total">{{ document.total | currencyLocale:document.currency:document.clientCountry }}</td>
         </tr>
       </tbody>
     </table>

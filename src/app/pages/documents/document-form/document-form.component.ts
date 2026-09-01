@@ -9,6 +9,7 @@ import { CustomerService } from '../../../core/services/customer.service';
 import { TemplateService } from '../../../core/services/template.service';
 import { ProductService } from '../../../core/services/product.service';
 import { OfflineQueueService } from '../../../core/services/offline-queue.service';
+import { WorkspaceProfileService } from '../../../core/services/workspace-profile.service';
 import { Customer } from '../../../core/models/customer.model';
 import { Template } from '../../../core/models/template.model';
 import { Product } from '../../../core/models/product.model';
@@ -20,6 +21,7 @@ import {
   DocumentType,
   UpdateDocumentRequest
 } from '../../../core/models/document.model';
+import { ISO_COUNTRIES, ISO_CURRENCIES } from '../../../core/constants/locale.constants';
 
 const DEFAULT_DUE_DAYS = 14;
 const MAX_SUGGESTIONS = 6;
@@ -50,6 +52,11 @@ export class DocumentFormComponent implements OnInit {
   /** Which line-item row's catalog suggestion list is open, if any. */
   openSuggestionsForIndex: number | null = null;
 
+  readonly countries = ISO_COUNTRIES;
+  readonly currencies = ISO_CURRENCIES;
+  /** The workspace's own default — shown as the Currency select's starting point for a brand-new document (TASK-029). */
+  workspaceDefaultCurrency = 'USD';
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly route: ActivatedRoute,
@@ -58,13 +65,16 @@ export class DocumentFormComponent implements OnInit {
     private readonly customerService: CustomerService,
     private readonly templateService: TemplateService,
     private readonly productService: ProductService,
-    private readonly offlineQueue: OfflineQueueService
+    private readonly offlineQueue: OfflineQueueService,
+    private readonly workspaceProfileService: WorkspaceProfileService
   ) {
     this.form = this.fb.group({
       type: ['Quote' as DocumentType, Validators.required],
       customerId: ['', Validators.required],
       templateId: ['', Validators.required],
       dueDate: ['', Validators.required],
+      currency: ['USD', Validators.required],
+      clientCountry: [null as string | null],
       lineItems: this.fb.array([])
     });
   }
@@ -77,17 +87,19 @@ export class DocumentFormComponent implements OnInit {
       customers: this.customerService.getAll(),
       templates: this.templateService.getAll(),
       products: this.productService.getAll(),
+      workspace: this.workspaceProfileService.getCached(),
       document: this.isEditMode ? this.documentService.getById(this.documentId as string) : of(null)
     }).subscribe({
-      next: ({ customers, templates, products, document }) => {
+      next: ({ customers, templates, products, workspace, document }) => {
         this.customers = customers;
         this.templates = templates;
         this.products = products;
+        this.workspaceDefaultCurrency = workspace.defaultCurrency;
 
         if (document) {
           this.populateForEdit(document);
         } else {
-          this.populateDefaultsForCreate(templates);
+          this.populateDefaultsForCreate(templates, workspace.defaultCurrency, workspace.country);
         }
 
         this.loading = false;
@@ -97,6 +109,18 @@ export class DocumentFormComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  /** Picks up the selected customer's own country the moment a customer is chosen, so the target-country override starts from a sensible default (TASK-029) — the user can still change it. Only applies on create; an existing document's override is left as whatever was explicitly set. */
+  onCustomerSelected(): void {
+    if (this.isEditMode) {
+      return;
+    }
+
+    const customer = this.selectedCustomer;
+    if (customer?.country) {
+      this.form.patchValue({ clientCountry: customer.country });
+    }
   }
 
   get lineItems(): FormArray {
@@ -217,7 +241,9 @@ export class DocumentFormComponent implements OnInit {
       customerId: this.form.value.customerId,
       templateId: this.form.value.templateId,
       dueDate: this.form.value.dueDate,
-      lineItems
+      lineItems,
+      currency: this.form.value.currency,
+      clientCountry: this.form.value.clientCountry
     };
 
     // No point even trying the request while the browser already knows it's
@@ -255,7 +281,9 @@ export class DocumentFormComponent implements OnInit {
       templateId: this.form.value.templateId,
       dueDate: this.form.value.dueDate,
       status: this.existingStatus,
-      lineItems
+      lineItems,
+      currency: this.form.value.currency,
+      clientCountry: this.form.value.clientCountry
     };
 
     this.documentService.update(documentId, request).subscribe({
@@ -274,7 +302,9 @@ export class DocumentFormComponent implements OnInit {
       type: document.type,
       customerId: document.customerId,
       templateId: document.templateId,
-      dueDate: document.dueDate
+      dueDate: document.dueDate,
+      currency: document.currency,
+      clientCountry: document.clientCountry
     });
     // Customer and document type are fixed once a document exists — the backend's
     // PUT endpoint doesn't accept them, so disable rather than silently ignore.
@@ -293,12 +323,14 @@ export class DocumentFormComponent implements OnInit {
     });
   }
 
-  private populateDefaultsForCreate(templates: Template[]): void {
+  private populateDefaultsForCreate(templates: Template[], defaultCurrency: string, workspaceCountry: string): void {
     const defaultTemplate = templates.find((template) => template.isDefault) ?? templates[0];
 
     this.form.patchValue({
       templateId: defaultTemplate?.id ?? '',
-      dueDate: this.formatDate(this.addDays(new Date(), DEFAULT_DUE_DAYS))
+      dueDate: this.formatDate(this.addDays(new Date(), DEFAULT_DUE_DAYS)),
+      currency: defaultCurrency,
+      clientCountry: workspaceCountry
     });
 
     this.addLineItem();

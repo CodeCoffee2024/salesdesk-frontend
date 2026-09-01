@@ -6,6 +6,7 @@ import { OverviewComponent } from './overview.component';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { DocumentService } from '../../core/services/document.service';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
+import { CurrencyLocalePipe } from '../../core/pipes/currency-locale.pipe';
 import { Document as DocumentModel } from '../../core/models/document.model';
 import { DashboardSummary } from '../../core/models/dashboard.model';
 
@@ -27,6 +28,8 @@ function makeDocument(overrides: Partial<DocumentModel>): DocumentModel {
     templateName: 'Studio Standard',
     subtotal: 100,
     total: 100,
+    currency: 'USD',
+    clientCountry: null,
     lineItems: [],
     ...overrides
   };
@@ -39,7 +42,7 @@ describe('OverviewComponent', () => {
   function setup(summary: DashboardSummary, documents: DocumentModel[]) {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [OverviewComponent, StatusBadgeComponent],
+      declarations: [OverviewComponent, StatusBadgeComponent, CurrencyLocalePipe],
       providers: [
         { provide: DashboardService, useValue: { getSummary: () => of(summary) } },
         { provide: DocumentService, useValue: { getAll: () => of(documents) } }
@@ -51,7 +54,13 @@ describe('OverviewComponent', () => {
     fixture.detectChanges();
   }
 
-  const summary: DashboardSummary = { revenueThisYear: 28450, outstanding: 9600, quotePipeline: 6800, activeCustomers: 4 };
+  const summary: DashboardSummary = {
+    revenueThisYear: 28450,
+    outstanding: 9600,
+    quotePipeline: 6800,
+    activeCustomers: 4,
+    baseCurrency: 'USD'
+  };
 
   it('should create and load the summary and recent documents', () => {
     setup(summary, [makeDocument({})]);
@@ -112,7 +121,7 @@ describe('OverviewComponent', () => {
   it('shows an error state when loading fails', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [OverviewComponent, StatusBadgeComponent],
+      declarations: [OverviewComponent, StatusBadgeComponent, CurrencyLocalePipe],
       providers: [
         { provide: DashboardService, useValue: { getSummary: () => throwError(() => new Error('network')) } },
         { provide: DocumentService, useValue: { getAll: () => of([]) } }

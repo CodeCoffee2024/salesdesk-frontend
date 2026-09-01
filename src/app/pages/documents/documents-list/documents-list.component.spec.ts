@@ -9,6 +9,7 @@ import { DocumentService } from '../../../core/services/document.service';
 import { StatusBadgeComponent } from '../../../shared/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 import { HasRoleDirective } from '../../../shared/has-role.directive';
+import { CurrencyLocalePipe } from '../../../core/pipes/currency-locale.pipe';
 import { Document as DocumentModel } from '../../../core/models/document.model';
 
 function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
@@ -29,6 +30,8 @@ function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
     templateName: 'Studio Standard',
     subtotal: 1000,
     total: 1000,
+    currency: 'USD',
+    clientCountry: null,
     lineItems: [],
     ...overrides
   };
@@ -48,7 +51,7 @@ describe('DocumentsListComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
-      declarations: [DocumentsListComponent, StatusBadgeComponent, ConfirmDialogComponent, HasRoleDirective],
+      declarations: [DocumentsListComponent, StatusBadgeComponent, ConfirmDialogComponent, HasRoleDirective, CurrencyLocalePipe],
       providers: [{ provide: DocumentService, useValue: documentServiceSpy }]
     });
 

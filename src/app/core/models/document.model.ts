@@ -35,6 +35,10 @@ export interface Document {
   templateName: string;
   subtotal: number;
   total: number;
+  /** ISO 4217 code this document is priced in (TASK-029). */
+  currency: string;
+  /** Optional ISO 3166-1 alpha-2 override of the client's target country (TASK-029). */
+  clientCountry: string | null;
   lineItems: DocumentLineItem[];
 }
 
@@ -57,6 +61,10 @@ export interface CreateDocumentRequest {
   templateId: string;
   dueDate: string;
   lineItems: CreateDocumentLineItemRequest[];
+  /** ISO 4217 override — omit/null to default from the workspace/customer (TASK-029). */
+  currency?: string | null;
+  /** ISO 3166-1 alpha-2 override — omit/null to default from the customer/workspace (TASK-029). */
+  clientCountry?: string | null;
 }
 
 export interface UpdateDocumentRequest {
@@ -64,4 +72,8 @@ export interface UpdateDocumentRequest {
   dueDate: string;
   status: DocumentStatus;
   lineItems: CreateDocumentLineItemRequest[];
+  /** ISO 4217 override — omit/null to leave the document's currency unchanged (TASK-029). */
+  currency?: string | null;
+  /** ISO 3166-1 alpha-2 override — omit/null to leave unchanged (TASK-029). */
+  clientCountry?: string | null;
 }
