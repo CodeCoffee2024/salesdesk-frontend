@@ -1,5 +1,5 @@
 {
-  "buildCommand": "sed -i \"s|__API_BASE_URL__|$API_BASE_URL|\" src/environments/environment.prod.ts src/custom-sw.js && npm run build -- --configuration production",
+  "buildCommand": "sed -i \"s|__API_BASE_URL__|$API_BASE_URL|; s|__GA_MEASUREMENT_ID__|$GA_MEASUREMENT_ID|\" src/environments/environment.prod.ts src/custom-sw.js && npm run build -- --configuration production",
   "outputDirectory": "dist/sales-desk.front-end",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }

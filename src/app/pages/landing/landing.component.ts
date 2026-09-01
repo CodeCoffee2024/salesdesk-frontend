@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AnalyticsService } from '../../core/services/analytics.service';
 
 type PreviewDocType = 'Quote' | 'Invoice';
 
@@ -34,7 +35,7 @@ interface PricingPlan {
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']
 })
-export class LandingComponent {
+export class LandingComponent implements OnInit {
   readonly previewDocTypes: PreviewDocType[] = ['Quote', 'Invoice'];
   activePreviewDocType: PreviewDocType = 'Quote';
 
@@ -114,6 +115,17 @@ export class LandingComponent {
       highlighted: false
     }
   ];
+
+  constructor(private readonly analytics: AnalyticsService) {}
+
+  // First step of the marketing funnel (TASK-032 / docs/research/TASK-DAY-BY-DAY-MARKET.md):
+  // a distinctly-named GA4 event, separate from the automatic page_view
+  // AnalyticsService already fires on every route change, so a Funnel
+  // Exploration can be built against landing_view -> signup_started ->
+  // first_quote_sent without conflating it with any other page view.
+  ngOnInit(): void {
+    this.analytics.trackEvent('landing_view');
+  }
 
   get activeFeature(): FeatureHighlight {
     return this.features.find(feature => feature.id === this.activeFeatureId) ?? this.features[0];

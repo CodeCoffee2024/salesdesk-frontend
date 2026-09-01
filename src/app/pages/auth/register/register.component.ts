@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 
 function passwordsMatchValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -32,7 +33,12 @@ export class RegisterComponent {
   submitting = false;
   errorMessage: string | null = null;
 
-  constructor(private readonly fb: FormBuilder, private readonly authService: AuthService, private readonly router: Router) {}
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly analytics: AnalyticsService
+  ) {}
 
   submit(): void {
     if (this.form.invalid) {
@@ -46,7 +52,12 @@ export class RegisterComponent {
     const { fullName, workspaceName, email, password } = this.form.getRawValue();
 
     this.authService.register({ fullName: fullName!, workspaceName: workspaceName!, email: email!, password: password! }).subscribe({
-      next: () => this.router.navigateByUrl('/overview'),
+      next: () => {
+        // Second step of the marketing funnel — see LandingComponent's
+        // landing_view for the same rationale (TASK-032 / TASK-DAY-BY-DAY-MARKET.md).
+        this.analytics.trackEvent('signup_started', { method: 'email' });
+        this.router.navigateByUrl('/overview');
+      },
       error: (error: HttpErrorResponse) => {
         this.submitting = false;
         this.errorMessage =

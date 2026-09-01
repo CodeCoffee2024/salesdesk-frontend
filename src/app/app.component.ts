@@ -3,6 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { PageMetaService } from './core/services/page-meta.service';
 import { AuthService } from './core/services/auth.service';
+import { AnalyticsService } from './core/services/analytics.service';
 
 // '/view' (TASK-023/024's unauthenticated client document link) joins the auth
 // pages here — a client following a shared quote/invoice link was never logged in
@@ -33,12 +34,14 @@ export class AppComponent implements OnInit {
 
   private hasCheckedOnboarding = false;
 
-  // Injecting PageMetaService (rather than calling it) is what activates it: its
-  // constructor is where the router-driven title/favicon subscription starts.
+  // Injecting PageMetaService/AnalyticsService (rather than calling them) is
+  // what activates them: their constructors are where the router-driven
+  // title/favicon subscription and the GA4 page_view tracking start.
   constructor(
     private readonly router: Router,
     private readonly pageMeta: PageMetaService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly analytics: AnalyticsService
   ) {}
 
   ngOnInit(): void {

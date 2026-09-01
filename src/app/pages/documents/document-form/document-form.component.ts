@@ -10,6 +10,7 @@ import { TemplateService } from '../../../core/services/template.service';
 import { ProductService } from '../../../core/services/product.service';
 import { OfflineQueueService } from '../../../core/services/offline-queue.service';
 import { WorkspaceProfileService } from '../../../core/services/workspace-profile.service';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 import { Customer } from '../../../core/models/customer.model';
 import { Template } from '../../../core/models/template.model';
 import { Product } from '../../../core/models/product.model';
@@ -66,7 +67,8 @@ export class DocumentFormComponent implements OnInit {
     private readonly templateService: TemplateService,
     private readonly productService: ProductService,
     private readonly offlineQueue: OfflineQueueService,
-    private readonly workspaceProfileService: WorkspaceProfileService
+    private readonly workspaceProfileService: WorkspaceProfileService,
+    private readonly analytics: AnalyticsService
   ) {
     this.form = this.fb.group({
       type: ['Quote' as DocumentType, Validators.required],
@@ -254,7 +256,10 @@ export class DocumentFormComponent implements OnInit {
     }
 
     this.documentService.create(request).subscribe({
-      next: (created) => this.router.navigate(['/documents'], { state: { highlightId: created.id } }),
+      next: (created) => {
+        this.trackFirstQuoteSent(created.type);
+        this.router.navigate(['/documents'], { state: { highlightId: created.id } });
+      },
       error: (error: HttpErrorResponse) => {
         // status 0 means the request never reached the server at all (dropped
         // connection, DNS failure, etc.) — navigator.onLine can be wrong, so
@@ -272,8 +277,21 @@ export class DocumentFormComponent implements OnInit {
 
   private saveOffline(request: CreateDocumentRequest): void {
     void this.offlineQueue.enqueue(request).then(() => {
+      this.trackFirstQuoteSent(request.type);
       this.router.navigate(['/documents'], { state: { savedOffline: true } });
     });
+  }
+
+  /**
+   * Third step of the marketing funnel (TASK-032 / TASK-DAY-BY-DAY-MARKET.md)
+   * — fires on every successful document creation, not just the user's
+   * literal first one: GA4's own Funnel Exploration report handles
+   * "first occurrence per user," so this only needs to fire consistently.
+   * Deliberately not fired from the edit flow (submitEdit) — that's not the
+   * funnel action being measured.
+   */
+  private trackFirstQuoteSent(documentType: DocumentType): void {
+    this.analytics.trackEvent('first_quote_sent', { document_type: documentType });
   }
 
   private submitEdit(documentId: string, lineItems: CreateDocumentLineItemRequest[]): void {
