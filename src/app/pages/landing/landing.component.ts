@@ -38,14 +38,16 @@ export class LandingComponent {
   readonly previewDocTypes: PreviewDocType[] = ['Quote', 'Invoice'];
   activePreviewDocType: PreviewDocType = 'Quote';
 
+  // TASK-032: sample data reflects the "event pros" ICP (weddings, corporate gigs) —
+  // matches the hero headline/pitch directly above this preview card.
   private readonly previewLineItems: Record<PreviewDocType, PreviewLineItem[]> = {
     Quote: [
-      { description: 'Brand identity sprint', amount: '$4,200.00' },
-      { description: 'Web design & build', amount: '$6,800.00' }
+      { description: 'Wedding MC & DJ package (6 hrs)', amount: '$1,800.00' },
+      { description: 'Corporate event hosting (half-day)', amount: '$950.00' }
     ],
     Invoice: [
-      { description: 'Monthly creative retainer', amount: '$2,400.00' },
-      { description: 'Art direction (3 days)', amount: '$2,850.00' }
+      { description: 'Booking deposit — Saturday wedding', amount: '$500.00' },
+      { description: 'Final balance — reception hosting', amount: '$1,300.00' }
     ]
   };
 

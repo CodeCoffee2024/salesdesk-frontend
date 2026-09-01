@@ -32,7 +32,8 @@ import { verifiedGuard } from './core/guards/verified.guard';
 const routes: Routes = [
   // TASK-018: the public marketing page lives at root for guests; homeGuard sends
   // an already-authenticated visitor straight to /overview instead.
-  { path: '', component: LandingComponent, canActivate: [homeGuard], data: { title: 'Professional quotes & invoices' } },
+  // TASK-032: repositioned around the "event pros" ICP/pitch — see docs/tasks/TASK-032.txt.
+  { path: '', component: LandingComponent, canActivate: [homeGuard], data: { title: 'Fast quotes & invoices for event pros' } },
   { path: 'login', component: LoginComponent, data: { title: 'Sign in' } },
   { path: 'register', component: RegisterComponent, data: { title: 'Create your account' } },
   { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Reset your password' } },
