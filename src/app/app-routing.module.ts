@@ -23,6 +23,7 @@ import { AdminAuditLogComponent } from './pages/admin/admin-audit-log/admin-audi
 import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
 import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
 import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/workspace-profile.component';
+import { BillingComponent } from './pages/settings/billing/billing.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { homeGuard } from './core/guards/home.guard';
@@ -88,6 +89,11 @@ const routes: Routes = [
         path: 'settings/workspace',
         component: WorkspaceProfileComponent,
         data: { breadcrumb: [{ label: 'Business profile' }] }
+      },
+      {
+        path: 'settings/billing',
+        component: BillingComponent,
+        data: { breadcrumb: [{ label: 'Billing' }] }
       },
       {
         path: 'admin',

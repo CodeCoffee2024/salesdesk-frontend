@@ -73,4 +73,16 @@ describe('SidebarComponent', () => {
     setup('Viewer');
     expect(fixture.nativeElement.querySelector('a[routerLink="/settings/reminders"]')).toBeNull();
   });
+
+  it('shows the Billing link for a WorkspaceAdmin (TASK-031)', () => {
+    setup('WorkspaceAdmin');
+    const link = fixture.nativeElement.querySelector('a[routerLink="/settings/billing"]');
+    expect(link).not.toBeNull();
+    expect(link.textContent).toContain('Billing');
+  });
+
+  it('hides the Billing link for a Viewer', () => {
+    setup('Viewer');
+    expect(fixture.nativeElement.querySelector('a[routerLink="/settings/billing"]')).toBeNull();
+  });
 });

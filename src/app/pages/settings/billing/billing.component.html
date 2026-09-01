@@ -1,0 +1,42 @@
+<div class="billing" *ngIf="!loading && !loadError && billing as b">
+  <div class="billing__header">
+    <div>
+      <h1>Billing</h1>
+      <p>Your subscription plan and, if applicable, promo status.</p>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <div class="plan-row">
+      <div class="plan-row__tier">
+        <span class="tier-badge" [class.tier-badge--premium]="isPremium">{{ b.subscriptionTier }}</span>
+        <span class="plan-row__label">
+          {{ isPremium ? 'Premium plan' : 'Free plan' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="early-bird-banner" *ngIf="b.isEarlyBirdPromo">
+      <i class="bi bi-stars" aria-hidden="true"></i>
+      <div>
+        <p class="early-bird-banner__title">You're one of our first 100 members!</p>
+        <p class="early-bird-banner__detail" *ngIf="b.subscriptionEndDate">
+          Your free year of Premium is active through {{ b.subscriptionEndDate | date: 'longDate' }}.
+        </p>
+      </div>
+    </div>
+
+    <p class="plan-note" *ngIf="!isPremium">
+      Upgrade to Premium for advanced features. (Paid upgrades aren't available yet — check back soon.)
+    </p>
+  </div>
+</div>
+
+<div class="billing__loading" *ngIf="loading">Loading&hellip;</div>
+
+<app-empty-state
+  *ngIf="!loading && loadError"
+  icon="not-found"
+  heading="Couldn't load your billing details"
+  description="Something went wrong fetching it. Please try again."
+></app-empty-state>

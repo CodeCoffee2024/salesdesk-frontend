@@ -39,6 +39,7 @@ import { SignatureAcceptanceModalComponent } from './shared/signature-acceptance
 import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
 import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
 import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/workspace-profile.component';
+import { BillingComponent } from './pages/settings/billing/billing.component';
 import { OnboardingChecklistComponent } from './shared/onboarding-checklist/onboarding-checklist.component';
 import { FloatingHelpWidgetComponent } from './shared/floating-help-widget/floating-help-widget.component';
 import { InfoTooltipComponent } from './shared/info-tooltip/info-tooltip.component';
@@ -81,6 +82,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     DocumentSignComponent,
     ReminderSettingsComponent,
     WorkspaceProfileComponent,
+    BillingComponent,
     OnboardingChecklistComponent,
     FloatingHelpWidgetComponent,
     InfoTooltipComponent,
