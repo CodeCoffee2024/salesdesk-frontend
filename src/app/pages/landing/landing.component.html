@@ -1,3 +1,17 @@
+<!-- Google tag (gtag.js) -->
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=G-6J74F3HXY5"
+></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+
+  gtag("config", "G-6J74F3HXY5");
+</script>
 <div class="landing">
   <header class="landing-header">
     <div class="landing-header__brand">
@@ -17,10 +31,14 @@
 
   <section class="hero">
     <div class="hero__copy">
-      <h1>Create professional quotes and invoices in under 2 minutes&mdash;no spreadsheets or complicated setup required.</h1>
+      <h1>
+        Create professional quotes and invoices in under 2 minutes&mdash;no
+        spreadsheets or complicated setup required.
+      </h1>
       <p class="hero__subhead">
-        Built for freelance event hosts, emcees, and event pros who need to issue fast, polished quotes and
-        collect deposits before booking clients &mdash; without wrestling with complex software.
+        Built for freelance event hosts, emcees, and event pros who need to
+        issue fast, polished quotes and collect deposits before booking clients
+        &mdash; without wrestling with complex software.
       </p>
 
       <ul class="hero__pain-points">
@@ -29,8 +47,12 @@
       </ul>
 
       <div class="hero__cta">
-        <a routerLink="/register" class="btn-primary btn-primary--lg">Start free trial</a>
-        <a routerLink="/login" class="btn-secondary btn-secondary--lg">Sign in</a>
+        <a routerLink="/register" class="btn-primary btn-primary--lg"
+          >Start free trial</a
+        >
+        <a routerLink="/login" class="btn-secondary btn-secondary--lg"
+          >Sign in</a
+        >
       </div>
     </div>
 
@@ -58,7 +80,10 @@
           </div>
 
           <div class="preview-card__lines">
-            <div class="preview-card__line" *ngFor="let item of activePreviewLineItems">
+            <div
+              class="preview-card__line"
+              *ngFor="let item of activePreviewLineItems"
+            >
               <span>{{ item.description }}</span>
               <span>{{ item.amount }}</span>
             </div>
@@ -106,7 +131,11 @@
     </div>
 
     <div class="pricing__grid">
-      <div class="plan-card" *ngFor="let plan of plans" [class.plan-card--highlighted]="plan.highlighted">
+      <div
+        class="plan-card"
+        *ngFor="let plan of plans"
+        [class.plan-card--highlighted]="plan.highlighted"
+      >
         <p class="plan-card__badge" *ngIf="plan.highlighted">Most popular</p>
         <h3>{{ plan.name }}</h3>
         <p class="plan-card__price">
@@ -122,14 +151,21 @@
           </li>
         </ul>
 
-        <a routerLink="/register" class="btn-primary" [class.btn-secondary]="!plan.highlighted">Start free trial</a>
+        <a
+          routerLink="/register"
+          class="btn-primary"
+          [class.btn-secondary]="!plan.highlighted"
+          >Start free trial</a
+        >
       </div>
     </div>
   </section>
 
   <section class="closing-cta">
     <h2>Send your next quote in minutes</h2>
-    <a routerLink="/register" class="btn-primary btn-primary--lg">Start free trial</a>
+    <a routerLink="/register" class="btn-primary btn-primary--lg"
+      >Start free trial</a
+    >
   </section>
 
   <footer class="landing-footer">
