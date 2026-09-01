@@ -25,6 +25,8 @@ import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
 import { ForgotPasswordComponent } from './pages/auth/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
+import { VerifyEmailComponent } from './pages/auth/verify-email/verify-email.component';
+import { EmailVerificationBannerComponent } from './shared/email-verification-banner/email-verification-banner.component';
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard.component';
 import { AdminWorkspacesComponent } from './pages/admin/admin-workspaces/admin-workspaces.component';
 import { AdminUsersComponent } from './pages/admin/admin-users/admin-users.component';
@@ -40,6 +42,7 @@ import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/wo
 import { OnboardingChecklistComponent } from './shared/onboarding-checklist/onboarding-checklist.component';
 import { FloatingHelpWidgetComponent } from './shared/floating-help-widget/floating-help-widget.component';
 import { InfoTooltipComponent } from './shared/info-tooltip/info-tooltip.component';
+import { CurrencyLocalePipe } from './core/pipes/currency-locale.pipe';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
@@ -65,6 +68,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     RegisterComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    VerifyEmailComponent,
+    EmailVerificationBannerComponent,
     AdminDashboardComponent,
     AdminWorkspacesComponent,
     AdminUsersComponent,
@@ -78,7 +83,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     WorkspaceProfileComponent,
     OnboardingChecklistComponent,
     FloatingHelpWidgetComponent,
-    InfoTooltipComponent
+    InfoTooltipComponent,
+    CurrencyLocalePipe
   ],
   imports: [
     BrowserModule,

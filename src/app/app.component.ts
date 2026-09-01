@@ -7,7 +7,7 @@ import { AuthService } from './core/services/auth.service';
 // '/view' (TASK-023/024's unauthenticated client document link) joins the auth
 // pages here — a client following a shared quote/invoice link was never logged in
 // to begin with, so the dashboard shell has nothing relevant to show them.
-const PUBLIC_ROUTE_PREFIXES = ['/login', '/register', '/forgot-password', '/reset-password', '/view'];
+const PUBLIC_ROUTE_PREFIXES = ['/login', '/register', '/forgot-password', '/reset-password', '/auth/verify-email', '/view'];
 
 // '/' (the landing page, TASK-018) is checked for exact equality rather than
 // folded into PUBLIC_ROUTE_PREFIXES — as a prefix it would match every route.

@@ -40,9 +40,46 @@
       </button>
     </form>
 
-    <div class="auth-footer">
-      <p><a routerLink="/forgot-password">Forgot your password?</a></p>
-      <p>Don't have an account? <a routerLink="/register">Create one</a></p>
-    </div>
+    <ng-container *ngIf="!showResendVerification; else resendVerificationBlock">
+      <div class="auth-footer">
+        <p><a routerLink="/forgot-password">Forgot your password?</a></p>
+        <p><a href="javascript:void(0)" (click)="toggleResendVerification()">Didn't get a verification email?</a></p>
+        <p>Don't have an account? <a routerLink="/register">Create one</a></p>
+      </div>
+    </ng-container>
+
+    <ng-template #resendVerificationBlock>
+      <ng-container *ngIf="!verificationResent; else resendConfirmation">
+        <p class="auth-subtext">Enter your email and we'll send you a new verification link.</p>
+
+        <form class="auth-form" [formGroup]="resendForm" (ngSubmit)="resendVerification()">
+          <div class="auth-field">
+            <label for="resendEmail">Email</label>
+            <input
+              id="resendEmail"
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              [class.is-invalid]="resendForm.controls.email.invalid && resendForm.controls.email.touched"
+            />
+            <span class="auth-field-error" *ngIf="resendForm.controls.email.invalid && resendForm.controls.email.touched">
+              Enter a valid email address.
+            </span>
+          </div>
+
+          <button type="submit" class="auth-submit" [disabled]="resendingVerification">
+            {{ resendingVerification ? 'Sending…' : 'Send verification link' }}
+          </button>
+        </form>
+      </ng-container>
+
+      <ng-template #resendConfirmation>
+        <p class="auth-subtext">If an account exists for that address and isn't already verified, we've sent a new link.</p>
+      </ng-template>
+
+      <div class="auth-footer">
+        <p><a href="javascript:void(0)" (click)="toggleResendVerification()">Back to sign in</a></p>
+      </div>
+    </ng-template>
   </div>
 </div>

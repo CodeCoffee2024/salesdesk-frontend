@@ -7,6 +7,7 @@ export interface CurrentUser {
   role: UserRole;
   workspaceId: string;
   hasCompletedOnboarding: boolean;
+  isEmailVerified: boolean;
 }
 
 export interface LoginRequest {
@@ -28,6 +29,14 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
+}
+
+export interface VerifyEmailRequest {
+  token: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
 }
 
 export interface AuthResponse {

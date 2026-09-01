@@ -1,0 +1,12 @@
+<div class="verification-banner" *ngIf="currentUser$ | async as user">
+  <ng-container *ngIf="!user.isEmailVerified">
+    <span class="verification-banner__text">
+      <i class="bi bi-envelope-exclamation" aria-hidden="true"></i>
+      Please verify your email address to unlock all features.
+    </span>
+
+    <button type="button" class="verification-banner__resend" [disabled]="sending" (click)="resend(user.email)">
+      {{ sent ? 'Email sent' : sending ? 'Sending…' : 'Resend Email' }}
+    </button>
+  </ng-container>
+</div>

@@ -9,8 +9,10 @@ import {
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
+  ResendVerificationRequest,
   ResetPasswordRequest,
-  UserRole
+  UserRole,
+  VerifyEmailRequest
 } from '../models/auth.model';
 
 const AUTH_TOKEN_MIRROR_ID = 'current';
@@ -57,6 +59,16 @@ export class AuthService {
 
   resetPassword(request: ResetPasswordRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${BASE_URL}/reset-password`, request).pipe(tap(response => this.storeSession(response)));
+  }
+
+  /** TASK-030: exchanges the token from the emailed /auth/verify-email?token=xyz link for a fresh, verified session — same shape as login/register/reset-password. */
+  verifyEmail(request: VerifyEmailRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${BASE_URL}/verify-email`, request).pipe(tap(response => this.storeSession(response)));
+  }
+
+  /** Backs both the login page's "resend verification link" and the in-app banner's "Resend Email" button — always resolves the same way whether or not the address is registered/already verified, see ResendVerificationEmailCommandHandler. */
+  resendVerificationEmail(request: ResendVerificationRequest): Observable<void> {
+    return this.http.post<void>(`${BASE_URL}/resend-verification`, request);
   }
 
   me(): Observable<CurrentUser> {

@@ -18,6 +18,17 @@ export class LoginComponent {
   submitting = false;
   errorMessage: string | null = null;
 
+  // TASK-030 AC: "provide an option on the login page to request a new
+  // verification link" — a small inline form rather than a separate route,
+  // since it's reachable before the user has even signed in.
+  readonly resendForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]]
+  });
+
+  showResendVerification = false;
+  resendingVerification = false;
+  verificationResent = false;
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
@@ -44,5 +55,31 @@ export class LoginComponent {
         this.errorMessage = error.status === 401 ? 'Invalid email or password.' : 'Something went wrong. Please try again.';
       }
     });
+  }
+
+  toggleResendVerification(): void {
+    this.showResendVerification = !this.showResendVerification;
+    this.verificationResent = false;
+  }
+
+  resendVerification(): void {
+    if (this.resendForm.invalid) {
+      this.resendForm.markAllAsTouched();
+      return;
+    }
+
+    this.resendingVerification = true;
+
+    // Always shows the same confirmation, whether or not the address is
+    // registered or already verified — see ResendVerificationEmailCommandHandler.
+    this.authService.resendVerificationEmail(this.resendForm.getRawValue() as { email: string }).subscribe({
+      next: () => this.onResendSettled(),
+      error: () => this.onResendSettled()
+    });
+  }
+
+  private onResendSettled(): void {
+    this.resendingVerification = false;
+    this.verificationResent = true;
   }
 }

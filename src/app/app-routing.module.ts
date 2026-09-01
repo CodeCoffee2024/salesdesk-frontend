@@ -15,6 +15,7 @@ import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
 import { ForgotPasswordComponent } from './pages/auth/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
+import { VerifyEmailComponent } from './pages/auth/verify-email/verify-email.component';
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard.component';
 import { AdminWorkspacesComponent } from './pages/admin/admin-workspaces/admin-workspaces.component';
 import { AdminUsersComponent } from './pages/admin/admin-users/admin-users.component';
@@ -25,6 +26,7 @@ import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/wo
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { homeGuard } from './core/guards/home.guard';
+import { verifiedGuard } from './core/guards/verified.guard';
 
 const routes: Routes = [
   // TASK-018: the public marketing page lives at root for guests; homeGuard sends
@@ -34,6 +36,10 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent, data: { title: 'Create your account' } },
   { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Reset your password' } },
   { path: 'reset-password', component: ResetPasswordComponent, data: { title: 'Set a new password' } },
+  // TASK-030: matches the literal /auth/verify-email path the backend's emailed
+  // link points at (IPublicLinkBuilder.BuildVerifyEmailUrl), even though it's the
+  // one auth route not living flat alongside its siblings above.
+  { path: 'auth/verify-email', component: VerifyEmailComponent, data: { title: 'Verify your email' } },
   // TASK-023/024: the unauthenticated link a client opens from their quote/invoice
   // — never behind authGuard, since the whole point is that the client has no
   // SalesDesk account.
@@ -48,11 +54,16 @@ const routes: Routes = [
       {
         path: 'documents/new',
         component: DocumentFormComponent,
+        // TASK-030: creating/editing a document is the clearest "mutation
+        // action" route in the app — see verifiedGuard's own doc comment for
+        // why only these two routes (not the whole shell) are gated here.
+        canActivate: [verifiedGuard],
         data: { breadcrumb: [{ label: 'Documents', url: '/documents' }, { label: 'New document' }] }
       },
       {
         path: 'documents/:id/edit',
         component: DocumentFormComponent,
+        canActivate: [verifiedGuard],
         data: { breadcrumb: [{ label: 'Documents', url: '/documents' }, { label: 'Edit' }] }
       },
       {

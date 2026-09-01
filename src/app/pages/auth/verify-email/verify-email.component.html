@@ -1,0 +1,59 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-brand">SalesDesk</div>
+
+    <ng-container [ngSwitch]="status">
+      <ng-container *ngSwitchCase="'verifying'">
+        <h1 class="auth-heading">Verifying your email&hellip;</h1>
+        <p class="auth-subtext">This will only take a moment.</p>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'success'">
+        <h1 class="auth-heading">Email verified</h1>
+        <p class="auth-subtext">Thanks for confirming your email address. Taking you to your dashboard&hellip;</p>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'missing-token'">
+        <h1 class="auth-heading">Invalid verification link</h1>
+        <p class="auth-subtext">This link is missing its verification token. Request a new one below.</p>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'error'">
+        <h1 class="auth-heading">Link expired or invalid</h1>
+        <p class="auth-subtext">This verification link is invalid or has expired. Request a new one below.</p>
+      </ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="status === 'error' || status === 'missing-token'">
+      <ng-container *ngIf="!resendSent; else resendConfirmation">
+        <form class="auth-form" [formGroup]="resendForm" (ngSubmit)="resend()">
+          <div class="auth-field">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              [class.is-invalid]="resendForm.controls.email.invalid && resendForm.controls.email.touched"
+            />
+            <span class="auth-field-error" *ngIf="resendForm.controls.email.invalid && resendForm.controls.email.touched">
+              Enter a valid email address.
+            </span>
+          </div>
+
+          <button type="submit" class="auth-submit" [disabled]="resending">
+            {{ resending ? 'Sending…' : 'Resend verification email' }}
+          </button>
+        </form>
+      </ng-container>
+
+      <ng-template #resendConfirmation>
+        <p class="auth-subtext">If an account exists for that address and isn't already verified, we've sent a new link.</p>
+      </ng-template>
+    </ng-container>
+
+    <div class="auth-footer">
+      <p><a routerLink="/login">Back to sign in</a></p>
+    </div>
+  </div>
+</div>

@@ -15,7 +15,8 @@ const adminUser: CurrentUser = {
   fullName: 'Nora Admin',
   role: 'WorkspaceAdmin',
   workspaceId: 'workspace-1',
-  hasCompletedOnboarding: true
+  hasCompletedOnboarding: true,
+  isEmailVerified: true
 };
 
 describe('TopbarComponent', () => {
@@ -73,6 +74,11 @@ describe('TopbarComponent', () => {
 
   it('hides the New document button for a Viewer', () => {
     setup(of(true), { ...adminUser, role: 'Viewer' });
+    expect(fixture.nativeElement.querySelector('.new-document-button')).toBeNull();
+  });
+
+  it('hides the New document button for an unverified user (TASK-030)', () => {
+    setup(of(true), { ...adminUser, isEmailVerified: false });
     expect(fixture.nativeElement.querySelector('.new-document-button')).toBeNull();
   });
 

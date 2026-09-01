@@ -1,0 +1,46 @@
+.verification-banner {
+  // Sticky, not fixed — mirrors ImpersonationBannerComponent so both can stack
+  // (unverified SystemAdmin impersonating someone is a real, if rare, case)
+  // without either covering page content.
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 16px;
+  background: #a15c00;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--sd-shadow-md);
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.verification-banner__text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.verification-banner__resend {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  color: #ffffff;
+  border-radius: var(--sd-radius-sm);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.8;
+  }
+}
