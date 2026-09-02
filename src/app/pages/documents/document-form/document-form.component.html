@@ -111,7 +111,9 @@
           <input type="number" min="0" step="0.01" placeholder="Unit price" formControlName="unitPrice" class="line-item-row__price" />
           <span class="line-item-row__total">{{ lineTotal(i) | currencyLocale:form.value.currency }}</span>
 
-          <button type="button" class="line-item-row__remove" (click)="removeLineItem(i)" aria-label="Remove line item">&times;</button>
+          <button type="button" class="line-item-row__remove" (click)="removeLineItem(i)" aria-label="Remove line item">
+            &times;<span class="line-item-row__remove-text">Remove item</span>
+          </button>
         </div>
 
         <button type="button" class="add-line-item" (click)="addLineItem()">+ Add line item</button>

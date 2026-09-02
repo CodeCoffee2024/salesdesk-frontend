@@ -31,6 +31,10 @@
   .search-input {
     max-width: none;
   }
+
+  .profile__meta {
+    grid-template-columns: 1fr;
+  }
 }
 
 .search-input {
@@ -203,6 +207,7 @@
   input,
   select {
     width: 100%;
+    min-height: 44px;
     padding: 9px 12px;
     border-radius: var(--sd-radius-sm);
     border: 1px solid var(--sd-border);

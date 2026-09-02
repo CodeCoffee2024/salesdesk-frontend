@@ -80,6 +80,7 @@ label {
 .field input,
 .line-item-row input {
   width: 100%;
+  min-height: 44px;
   padding: 9px 12px;
   border-radius: var(--sd-radius-sm);
   border: 1px solid var(--sd-border);
@@ -114,6 +115,10 @@ label {
 }
 
 .type-toggle__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   border: none;
   background: transparent;
   padding: 8px 20px;
@@ -165,6 +170,13 @@ label {
   &:hover {
     color: var(--sd-danger);
   }
+}
+
+/* Hidden on desktop, where the row stays a single compact grid line and the
+   trash icon alone is enough context — shown once the row stacks on mobile
+   (below), where a bare icon on a full-width bar reads as unlabeled. */
+.line-item-row__remove-text {
+  display: none;
 }
 
 .suggestions {
@@ -359,11 +371,68 @@ label {
 }
 
 @media (max-width: 900px) {
+  .document-form {
+    padding: 20px 16px;
+  }
+
   .document-form__layout {
     grid-template-columns: 1fr;
   }
 
   .field-row {
     grid-template-columns: 1fr;
+  }
+
+  /* Description/Qty/Unit price/Total/Remove stop being a 5-column grid and
+     become one full-width block per line item, each field on its own row. */
+  .line-item-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--sd-border);
+    border-radius: var(--sd-radius-sm);
+  }
+
+  .line-item-row__total {
+    text-align: left;
+    padding: 4px 0;
+
+    &::before {
+      content: 'Total: ';
+      font-weight: 400;
+      color: var(--sd-muted);
+    }
+  }
+
+  .line-item-row__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid var(--sd-border);
+    border-radius: var(--sd-radius-sm);
+    font-size: 14px;
+  }
+
+  .line-item-row__remove-text {
+    display: inline;
+    margin-left: 6px;
+  }
+
+  .add-line-item {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .document-form__actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    min-height: 44px;
   }
 }
