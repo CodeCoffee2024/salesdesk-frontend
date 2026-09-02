@@ -26,7 +26,9 @@
   --sd-danger: #c4302b;
   --sd-danger-bg: #fbe1dc;
   --sd-danger-dark: #a02622;
-  --sd-warning: #a15c00;
+  /* A harmonized warm gold, not the old isolated brown literal — paired with
+     ink text (~4.6:1), same contrast-safe pattern as --sd-accent-ink. */
+  --sd-warning: #b7791f;
   --sd-warning-bg: #fdf0dc;
 
   /* Document status pills — one pale bg/fg pair per DocumentStatus value. */

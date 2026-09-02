@@ -1,5 +1,9 @@
-<div class="verification-banner" *ngIf="currentUser$ | async as user">
-  <ng-container *ngIf="!user.isEmailVerified">
+<ng-container *ngIf="currentUser$ | async as user">
+  <!-- The styled bar itself is gated on !isEmailVerified, not just its text —
+       previously the bar's background/padding/shadow rendered for every
+       logged-in user and only the text inside was conditional, leaving an
+       empty colored sliver at the top of the page once verified. -->
+  <div class="verification-banner" *ngIf="!user.isEmailVerified">
     <span class="verification-banner__text">
       <i class="bi bi-envelope-exclamation" aria-hidden="true"></i>
       Please verify your email address to unlock all features.
@@ -8,5 +12,5 @@
     <button type="button" class="verification-banner__resend" [disabled]="sending" (click)="resend(user.email)">
       {{ sent ? 'Email sent' : sending ? 'Sending…' : 'Resend Email' }}
     </button>
-  </ng-container>
-</div>
+  </div>
+</ng-container>

@@ -11,7 +11,9 @@
   gap: 16px;
   padding: 10px 16px;
   background: var(--sd-warning);
-  color: #ffffff;
+  /* Ink, not white — white-on-gold fails contrast, same reasoning as the
+     impersonation banner's accent-ink pairing. */
+  color: var(--sd-ink);
   font-size: 13px;
   font-weight: 600;
   box-shadow: var(--sd-shadow-md);
@@ -26,9 +28,9 @@
 }
 
 .verification-banner__resend {
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(var(--sd-ink-rgb), 0.4);
   background: transparent;
-  color: #ffffff;
+  color: var(--sd-ink);
   border-radius: var(--sd-radius-sm);
   padding: 4px 12px;
   font-size: 12px;
@@ -36,7 +38,7 @@
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(var(--sd-ink-rgb), 0.1);
   }
 
   &:disabled {
