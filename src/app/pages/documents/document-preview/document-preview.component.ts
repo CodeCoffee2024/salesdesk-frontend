@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 import { DocumentService } from '../../../core/services/document.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Document as DocumentModel, DocumentStatus } from '../../../core/models/document.model';
@@ -160,6 +161,15 @@ export class DocumentPreviewComponent implements OnInit {
   }
 
   printDocument(): void {
+    // window.print() has nothing to talk to inside the Capacitor native app's
+    // WebView (no browser chrome, no print dialog). Fall back to the same
+    // download-and-share flow, whose share sheet exposes a system Print
+    // action on most Android setups. Regular web keeps the normal print dialog.
+    if (Capacitor.isNativePlatform()) {
+      this.downloadPdf();
+      return;
+    }
+
     window.print();
   }
 
@@ -168,16 +178,18 @@ export class DocumentPreviewComponent implements OnInit {
       return;
     }
 
-    this.pdfService.download(
-      this.document,
-      this.document.signature
-        ? {
-            signerName: this.document.signature.signerName,
-            signedAtUtc: this.document.signature.signedAtUtc,
-            signatureImageDataUrl: this.document.signature.signatureImageDataUrl
-          }
-        : null
-    );
+    this.pdfService
+      .download(
+        this.document,
+        this.document.signature
+          ? {
+              signerName: this.document.signature.signerName,
+              signedAtUtc: this.document.signature.signedAtUtc,
+              signatureImageDataUrl: this.document.signature.signatureImageDataUrl
+            }
+          : null
+      )
+      .catch(() => (this.actionError = 'Could not generate the PDF. Please try again.'));
   }
 
   get publicLink(): string {

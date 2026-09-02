@@ -6,7 +6,10 @@
   height: 100%;
   background: var(--sd-sidebar-bg);
   color: var(--sd-sidebar-fg);
-  padding: 20px 14px;
+  /* As a fixed full-height drawer on narrow screens (below), this reaches the
+     very top/bottom of the viewport — the extra inset keeps the brand mark and
+     nav clear of a notch or home indicator on a native iOS build (0 elsewhere). */
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 14px calc(20px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
 }
 

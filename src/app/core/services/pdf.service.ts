@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
+import { Capacitor } from '@capacitor/core';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { formatCurrency } from '../utils/locale.util';
 
 const PAGE_WIDTH_PT = 595;
@@ -42,7 +45,34 @@ export interface PdfSignatureInfo {
   providedIn: 'root'
 })
 export class PdfService {
-  download(document: PdfDocumentSource, signature?: PdfSignatureInfo | null): void {
+  /**
+   * jsPDF's own doc.save() triggers a browser download via a synthetic
+   * `<a download>` click. Inside the Capacitor native app's WebView (TASK-mobile)
+   * that click has nothing to hand off to, so it silently does nothing. On a
+   * native platform this writes the PDF to the app's cache dir instead and hands
+   * it to the OS share sheet, which covers saving, printing (most Android share
+   * sheets expose a system Print action), and sending it on. A regular browser
+   * still gets its normal direct download, unchanged.
+   */
+  async download(document: PdfDocumentSource, signature?: PdfSignatureInfo | null): Promise<void> {
+    const doc = this.buildDocument(document, signature);
+    const filename = `${document.documentNumber}.pdf`;
+
+    if (Capacitor.isNativePlatform()) {
+      await this.saveAndShare(doc, filename);
+      return;
+    }
+
+    doc.save(filename);
+  }
+
+  private async saveAndShare(doc: jsPDF, filename: string): Promise<void> {
+    const base64 = doc.output('datauristring').split(',')[1];
+    const { uri } = await Filesystem.writeFile({ path: filename, data: base64, directory: Directory.Cache });
+    await Share.share({ title: filename, url: uri });
+  }
+
+  private buildDocument(document: PdfDocumentSource, signature?: PdfSignatureInfo | null): jsPDF {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     const money = (amount: number) => formatCurrency(amount, document.currency, document.clientCountry);
     let y = 56;
@@ -125,6 +155,6 @@ export class PdfService {
       doc.setTextColor(0, 0, 0);
     }
 
-    doc.save(`${document.documentNumber}.pdf`);
+    return doc;
   }
 }

@@ -102,12 +102,14 @@ export class DocumentSignComponent implements OnInit {
       return;
     }
 
-    this.pdfService.download(
-      this.document,
-      this.document.isSigned && this.document.signedByName && this.document.signedAtUtc
-        ? { signerName: this.document.signedByName, signedAtUtc: this.document.signedAtUtc, signatureImageDataUrl: '' }
-        : null
-    );
+    this.pdfService
+      .download(
+        this.document,
+        this.document.isSigned && this.document.signedByName && this.document.signedAtUtc
+          ? { signerName: this.document.signedByName, signedAtUtc: this.document.signedAtUtc, signatureImageDataUrl: '' }
+          : null
+      )
+      .catch(() => undefined);
   }
 
   private fetch(): void {

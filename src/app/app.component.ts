@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
+import { App as CapacitorApp } from '@capacitor/app';
 import { filter, map, startWith } from 'rxjs';
 import { PageMetaService } from './core/services/page-meta.service';
 import { AuthService } from './core/services/auth.service';
 import { AnalyticsService } from './core/services/analytics.service';
+import { NativePushService } from './core/services/native-push.service';
 
 // '/view' (TASK-023/024's unauthenticated client document link) joins the auth
 // pages here — a client following a shared quote/invoice link was never logged in
@@ -39,12 +43,29 @@ export class AppComponent implements OnInit {
   // title/favicon subscription and the GA4 page_view tracking start.
   constructor(
     private readonly router: Router,
+    private readonly location: Location,
     private readonly pageMeta: PageMetaService,
     private readonly authService: AuthService,
-    private readonly analytics: AnalyticsService
+    private readonly analytics: AnalyticsService,
+    private readonly nativePush: NativePushService
   ) {}
 
   ngOnInit(): void {
+    // Android's hardware/gesture back button has nothing to do by default in a
+    // WebView-hosted SPA — it just closes the app from any page. Wire it to the
+    // Angular router's own history instead, matching how a real installed app
+    // behaves, and only exit when there's nowhere left in-app to go back to.
+    if (Capacitor.isNativePlatform()) {
+      CapacitorApp.addListener('backButton', () => {
+        const navigationId = (window.history.state as { navigationId?: number } | null)?.navigationId ?? 1;
+        if (navigationId > 1) {
+          this.location.back();
+        } else {
+          void CapacitorApp.exitApp();
+        }
+      });
+    }
+
     // Evaluated once per "a user became present" transition (fresh login/register,
     // or the app booting already-logged-in) rather than on every currentUser$
     // emission, so re-fetching /me or an impersonation swap doesn't reopen it.
@@ -52,6 +73,9 @@ export class AppComponent implements OnInit {
       if (user && !this.hasCheckedOnboarding) {
         this.hasCheckedOnboarding = true;
         this.showOnboarding = !user.hasCompletedOnboarding;
+        // Native app only (TASK-mobile). Web Push has its own separate,
+        // explicit opt-in via the topbar's bell icon (PushNotificationService).
+        void this.nativePush.requestPermissionAndRegister();
       } else if (!user) {
         this.hasCheckedOnboarding = false;
         this.showOnboarding = false;

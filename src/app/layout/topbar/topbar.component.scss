@@ -3,9 +3,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  height: 56px;
-  flex: 0 0 56px;
-  padding: 0 24px;
+  min-height: 56px;
+  flex: 0 0 auto;
+  /* padding-top adds the notch/status-bar inset on a native iOS build (0 on
+     Android and web, where the OS or the WebView already reserves that space). */
+  padding: env(safe-area-inset-top, 0) 24px 0;
   background: var(--sd-surface);
   border-bottom: 1px solid var(--sd-border);
 }
