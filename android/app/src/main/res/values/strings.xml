@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SalesDesk</string>
+    <string name="title_activity_main">SalesDesk</string>
+    <string name="package_name">com.salesdesk.app</string>
+    <string name="custom_url_scheme">com.salesdesk.app</string>
+</resources>
