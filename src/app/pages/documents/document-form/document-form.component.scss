@@ -48,6 +48,19 @@
   margin-bottom: 20px;
 }
 
+.document-form__readonly-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-warning-bg);
+  color: var(--sd-ink);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
 .document-form__layout {
   display: grid;
   grid-template-columns: 1.5fr 1fr;

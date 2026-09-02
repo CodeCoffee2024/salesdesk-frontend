@@ -47,6 +47,13 @@ export class DocumentFormComponent implements OnInit {
   documentId: string | null = null;
   private existingStatus: DocumentStatus = 'Draft';
 
+  /** TASK-037: Sent/Overdue/Accepted/Paid documents can't be edited directly — only Draft (never sent) and RevisionRequested (client asked for changes) reach an editable form. Matches Document.EnsureEditable on the backend. */
+  readOnly = false;
+  /** True while editing a RevisionRequested document — swaps the create flow's "Save & Send" wording for "Save & Re-Send Revision". */
+  get isRevision(): boolean {
+    return this.isEditMode && this.existingStatus === 'RevisionRequested';
+  }
+
   customers: Customer[] = [];
   templates: Template[] = [];
   products: Product[] = [];
@@ -324,8 +331,18 @@ export class DocumentFormComponent implements OnInit {
 
   // ---- Submit ----
 
-  submit(): void {
-    if (this.form.invalid || this.lineItems.length === 0) {
+  /** "Save Draft" (create) / "Save changes" (edit) — never dispatches. */
+  saveOnly(): void {
+    this.submit(false);
+  }
+
+  /** "Save & Send to Client" (create, or edit of a Draft) / "Save & Re-Send Revision" (edit of a RevisionRequested document). */
+  saveAndSend(): void {
+    this.submit(true);
+  }
+
+  private submit(dispatch: boolean): void {
+    if (this.readOnly || this.form.invalid || this.lineItems.length === 0) {
       this.form.markAllAsTouched();
       return;
     }
@@ -342,9 +359,9 @@ export class DocumentFormComponent implements OnInit {
       }));
 
     if (this.isEditMode && this.documentId) {
-      this.submitEdit(this.documentId, lineItems);
+      this.submitEdit(this.documentId, lineItems, dispatch);
     } else {
-      this.submitCreate(lineItems);
+      this.submitCreate(lineItems, dispatch);
     }
   }
 
@@ -352,7 +369,7 @@ export class DocumentFormComponent implements OnInit {
     this.router.navigate(['/documents']);
   }
 
-  private submitCreate(lineItems: CreateDocumentLineItemRequest[]): void {
+  private submitCreate(lineItems: CreateDocumentLineItemRequest[], dispatch: boolean): void {
     const request: CreateDocumentRequest = {
       type: this.form.value.type,
       customerId: this.form.value.customerId,
@@ -361,6 +378,7 @@ export class DocumentFormComponent implements OnInit {
       lineItems,
       currency: this.form.value.currency,
       clientCountry: this.form.value.clientCountry,
+      dispatch,
     };
 
     // No point even trying the request while the browser already knows it's
@@ -416,14 +434,15 @@ export class DocumentFormComponent implements OnInit {
   private submitEdit(
     documentId: string,
     lineItems: CreateDocumentLineItemRequest[],
+    dispatch: boolean,
   ): void {
     const request: UpdateDocumentRequest = {
       templateId: this.form.value.templateId,
       dueDate: this.form.value.dueDate,
-      status: this.existingStatus,
       lineItems,
       currency: this.form.value.currency,
       clientCountry: this.form.value.clientCountry,
+      dispatch,
     };
 
     this.documentService.update(documentId, request).subscribe({
@@ -437,6 +456,10 @@ export class DocumentFormComponent implements OnInit {
 
   private populateForEdit(document: DocumentModel): void {
     this.existingStatus = document.status;
+    // TASK-037: matches Document.EnsureEditable on the backend — a Sent/Overdue/
+    // Accepted/Paid document's content can't change under a client who's already
+    // seen it, so the form loads locked instead of a PUT bouncing off a 409 later.
+    this.readOnly = document.status !== 'Draft' && document.status !== 'RevisionRequested';
 
     this.form.patchValue({
       type: document.type,
@@ -464,6 +487,13 @@ export class DocumentFormComponent implements OnInit {
         }),
       );
     });
+
+    // Must run after the line items above are pushed — disabling the group
+    // first and adding FormArray controls afterward leaves those late arrivals
+    // enabled, so the parent's aggregate `disabled` never becomes true.
+    if (this.readOnly) {
+      this.form.disable();
+    }
   }
 
   private populateDefaultsForCreate(

@@ -100,6 +100,21 @@ export class DocumentsListComponent implements OnInit {
     this.router.navigate(['/documents', documentId, 'edit']);
   }
 
+  /** TASK-037: once a document has been dispatched, its content is locked from direct edits — Draft (never sent) and RevisionRequested (client asked for changes) are the only editable states, matching Document.EnsureEditable on the backend. */
+  canEdit(document: DocumentModel): boolean {
+    return !document.isLocked && (document.status === 'Draft' || document.status === 'RevisionRequested');
+  }
+
+  editDisabledReason(document: DocumentModel): string {
+    if (document.isLocked) {
+      return 'Signed documents cannot be edited';
+    }
+    if (!this.canEdit(document)) {
+      return 'Already sent to the client — request or create a revision to make changes';
+    }
+    return '';
+  }
+
   changeStatus(document: DocumentModel, status: DocumentStatus): void {
     this.documentService.updateStatus(document.id, status).subscribe(() => {
       this.closeMenu();

@@ -22,6 +22,9 @@ export interface Document {
   id: string;
   publicToken: string;
   isLocked: boolean;
+  /** True once this document has ever been sent to the client (TASK-037) — stays true even after status later moves on. */
+  isDispatched: boolean;
+  dispatchedAt: string | null;
   signature: DocumentSignatureSummary | null;
   documentNumber: string;
   type: DocumentType;
@@ -65,15 +68,18 @@ export interface CreateDocumentRequest {
   currency?: string | null;
   /** ISO 3166-1 alpha-2 override — omit/null to default from the customer/workspace (TASK-029). */
   clientCountry?: string | null;
+  /** TASK-037 "Save & Send to Client" — true dispatches immediately instead of saving a Draft. */
+  dispatch?: boolean;
 }
 
 export interface UpdateDocumentRequest {
   templateId: string;
   dueDate: string;
-  status: DocumentStatus;
   lineItems: CreateDocumentLineItemRequest[];
   /** ISO 4217 override — omit/null to leave the document's currency unchanged (TASK-029). */
   currency?: string | null;
   /** ISO 3166-1 alpha-2 override — omit/null to leave unchanged (TASK-029). */
   clientCountry?: string | null;
+  /** TASK-037 "Save & Send to Client" / "Save & Re-Send Revision" — true dispatches (or re-dispatches) to Sent. */
+  dispatch?: boolean;
 }

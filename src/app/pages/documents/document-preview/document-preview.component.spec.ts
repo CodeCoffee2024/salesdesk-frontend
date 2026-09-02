@@ -19,6 +19,8 @@ function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
     id: '3a94928f-7367-4206-a02f-b2fc9884b087',
     publicToken: 'b1e2c3d4-0000-0000-0000-000000000000',
     isLocked: false,
+    isDispatched: false,
+    dispatchedAt: null,
     signature: null,
     documentNumber: 'QUO-2026-028',
     type: 'Quote',
@@ -55,6 +57,9 @@ describe('DocumentPreviewComponent', () => {
     documentServiceSpy.convertToInvoice.and.returnValue(of(makeDocument({ id: 'new-invoice-id', type: 'Invoice' })));
     documentServiceSpy.delete.and.returnValue(of(undefined));
     pdfServiceSpy = jasmine.createSpyObj('PdfService', ['download']);
+    // download() is async (native Filesystem+Share on mobile) — the spy must
+    // return a real Promise, or the component's own .catch() throws on undefined.
+    pdfServiceSpy.download.and.returnValue(Promise.resolve());
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],

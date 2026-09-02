@@ -19,6 +19,8 @@ function makeDocument(): DocumentModel {
     id: 'doc-1',
     publicToken: 'pub-1',
     isLocked: false,
+    isDispatched: false,
+    dispatchedAt: null,
     signature: null,
     documentNumber: 'QUO-1',
     type: 'Quote',

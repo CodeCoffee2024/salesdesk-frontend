@@ -11,10 +11,15 @@
 
   <p class="document-form__ai-notice" *ngIf="aiNotice">{{ aiNotice }}</p>
 
+  <p class="document-form__readonly-notice" *ngIf="readOnly">
+    <i class="bi bi-lock-fill" aria-hidden="true"></i>
+    This document has already been sent to the client. Request or create a revision to make changes.
+  </p>
+
   <app-ai-parse-modal *ngIf="showAiParseModal" (parsed)="onAiParsed($event)" (closed)="onAiParseModalClosed()"></app-ai-parse-modal>
 
   <div class="document-form__layout">
-    <form class="document-form__panel" [formGroup]="form" (ngSubmit)="submit()">
+    <form class="document-form__panel" [formGroup]="form" (ngSubmit)="saveOnly()">
       <div class="type-toggle" *ngIf="!isEditMode">
         <button
           type="button"
@@ -121,11 +126,18 @@
 
       <p class="document-form__error" *ngIf="saveError">{{ saveError }}</p>
 
-      <div class="document-form__actions">
+      <div class="document-form__actions" *ngIf="!readOnly">
         <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn-primary" [disabled]="saving">
-          {{ saving ? 'Saving…' : isEditMode ? 'Save changes' : 'Create ' + (form.value.type === 'Invoice' ? 'invoice' : 'quote') }}
+        <button type="submit" class="btn-secondary" [disabled]="saving">
+          {{ saving ? 'Saving…' : isRevision ? 'Save changes' : 'Save Draft' }}
         </button>
+        <button type="button" class="btn-primary" [disabled]="saving" (click)="saveAndSend()">
+          {{ saving ? 'Sending…' : isRevision ? 'Save & Re-Send Revision' : 'Save & Send to Client' }}
+        </button>
+      </div>
+
+      <div class="document-form__actions" *ngIf="readOnly">
+        <button type="button" class="btn-secondary" (click)="cancel()">Back to documents</button>
       </div>
     </form>
 

@@ -15,6 +15,8 @@ function makeDocument(overrides: Partial<DocumentModel>): DocumentModel {
     id: 'doc-1',
     publicToken: 'pub-token-1',
     isLocked: false,
+    isDispatched: false,
+    dispatchedAt: null,
     signature: null,
     documentNumber: 'QUO-2026-001',
     type: 'Quote',

@@ -53,10 +53,12 @@ function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
     id: 'doc-1',
     publicToken: 'pub-token-1',
     isLocked: false,
+    isDispatched: false,
+    dispatchedAt: null,
     signature: null,
     documentNumber: 'QUO-2026-035',
     type: 'Quote',
-    status: 'Sent',
+    status: 'Draft',
     issueDate: '2026-08-25',
     dueDate: '2026-09-08',
     customerId: 'cust-1',
@@ -80,11 +82,11 @@ describe('DocumentFormComponent', () => {
   let offlineQueueSpy: jasmine.SpyObj<OfflineQueueService>;
   let router: Router;
 
-  function setup(routeId: string | null) {
+  function setup(routeId: string | null, existingDocument: DocumentModel = makeDocument()) {
     documentServiceSpy = jasmine.createSpyObj('DocumentService', ['getById', 'create', 'update']);
-    documentServiceSpy.getById.and.returnValue(of(makeDocument()));
+    documentServiceSpy.getById.and.returnValue(of(existingDocument));
     documentServiceSpy.create.and.returnValue(of(makeDocument({ id: 'new-doc' })));
-    documentServiceSpy.update.and.returnValue(of(makeDocument()));
+    documentServiceSpy.update.and.returnValue(of(existingDocument));
 
     offlineQueueSpy = jasmine.createSpyObj('OfflineQueueService', ['enqueue']);
     offlineQueueSpy.enqueue.and.returnValue(Promise.resolve());
@@ -99,7 +101,10 @@ describe('DocumentFormComponent', () => {
         { provide: ProductService, useValue: { getAll: () => of(products) } },
         { provide: OfflineQueueService, useValue: offlineQueueSpy },
         { provide: WorkspaceProfileService, useValue: { getCached: () => of(workspaceProfile) } },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap(routeId ? { id: routeId } : {}) } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap(routeId ? { id: routeId } : {}), queryParamMap: convertToParamMap({}) } }
+        },
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }
       ]
     });
@@ -172,7 +177,7 @@ describe('DocumentFormComponent', () => {
 
     it('blocks submit and marks the form touched when invalid', () => {
       component.form.patchValue({ customerId: '' });
-      component.submit();
+      component.saveOnly();
 
       expect(documentServiceSpy.create).not.toHaveBeenCalled();
       expect(component.form.get('customerId')?.touched).toBeTrue();
@@ -182,19 +187,28 @@ describe('DocumentFormComponent', () => {
       component.form.patchValue({ customerId: 'cust-1' });
       component.removeLineItem(0);
 
-      component.submit();
+      component.saveOnly();
 
       expect(documentServiceSpy.create).not.toHaveBeenCalled();
     });
 
-    it('creates the document and navigates to the list with a highlight state on success', () => {
+    it('creates the document as a draft and navigates to the list with a highlight state on success', () => {
       component.form.patchValue({ customerId: 'cust-1' });
       component.lineItems.at(0).patchValue({ description: 'Research', quantity: 1, unitPrice: 500 });
 
-      component.submit();
+      component.saveOnly();
 
-      expect(documentServiceSpy.create).toHaveBeenCalled();
+      expect(documentServiceSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({ dispatch: false }));
       expect(router.navigate).toHaveBeenCalledWith(['/documents'], { state: { highlightId: 'new-doc' } });
+    });
+
+    it('creates and dispatches the document when Save & Send is used', () => {
+      component.form.patchValue({ customerId: 'cust-1' });
+      component.lineItems.at(0).patchValue({ description: 'Research', quantity: 1, unitPrice: 500 });
+
+      component.saveAndSend();
+
+      expect(documentServiceSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({ dispatch: true }));
     });
 
     it('shows an error and stops saving if create fails', () => {
@@ -202,7 +216,7 @@ describe('DocumentFormComponent', () => {
       component.form.patchValue({ customerId: 'cust-1' });
       component.lineItems.at(0).patchValue({ description: 'Research', quantity: 1, unitPrice: 500 });
 
-      component.submit();
+      component.saveOnly();
 
       expect(component.saving).toBeFalse();
       expect(component.saveError).toContain('Could not create');
@@ -213,7 +227,7 @@ describe('DocumentFormComponent', () => {
       component.form.patchValue({ customerId: 'cust-1' });
       component.lineItems.at(0).patchValue({ description: 'Research', quantity: 1, unitPrice: 500 });
 
-      component.submit();
+      component.saveOnly();
       await fixture.whenStable();
 
       expect(documentServiceSpy.create).not.toHaveBeenCalled();
@@ -226,7 +240,7 @@ describe('DocumentFormComponent', () => {
       component.form.patchValue({ customerId: 'cust-1' });
       component.lineItems.at(0).patchValue({ description: 'Research', quantity: 1, unitPrice: 500 });
 
-      component.submit();
+      component.saveOnly();
       await fixture.whenStable();
 
       expect(offlineQueueSpy.enqueue).toHaveBeenCalled();
@@ -234,7 +248,7 @@ describe('DocumentFormComponent', () => {
     });
   });
 
-  describe('edit mode', () => {
+  describe('edit mode — Draft (editable)', () => {
     beforeEach(() => setup('doc-1'));
 
     it('loads the existing document and disables type and customer', () => {
@@ -246,14 +260,57 @@ describe('DocumentFormComponent', () => {
       expect(component.lineItems.at(0).value.description).toBe('Research');
     });
 
-    it('saves via update and navigates to the preview page, preserving the existing status', () => {
-      component.submit();
+    it('is not read-only and is not a revision', () => {
+      expect(component.readOnly).toBeFalse();
+      expect(component.isRevision).toBeFalse();
+      expect(component.form.enabled).toBeTrue();
+    });
+
+    it('saves via update without dispatching and navigates to the preview page', () => {
+      component.saveOnly();
 
       expect(documentServiceSpy.update).toHaveBeenCalledWith(
         'doc-1',
-        jasmine.objectContaining({ status: 'Sent', templateId: 'tpl-1' })
+        jasmine.objectContaining({ templateId: 'tpl-1', dispatch: false })
       );
       expect(router.navigate).toHaveBeenCalledWith(['/documents', 'doc-1', 'preview']);
+    });
+
+    it('dispatches on Save & Send', () => {
+      component.saveAndSend();
+
+      expect(documentServiceSpy.update).toHaveBeenCalledWith('doc-1', jasmine.objectContaining({ dispatch: true }));
+    });
+  });
+
+  describe('edit mode — RevisionRequested (editable, dispatch re-sends)', () => {
+    beforeEach(() => setup('doc-1', makeDocument({ status: 'RevisionRequested' })));
+
+    it('is editable and flagged as a revision, offering Save & Re-Send Revision', () => {
+      expect(component.readOnly).toBeFalse();
+      expect(component.isRevision).toBeTrue();
+      expect(component.form.enabled).toBeTrue();
+    });
+
+    it('re-sends (dispatches) on Save & Re-Send Revision', () => {
+      component.saveAndSend();
+
+      expect(documentServiceSpy.update).toHaveBeenCalledWith('doc-1', jasmine.objectContaining({ dispatch: true }));
+    });
+  });
+
+  describe('edit mode — Sent (locked from editing)', () => {
+    beforeEach(() => setup('doc-1', makeDocument({ status: 'Sent' })));
+
+    it('loads read-only, with the whole form disabled', () => {
+      expect(component.readOnly).toBeTrue();
+      expect(component.form.disabled).toBeTrue();
+    });
+
+    it('refuses to submit even if called directly', () => {
+      component.saveOnly();
+
+      expect(documentServiceSpy.update).not.toHaveBeenCalled();
     });
   });
 });

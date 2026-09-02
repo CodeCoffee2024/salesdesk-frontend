@@ -66,8 +66,8 @@
             <button
               type="button"
               *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
-              [disabled]="document.isLocked"
-              [title]="document.isLocked ? 'Signed documents cannot be edited' : ''"
+              [disabled]="!canEdit(document)"
+              [title]="editDisabledReason(document)"
               (click)="edit(document.id)"
             >Edit</button>
 

@@ -51,6 +51,10 @@
     <i class="bi bi-lock-fill" aria-hidden="true"></i> Signed by {{ doc.signature.signerName }} on {{ doc.signature.signedAtUtc | date: 'MMM d, y, h:mm a' }}. This document is locked from further edits.
   </p>
 
+  <p class="document-preview__locked no-print" *ngIf="isLockedFromEditing">
+    <i class="bi bi-lock-fill" aria-hidden="true"></i> This document has already been sent to the client. Request or create a revision to make changes.
+  </p>
+
   <p class="document-preview__error no-print" *ngIf="actionError">{{ actionError }}</p>
 
   <div class="document-card" id="printable-document" [style.border-top-color]="'#2D6A63'">

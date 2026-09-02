@@ -101,6 +101,11 @@ export class DocumentPreviewComponent implements OnInit {
     return !!this.document && this.document.type === 'Quote' && this.document.status === 'Accepted';
   }
 
+  /** TASK-037: mirrors Document.EnsureEditable on the backend — shown once a document has been dispatched and can't be edited directly until it's back in RevisionRequested. */
+  get isLockedFromEditing(): boolean {
+    return !!this.document && !this.document.isLocked && this.document.status !== 'Draft' && this.document.status !== 'RevisionRequested';
+  }
+
   setStatus(status: DocumentStatus): void {
     if (!this.document) {
       return;
