@@ -27,7 +27,7 @@
     </p>
 
     <p class="public-doc__revision-banner" *ngIf="!doc.isSigned && doc.status === 'RevisionRequested'">
-      <i class="bi bi-pencil-square" aria-hidden="true"></i> We've sent your request for changes — the studio will follow up with an updated version.
+      <i class="bi bi-pencil-square" aria-hidden="true"></i> We've sent your request for changes. The studio will follow up with an updated version.
     </p>
 
     <div class="document-card">
@@ -99,7 +99,7 @@
   <div class="revision-modal__backdrop" *ngIf="showRevisionModal" (click)="closeRevisionModal()">
     <div class="revision-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
       <h2>What would you like changed?</h2>
-      <p>Let the studio know what to update — they'll follow up with a revised version.</p>
+      <p>Let the studio know what to update, and they'll follow up with a revised version.</p>
 
       <textarea
         rows="4"

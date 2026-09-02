@@ -29,15 +29,36 @@
 }
 
 .auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--sd-font-display);
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--sd-primary-dark);
   margin-bottom: 28px;
 }
 
+.auth-brand__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-primary);
+  color: #fff;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
 .auth-heading {
   font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   margin-bottom: 8px;
 }
 
@@ -133,12 +154,12 @@
   text-align: center;
 
   a {
-    color: var(--sd-accent);
+    color: var(--sd-primary);
     font-weight: 600;
     text-decoration: none;
 
     &:hover {
-      color: var(--sd-accent-dark);
+      color: var(--sd-primary-dark);
       text-decoration: underline;
     }
   }

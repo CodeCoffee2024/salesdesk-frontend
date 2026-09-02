@@ -52,7 +52,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(20, 32, 29, 0.45);
+    background: rgba(var(--sd-ink-rgb), 0.45);
     z-index: 190;
   }
 }
@@ -72,7 +72,8 @@
   height: 28px;
   border-radius: var(--sd-radius-sm);
   background: var(--sd-primary);
-  color: var(--sd-sidebar-bg);
+  /* White, not --sd-sidebar-bg: ink-on-cobalt only reaches ~3:1, white reaches ~5.9:1. */
+  color: #fff;
 
   svg {
     width: 16px;

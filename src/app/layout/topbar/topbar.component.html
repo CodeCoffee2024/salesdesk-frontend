@@ -25,7 +25,7 @@
       *ngIf="pushSupported"
       [class.notify-toggle--on]="pushSubscribed"
       [disabled]="pushBusy"
-      [title]="pushSubscribed ? 'Notifications on — click to turn off' : 'Get notified when a client views, signs, or requests changes'"
+      [title]="pushSubscribed ? 'Notifications on. Click to turn off.' : 'Get notified when a client views, signs, or requests changes'"
       (click)="toggleNotifications()"
     ><i class="bi" [ngClass]="pushSubscribed ? 'bi-bell-fill' : 'bi-bell-slash'" aria-hidden="true"></i></button>
 

@@ -48,7 +48,7 @@
   </div>
 
   <p class="document-preview__locked no-print" *ngIf="doc.isLocked && doc.signature">
-    <i class="bi bi-lock-fill" aria-hidden="true"></i> Signed by {{ doc.signature.signerName }} on {{ doc.signature.signedAtUtc | date: 'MMM d, y, h:mm a' }} — this document is locked from further edits.
+    <i class="bi bi-lock-fill" aria-hidden="true"></i> Signed by {{ doc.signature.signerName }} on {{ doc.signature.signedAtUtc | date: 'MMM d, y, h:mm a' }}. This document is locked from further edits.
   </p>
 
   <p class="document-preview__error no-print" *ngIf="actionError">{{ actionError }}</p>

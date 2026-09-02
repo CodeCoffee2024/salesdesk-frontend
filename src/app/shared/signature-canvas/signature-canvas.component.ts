@@ -46,7 +46,7 @@ export class SignatureCanvasComponent implements AfterViewInit {
     ctx.lineWidth = 2.2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#1c2321';
+    ctx.strokeStyle = '#14192b';
     this.ctx = ctx;
   }
 
@@ -118,7 +118,7 @@ export class SignatureCanvasComponent implements AfterViewInit {
 
     this.ctx.save();
     this.ctx.font = `${Math.min(48, 320 / Math.max(this.typedName.length, 6))}px 'Dancing Script', cursive`;
-    this.ctx.fillStyle = '#1c2321';
+    this.ctx.fillStyle = '#14192b';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(this.typedName.trim(), width / 2, height / 2);

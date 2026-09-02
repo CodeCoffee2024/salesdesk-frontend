@@ -136,14 +136,14 @@
   margin-top: auto;
   padding: 10px 18px;
   border-radius: var(--sd-radius-sm);
-  background: var(--sd-accent);
+  background: var(--sd-primary);
   color: #fff;
   font-weight: 600;
   font-size: 13px;
   text-decoration: none;
 
   &:hover {
-    background: var(--sd-accent-dark);
+    background: var(--sd-primary-dark);
   }
 }
 

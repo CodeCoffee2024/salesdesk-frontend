@@ -42,14 +42,13 @@
   color: var(--sd-danger);
 
   &:hover {
-    background: #f6d5cd;
+    background: color-mix(in srgb, var(--sd-danger-bg), var(--sd-danger) 25%);
   }
 }
 
 .document-card {
   background: var(--sd-surface);
   border: 1px solid var(--sd-border);
-  border-top: 4px solid var(--sd-primary);
   border-radius: var(--sd-radius-lg);
   padding: 36px;
   box-shadow: var(--sd-shadow-sm);
@@ -154,6 +153,7 @@
   padding: 6px 0;
   font-size: 13px;
   color: var(--sd-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .document-card__totals-row--grand {

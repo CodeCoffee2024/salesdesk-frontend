@@ -1,48 +1,55 @@
 /* Global styles + SalesDesk design tokens. */
 
 :root {
-  --sd-bg: #faf7f1;
+  --sd-bg: #f4f5f9;
   --sd-surface: #ffffff;
-  --sd-sidebar-bg: #14201d;
-  --sd-sidebar-fg: #d7ded9;
-  --sd-sidebar-fg-muted: #8b9891;
-  --sd-sidebar-active-bg: #223531;
+  --sd-sidebar-bg: #14192b;
+  --sd-sidebar-fg: #c7ccdc;
+  --sd-sidebar-fg-muted: #7c84a0;
+  --sd-sidebar-active-bg: #232b47;
 
-  --sd-primary: #2d6a63;
-  --sd-primary-dark: #1f4a45;
-  --sd-accent: #e0722f;
-  --sd-accent-dark: #c25f22;
+  --sd-primary: #2451f5;
+  --sd-primary-dark: #1b3ecc;
+  --sd-accent: #ff6a45;
+  --sd-accent-dark: #e1522f;
+  /* Accent fails white-text contrast (~2.8:1): anything using --sd-accent as a
+     background pairs it with this ink text instead, never white. */
+  --sd-accent-ink: #14192b;
 
-  --sd-ink: #1c2321;
-  --sd-muted: #6b7370;
-  --sd-border: #e7e1d6;
+  --sd-ink: #14192b;
+  --sd-ink-rgb: 20, 25, 43;
+  --sd-muted: #5b6178;
+  --sd-border: #e2e5ee;
 
-  --sd-success: #3c8f6b;
-  --sd-success-bg: #e3f1ea;
-  --sd-danger: #c4523b;
-  --sd-danger-bg: #fbe9e5;
+  --sd-success: #15803d;
+  --sd-success-bg: #dcf5e3;
+  --sd-danger: #c4302b;
+  --sd-danger-bg: #fbe1dc;
+  --sd-danger-dark: #a02622;
+  --sd-warning: #a15c00;
+  --sd-warning-bg: #fdf0dc;
 
   /* Document status pills — one pale bg/fg pair per DocumentStatus value. */
-  --sd-status-draft-bg: #ede7da;
-  --sd-status-draft-fg: #8a7a54;
-  --sd-status-sent-bg: #dfe9f5;
-  --sd-status-sent-fg: #3f6a96;
-  --sd-status-overdue-bg: #fbe6d8;
-  --sd-status-overdue-fg: #b1602c;
-  --sd-status-accepted-bg: #dcefe8;
-  --sd-status-accepted-fg: #2c7a63;
-  --sd-status-paid-bg: #e1f2df;
-  --sd-status-paid-fg: #3f7a37;
+  --sd-status-draft-bg: #eef0f5;
+  --sd-status-draft-fg: #48505e;
+  --sd-status-sent-bg: #e3eafd;
+  --sd-status-sent-fg: #2451f5;
+  --sd-status-overdue-bg: #ffe7de;
+  --sd-status-overdue-fg: #c2410c;
+  --sd-status-accepted-bg: #e1f5f0;
+  --sd-status-accepted-fg: #0f766e;
+  --sd-status-paid-bg: #dcf5e3;
+  --sd-status-paid-fg: #15803d;
 
-  --sd-font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --sd-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sd-font-display: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sd-font-body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  --sd-radius-sm: 6px;
-  --sd-radius-md: 10px;
-  --sd-radius-lg: 16px;
+  --sd-radius-sm: 8px;
+  --sd-radius-md: 12px;
+  --sd-radius-lg: 18px;
 
-  --sd-shadow-sm: 0 1px 2px rgba(28, 35, 33, 0.06);
-  --sd-shadow-md: 0 4px 16px rgba(28, 35, 33, 0.08);
+  --sd-shadow-sm: 0 1px 3px rgba(var(--sd-ink-rgb), 0.08), 0 1px 2px rgba(var(--sd-ink-rgb), 0.04);
+  --sd-shadow-md: 0 8px 24px rgba(var(--sd-ink-rgb), 0.12), 0 2px 8px rgba(var(--sd-ink-rgb), 0.06);
 }
 
 * {
@@ -63,6 +70,44 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-color: var(--sd-muted) var(--sd-bg);
+}
+
+/* Browser surfaces we didn't draw still carry the design, themed rather than left as
+   unstyled defaults belonging to no system. */
+::selection {
+  background: var(--sd-primary);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sd-primary);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sd-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--sd-border);
+  border-radius: 999px;
+  border: 3px solid var(--sd-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--sd-muted);
+}
+
+/* Money figures read as data, not prose: fixed-width digits keep columns of
+   amounts aligned instead of jittering with each row's numeral shapes. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 h1,

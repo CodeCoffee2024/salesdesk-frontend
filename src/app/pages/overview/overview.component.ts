@@ -59,7 +59,7 @@ export class OverviewComponent implements OnInit {
     const pipeline = this.summary?.quotePipeline ?? 0;
     return pipeline > 0
       ? 'Turn a warm quote into a yes.'
-      : "You're all caught up — no quotes waiting on a decision.";
+      : "You're all caught up. No quotes waiting on a decision.";
   }
 
   private computeMonthlyRevenue(documents: DocumentModel[]): MonthlyRevenuePoint[] {

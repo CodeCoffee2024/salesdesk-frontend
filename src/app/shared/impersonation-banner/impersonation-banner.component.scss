@@ -12,7 +12,8 @@
   gap: 16px;
   padding: 10px 16px;
   background: var(--sd-accent);
-  color: #ffffff;
+  /* Ink, not white — white-on-accent measures ~2.8:1 and fails contrast. */
+  color: var(--sd-accent-ink);
   font-size: 13px;
   font-weight: 600;
   box-shadow: var(--sd-shadow-md);
@@ -25,9 +26,9 @@
 }
 
 .impersonation-banner__exit {
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(var(--sd-ink-rgb), 0.4);
   background: transparent;
-  color: #ffffff;
+  color: var(--sd-accent-ink);
   border-radius: var(--sd-radius-sm);
   padding: 4px 12px;
   font-size: 12px;
@@ -35,6 +36,6 @@
   cursor: pointer;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(var(--sd-ink-rgb), 0.1);
   }
 }

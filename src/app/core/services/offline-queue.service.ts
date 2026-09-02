@@ -77,7 +77,7 @@ export class OfflineQueueService {
       } catch {
         await offlineDb.pendingDocuments.update(item.id, {
           status: 'failed',
-          errorMessage: 'Could not sync automatically — it will retry the next time you reconnect.'
+          errorMessage: 'Could not sync automatically. It will retry the next time you reconnect.'
         });
       }
     }

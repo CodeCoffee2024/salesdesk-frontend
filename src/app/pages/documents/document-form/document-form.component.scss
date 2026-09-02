@@ -243,7 +243,7 @@ label {
   background: var(--sd-sidebar-bg);
   color: #fff;
   border-radius: var(--sd-radius-md);
-  border-top: 4px solid var(--sd-primary);
+  box-shadow: var(--sd-shadow-md);
   padding: 20px;
 }
 

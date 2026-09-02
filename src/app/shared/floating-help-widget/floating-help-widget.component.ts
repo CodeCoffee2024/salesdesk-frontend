@@ -10,7 +10,7 @@ const FAQ: FaqEntry[] = [
   {
     question: 'How do clients accept and e-sign a document?',
     answer:
-      'Every document gets a public link (visible on its preview page). Your client opens it, reviews the quote or invoice, and can draw or type their signature — no account needed on their end.'
+      'Every document gets a public link (visible on its preview page). Your client opens it, reviews the quote or invoice, and can draw or type their signature. No account needed on their end.'
   },
   {
     question: 'How do I set up my template colors and branding?',
@@ -20,15 +20,15 @@ const FAQ: FaqEntry[] = [
   {
     question: 'What are merge tags like {{Customer.Name}}?',
     answer:
-      "Placeholders you drop into a template's content — they're automatically replaced with each document's real customer/quote details when it's sent, so one template works for every client."
+      "Placeholders you drop into a template's content. They're automatically replaced with each document's real customer/quote details when it's sent, so one template works for every client."
   },
   {
     question: 'Can I get notified when a client views or signs a document?',
-    answer: 'Yes — turn on the bell icon in the top bar to get a browser notification the moment a client views, signs, or requests changes.'
+    answer: 'Yes: turn on the bell icon in the top bar to get a browser notification the moment a client views, signs, or requests changes.'
   },
   {
     question: "What happens if I lose connection while working?",
-    answer: "Creating a document while offline saves it on your device automatically and syncs the moment you're back online — nothing is lost."
+    answer: "Creating a document while offline saves it on your device automatically and syncs the moment you're back online. Nothing is lost."
   }
 ];
 

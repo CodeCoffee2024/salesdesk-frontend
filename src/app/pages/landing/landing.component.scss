@@ -21,7 +21,7 @@
   .brand__mark {
     width: 28px;
     height: 28px;
-    color: var(--sd-accent);
+    color: var(--sd-primary);
 
     svg {
       width: 100%;
@@ -109,7 +109,9 @@
     // sized down from the previous 46px so a two-clause sentence still reads
     // as a headline rather than a wall of text.
     font-size: 38px;
-    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
     margin-bottom: 20px;
   }
 }
@@ -259,6 +261,8 @@
   h2 {
     font-family: var(--sd-font-display);
     font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     margin-bottom: 10px;
   }
 
@@ -422,6 +426,8 @@
   h2 {
     font-family: var(--sd-font-display);
     font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     margin-bottom: 24px;
   }
 }

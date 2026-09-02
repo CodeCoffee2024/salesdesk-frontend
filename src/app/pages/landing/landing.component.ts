@@ -47,8 +47,8 @@ export class LandingComponent implements OnInit {
       { description: 'Corporate event hosting (half-day)', amount: '$950.00' }
     ],
     Invoice: [
-      { description: 'Booking deposit — Saturday wedding', amount: '$500.00' },
-      { description: 'Final balance — reception hosting', amount: '$1,300.00' }
+      { description: 'Booking deposit, Saturday wedding', amount: '$500.00' },
+      { description: 'Final balance, reception hosting', amount: '$1,300.00' }
     ]
   };
 
