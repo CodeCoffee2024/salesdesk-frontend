@@ -52,9 +52,20 @@ export class LoginComponent {
       },
       error: (error: HttpErrorResponse) => {
         this.submitting = false;
-        this.errorMessage = error.status === 401 ? 'Invalid email or password.' : 'Something went wrong. Please try again.';
+        this.errorMessage = this.messageFor(error);
       }
     });
+  }
+
+  /** Status 0 means the request never got a response at all (dropped connection, or the browser/WebView blocked it before it reached the server, e.g. a CORS rejection). Worth telling apart from a real server error, since the fix is completely different (network/config, not "try again"). */
+  private messageFor(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'Invalid email or password.';
+    }
+    if (error.status === 0) {
+      return "Couldn't reach the server. Check your connection. If this keeps happening from this app specifically, the server may not be configured to accept requests from it yet.";
+    }
+    return 'Something went wrong. Please try again.';
   }
 
   toggleResendVerification(): void {
