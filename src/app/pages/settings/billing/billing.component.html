@@ -2,18 +2,21 @@
   <div class="billing__header">
     <div>
       <h1>Billing</h1>
-      <p>Your subscription plan and, if applicable, promo status.</p>
+      <p>Your subscription plan, usage, and upgrade options.</p>
     </div>
   </div>
 
   <div class="settings-card">
     <div class="plan-row">
       <div class="plan-row__tier">
-        <span class="tier-badge" [class.tier-badge--premium]="isPremium">{{ b.subscriptionTier }}</span>
-        <span class="plan-row__label">
-          {{ isPremium ? 'Premium plan' : 'Free plan' }}
-        </span>
+        <span class="tier-badge" [class.tier-badge--paid]="b.subscriptionTier !== 'Free'">{{ b.subscriptionTier }}</span>
+        <span class="plan-row__label">{{ b.subscriptionTier }} plan</span>
       </div>
+
+      <p class="plan-row__usage" *ngIf="b.monthlyDocumentLimit !== null">
+        {{ b.documentsIssuedThisMonth }} of {{ b.monthlyDocumentLimit }} documents used this month
+      </p>
+      <p class="plan-row__usage" *ngIf="b.monthlyDocumentLimit === null">Unlimited documents</p>
     </div>
 
     <div class="early-bird-banner" *ngIf="b.isEarlyBirdPromo">
@@ -21,14 +24,47 @@
       <div>
         <p class="early-bird-banner__title">You're one of our first 100 members!</p>
         <p class="early-bird-banner__detail" *ngIf="b.subscriptionEndDate">
-          Your free year of Premium is active through {{ b.subscriptionEndDate | date: 'longDate' }}.
+          Your free year of Pro is active through {{ b.subscriptionEndDate | date: 'longDate' }}.
         </p>
       </div>
     </div>
+  </div>
 
-    <p class="plan-note" *ngIf="!isPremium">
-      Upgrade to Premium for advanced features. (Paid upgrades aren't available yet, check back soon.)
-    </p>
+  <div class="settings-card" *ngIf="pricing as catalog">
+    <div class="pricing-header">
+      <h2>Plans for {{ catalog.region === 'PH' ? 'the Philippines' : 'your region' }}</h2>
+      <div class="billing-cycle-toggle">
+        <button type="button" [class.billing-cycle-toggle__option--active]="billingCycle === 'Monthly'" (click)="billingCycle = 'Monthly'">Monthly</button>
+        <button type="button" [class.billing-cycle-toggle__option--active]="billingCycle === 'Annual'" (click)="billingCycle = 'Annual'">Annual</button>
+      </div>
+    </div>
+
+    <p class="checkout-error" *ngIf="checkoutError">{{ checkoutError }}</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card" *ngFor="let tier of catalog.tiers" [class.pricing-card--current]="isCurrentTier(tier.tier)">
+        <p class="pricing-card__name">{{ tier.displayName }}</p>
+        <p class="pricing-card__price">
+          <span class="pricing-card__amount">{{ priceFor(tier) | currency: catalog.currency : 'symbol-narrow' }}</span>
+          <span class="pricing-card__period" *ngIf="tier.tier !== 'Free'">/ {{ billingCycle === 'Annual' ? 'year' : 'month' }}</span>
+        </p>
+
+        <ul class="pricing-card__features">
+          <li *ngFor="let feature of tier.features">{{ feature }}</li>
+        </ul>
+
+        <button type="button" class="btn-secondary" disabled *ngIf="isCurrentTier(tier.tier)">Current plan</button>
+        <button
+          type="button"
+          class="btn-primary"
+          *ngIf="!isCurrentTier(tier.tier) && tier.tier !== 'Free'"
+          [disabled]="checkingOutTier === tier.tier"
+          (click)="upgrade(tier)"
+        >
+          {{ checkingOutTier === tier.tier ? 'Starting checkout…' : 'Upgrade' }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
