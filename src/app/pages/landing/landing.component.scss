@@ -335,6 +335,14 @@
   margin: 0 auto;
 }
 
+.pricing__disclaimer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--sd-muted);
+  max-width: 1000px;
+  margin: 20px auto 0;
+}
+
 .plan-card {
   position: relative;
   background: var(--sd-surface);
@@ -380,6 +388,13 @@
     font-weight: 400;
     color: var(--sd-muted);
   }
+}
+
+.plan-card__price-estimate {
+  font-size: 13px;
+  color: var(--sd-muted);
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 .plan-card__description {

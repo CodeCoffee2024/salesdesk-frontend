@@ -8,6 +8,7 @@ import {
   DocumentStatus,
   UpdateDocumentRequest
 } from '../models/document.model';
+import { ParsedQuoteResult } from '../models/ai-quote-parse.model';
 import { environment } from '../../../environments/environment';
 
 const BASE_URL = `${environment.apiBaseUrl}/api/documents`;
@@ -39,6 +40,11 @@ export class DocumentService {
 
   create(request: CreateDocumentRequest): Observable<DocumentModel> {
     return this.http.post<DocumentModel>(BASE_URL, request);
+  }
+
+  /** TASK-033: sends pasted unstructured text (a WhatsApp message, email, etc.) to the AI parser, which extracts a customer + line items and auto-provisions the customer if they don't already exist. Doesn't create a Document; the caller pre-fills the normal create form with the result. */
+  parseText(rawText: string): Observable<ParsedQuoteResult> {
+    return this.http.post<ParsedQuoteResult>(`${BASE_URL}/parse-text`, { rawText });
   }
 
   update(id: string, request: UpdateDocumentRequest): Observable<DocumentModel> {

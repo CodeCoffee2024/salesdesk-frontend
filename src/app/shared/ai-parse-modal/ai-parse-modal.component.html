@@ -1,0 +1,27 @@
+<div class="ai-parse-modal__backdrop" (click)="close()">
+  <div class="ai-parse-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ai-parse-heading">
+    <h2 id="ai-parse-heading">Paste a client message</h2>
+    <p class="ai-parse-modal__hint">
+      Paste a WhatsApp message, email, or note with the event details and pricing. AI will pull out the customer and line items for you to review.
+    </p>
+
+    <textarea
+      class="ai-parse-modal__textarea"
+      name="rawText"
+      rows="8"
+      [attr.maxlength]="maxLength"
+      [(ngModel)]="rawText"
+      placeholder="Event: Corporate Gala on Oct 12. Client: Sarah Jenkins (sarah@company.com). Host rate $1,500, Sound system rental $300."
+      [attr.disabled]="parsing ? '' : null"
+    ></textarea>
+
+    <p class="ai-parse-modal__error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="ai-parse-modal__actions">
+      <button type="button" class="ai-parse-modal__cancel" (click)="close()" [disabled]="parsing">Cancel</button>
+      <button type="button" class="ai-parse-modal__submit" (click)="submit()" [disabled]="parsing || !rawText.trim()">
+        {{ parsing ? 'Parsing…' : 'Parse with AI' }}
+      </button>
+    </div>
+  </div>
+</div>

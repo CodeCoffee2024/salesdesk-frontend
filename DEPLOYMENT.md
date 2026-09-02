@@ -12,12 +12,12 @@ Target: Vercel free tier (static SPA + global CDN). Render's free/starter static
    | `GA_MEASUREMENT_ID` | (optional) Your GA4 property's Measurement ID, e.g. `G-XXXXXXXXXX` — found in GA4 Admin → Data Streams → your web stream. Leave unset to ship with analytics disabled. |
 
    `vercel.json`'s `buildCommand` substitutes these into `src/environments/environment.prod.ts`'s `__API_BASE_URL__` / `__GA_MEASUREMENT_ID__` placeholders before `ng build --configuration production` runs — this is the "static build secret" injection, since a compiled Angular bundle can't read an env var at runtime the way a Node server could.
-3. Once connected, Vercel deploys automatically on every push to `main` (production) and creates a preview deployment for every PR — no GitHub Actions step is needed to trigger the deploy itself.
+3. Once connected, Vercel deploys automatically on every push to `master` (production) and creates a preview deployment for every PR — no GitHub Actions step is needed to trigger the deploy itself.
 4. If you set `GA_MEASUREMENT_ID`, go into GA4 (Admin → Events, once real traffic has produced them) and mark `landing_view`, `signup_started`, and `first_quote_sent` as **key events** — see `core/services/analytics.service.ts` and `docs/research/TASK-DAY-BY-DAY-MARKET.md` for what each one tracks and where it fires. Marking key events is a GA4-console step, not something the build/deploy pipeline can do for you.
 
 ## CI gate
 
-`.github/workflows/deploy-web.yml` runs on every push/PR: `npm ci`, headless-Chrome unit tests, and a production build. Set it as a required status check on `main` (repo Settings → Branches) so a broken build can't merge, independent of what Vercel does with the push.
+`.github/workflows/deploy-web.yml` runs on every push/PR: `npm ci`, headless-Chrome unit tests, and a production build. Set it as a required status check on `master` (repo Settings → Branches) so a broken build can't merge, independent of what Vercel does with the push.
 
 ## Custom domain & TLS
 

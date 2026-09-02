@@ -1,8 +1,17 @@
 <div class="document-form" *ngIf="!loading && !loadError">
   <div class="document-form__header">
-    <h1>{{ isEditMode ? 'Edit document' : 'Make it clear.' }}</h1>
-    <p>{{ isEditMode ? 'Update the details below.' : 'Build a customer-ready document from the pieces you already use.' }}</p>
+    <div>
+      <h1>{{ isEditMode ? 'Edit document' : 'Make it clear.' }}</h1>
+      <p>{{ isEditMode ? 'Update the details below.' : 'Build a customer-ready document from the pieces you already use.' }}</p>
+    </div>
+    <button type="button" class="document-form__ai-trigger" *ngIf="!isEditMode" (click)="openAiParseModal()">
+      <i class="bi bi-magic" aria-hidden="true"></i> Paste from message
+    </button>
   </div>
+
+  <p class="document-form__ai-notice" *ngIf="aiNotice">{{ aiNotice }}</p>
+
+  <app-ai-parse-modal *ngIf="showAiParseModal" (parsed)="onAiParsed($event)" (closed)="onAiParseModalClosed()"></app-ai-parse-modal>
 
   <div class="document-form__layout">
     <form class="document-form__panel" [formGroup]="form" (ngSubmit)="submit()">

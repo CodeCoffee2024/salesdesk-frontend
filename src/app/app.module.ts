@@ -43,6 +43,7 @@ import { BillingComponent } from './pages/settings/billing/billing.component';
 import { OnboardingChecklistComponent } from './shared/onboarding-checklist/onboarding-checklist.component';
 import { FloatingHelpWidgetComponent } from './shared/floating-help-widget/floating-help-widget.component';
 import { InfoTooltipComponent } from './shared/info-tooltip/info-tooltip.component';
+import { AiParseModalComponent } from './shared/ai-parse-modal/ai-parse-modal.component';
 import { CurrencyLocalePipe } from './core/pipes/currency-locale.pipe';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -86,7 +87,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     OnboardingChecklistComponent,
     FloatingHelpWidgetComponent,
     InfoTooltipComponent,
-    CurrencyLocalePipe
+    CurrencyLocalePipe,
+    AiParseModalComponent
   ],
   imports: [
     BrowserModule,

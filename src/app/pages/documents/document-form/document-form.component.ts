@@ -23,6 +23,7 @@ import {
   UpdateDocumentRequest
 } from '../../../core/models/document.model';
 import { ISO_COUNTRIES, ISO_CURRENCIES } from '../../../core/constants/locale.constants';
+import { EMPTY_CUSTOMER_ID, ParsedQuoteResult } from '../../../core/models/ai-quote-parse.model';
 
 const DEFAULT_DUE_DAYS = 14;
 const MAX_SUGGESTIONS = 6;
@@ -57,6 +58,10 @@ export class DocumentFormComponent implements OnInit {
   readonly currencies = ISO_CURRENCIES;
   /** The workspace's own default — shown as the Currency select's starting point for a brand-new document (TASK-029). */
   workspaceDefaultCurrency = 'USD';
+
+  /** TASK-033: "Paste a client message" modal, offered only when creating (not editing) a document. Opens automatically when the route carries ?mode=ai. */
+  showAiParseModal = false;
+  aiNotice: string | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -105,12 +110,76 @@ export class DocumentFormComponent implements OnInit {
         }
 
         this.loading = false;
+
+        if (!this.isEditMode && this.route.snapshot.queryParamMap.get('mode') === 'ai') {
+          this.showAiParseModal = true;
+        }
       },
       error: () => {
         this.loadError = true;
         this.loading = false;
       }
     });
+  }
+
+  // ---- AI text parsing (TASK-033) ----
+
+  openAiParseModal(): void {
+    this.showAiParseModal = true;
+  }
+
+  onAiParseModalClosed(): void {
+    this.showAiParseModal = false;
+  }
+
+  onAiParsed(result: ParsedQuoteResult): void {
+    this.showAiParseModal = false;
+
+    const noticeParts: string[] = [];
+
+    if (result.customerId && result.customerId !== EMPTY_CUSTOMER_ID) {
+      if (result.customerCreated) {
+        noticeParts.push(`Created a new customer, ${result.customerName}.`);
+      } else {
+        noticeParts.push(`Matched the existing customer ${result.customerName}.`);
+      }
+
+      // The newly resolved customer needs to be in `this.customers` for the
+      // select to show it and for `selectedCustomer`/clientCountry defaulting
+      // to work — simplest correct fix is to refetch the list rather than
+      // hand-construct a partial Customer from the parse result's few fields.
+      this.customerService.getAll().subscribe((customers) => {
+        this.customers = customers;
+        this.form.patchValue({ customerId: result.customerId });
+        this.onCustomerSelected();
+      });
+    } else {
+      noticeParts.push("Couldn't identify a customer from that text. Pick or add one below.");
+    }
+
+    if (result.lineItems.length > 0) {
+      this.lineItems.clear();
+      result.lineItems.forEach((item) => {
+        this.lineItems.push(
+          this.fb.group({
+            description: [item.description, Validators.required],
+            quantity: [item.quantity, [Validators.required, Validators.min(0.01)]],
+            unitPrice: [item.unitPrice, [Validators.required, Validators.min(0)]],
+            productId: [null as string | null]
+          })
+        );
+      });
+    }
+
+    if (result.suggestedDepositPercentage !== null) {
+      noticeParts.push(`Mentioned a ${result.suggestedDepositPercentage}% deposit (there's no deposit field yet, so note it manually).`);
+    }
+
+    if (result.unresolvedFields.length > 0) {
+      noticeParts.push(`Couldn't find: ${result.unresolvedFields.join(', ')}.`);
+    }
+
+    this.aiNotice = `Parsed via AI, review before sending. ${noticeParts.join(' ')}`;
   }
 
   /** Picks up the selected customer's own country the moment a customer is chosen, so the target-country override starts from a sensible default (TASK-029) — the user can still change it. Only applies on create; an existing document's override is left as whatever was explicitly set. */

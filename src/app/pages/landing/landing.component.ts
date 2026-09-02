@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AnalyticsService } from '../../core/services/analytics.service';
+import { CURRENCY_BY_COUNTRY } from '../../core/constants/locale.constants';
+import { detectVisitorCountry, estimateFromUsd } from '../../core/utils/currency-estimate.util';
+import { formatCurrency } from '../../core/utils/locale.util';
 
 type PreviewDocType = 'Quote' | 'Invoice';
 
@@ -18,6 +21,8 @@ interface FeatureHighlight {
 interface PricingPlan {
   name: string;
   price: string;
+  /** Same amount as `price`, as a number, so it can be converted for the visitor-currency estimate. Null for the free plan (nothing to convert). */
+  priceUsd: number | null;
   cadence: string;
   description: string;
   quota: string;
@@ -86,10 +91,14 @@ export class LandingComponent implements OnInit {
 
   activeFeatureId = this.features[0].id;
 
+  /** Set once in ngOnInit from the visitor's detected country; null when detection fails or the visitor is already USD, in which case no estimate line is shown. */
+  private visitorCurrency: string | null = null;
+
   readonly plans: PricingPlan[] = [
     {
       name: 'Starter',
       price: 'Free',
+      priceUsd: null,
       cadence: '',
       description: 'For freelancers just getting started.',
       quota: '10 documents / month',
@@ -99,6 +108,7 @@ export class LandingComponent implements OnInit {
     {
       name: 'Studio',
       price: '$24',
+      priceUsd: 24,
       cadence: '/ month',
       description: 'For small studios billing clients regularly.',
       quota: '100 documents / month',
@@ -108,6 +118,7 @@ export class LandingComponent implements OnInit {
     {
       name: 'Agency',
       price: '$59',
+      priceUsd: 59,
       cadence: '/ month',
       description: 'For agencies managing many clients at once.',
       quota: 'Unlimited documents',
@@ -125,6 +136,24 @@ export class LandingComponent implements OnInit {
   // first_quote_sent without conflating it with any other page view.
   ngOnInit(): void {
     this.analytics.trackEvent('landing_view');
+
+    const country = detectVisitorCountry();
+    const currency = country ? CURRENCY_BY_COUNTRY[country] : null;
+    this.visitorCurrency = currency && currency !== 'USD' ? currency : null;
+  }
+
+  /** Approximate converted price for a paid plan, e.g. "≈ ₱1,356/mo", or null for the free plan, a USD visitor, or a currency with no reference rate (the USD price is always shown regardless; this is a secondary estimate only). */
+  estimatedPrice(plan: PricingPlan): string | null {
+    if (plan.priceUsd === null || !this.visitorCurrency) {
+      return null;
+    }
+
+    const converted = estimateFromUsd(plan.priceUsd, this.visitorCurrency);
+    if (converted === null) {
+      return null;
+    }
+
+    return formatCurrency(converted, this.visitorCurrency);
   }
 
   get activeFeature(): FeatureHighlight {

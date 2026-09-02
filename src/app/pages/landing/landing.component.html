@@ -142,6 +142,9 @@
           {{ plan.price }}
           <span *ngIf="plan.cadence">{{ plan.cadence }}</span>
         </p>
+        <p class="plan-card__price-estimate" *ngIf="estimatedPrice(plan) as estimate">
+          about {{ estimate }}{{ plan.cadence ? plan.cadence : '' }}
+        </p>
         <p class="plan-card__description">{{ plan.description }}</p>
         <p class="plan-card__quota">{{ plan.quota }}</p>
 
@@ -159,6 +162,8 @@
         >
       </div>
     </div>
+
+    <p class="pricing__disclaimer">Prices are billed in USD. Local-currency amounts are approximate estimates, not the billed price.</p>
   </section>
 
   <section class="closing-cta">

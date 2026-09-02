@@ -6,7 +6,8 @@
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "seed:demo-workspace": "node scripts/seed-demo-workspace.mjs"
   },
   "private": true,
   "dependencies": {

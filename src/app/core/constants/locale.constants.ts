@@ -101,6 +101,35 @@ export const LOCALE_BY_COUNTRY: Record<string, string> = {
   AE: 'ar-AE'
 };
 
+/** A country's own typical currency. Used to guess a landing-page visitor's likely currency from their detected country (see `core/utils/currency-estimate.util.ts`). Still pure ISO metadata, never a rate. */
+export const CURRENCY_BY_COUNTRY: Record<string, string> = {
+  US: 'USD',
+  CA: 'CAD',
+  GB: 'GBP',
+  IE: 'EUR',
+  DE: 'EUR',
+  FR: 'EUR',
+  ES: 'EUR',
+  IT: 'EUR',
+  NL: 'EUR',
+  PT: 'EUR',
+  CH: 'CHF',
+  SE: 'SEK',
+  NO: 'NOK',
+  DK: 'DKK',
+  PH: 'PHP',
+  JP: 'JPY',
+  CN: 'CNY',
+  IN: 'INR',
+  SG: 'SGD',
+  AU: 'AUD',
+  NZ: 'NZD',
+  MX: 'MXN',
+  BR: 'BRL',
+  ZA: 'ZAR',
+  AE: 'AED'
+};
+
 /** Fallback locale per currency, used when no target country is known — e.g. a dashboard total normalized into the workspace's base currency with no single client country attached. */
 export const LOCALE_BY_CURRENCY: Record<string, string> = {
   USD: 'en-US',
