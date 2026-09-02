@@ -1,29 +1,36 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-import { DocumentService } from '../../../core/services/document.service';
-import { CustomerService } from '../../../core/services/customer.service';
-import { TemplateService } from '../../../core/services/template.service';
-import { ProductService } from '../../../core/services/product.service';
-import { OfflineQueueService } from '../../../core/services/offline-queue.service';
-import { WorkspaceProfileService } from '../../../core/services/workspace-profile.service';
-import { AnalyticsService } from '../../../core/services/analytics.service';
+import {
+  ISO_COUNTRIES,
+  ISO_CURRENCIES,
+} from '../../../core/constants/locale.constants';
+import {
+  EMPTY_CUSTOMER_ID,
+  ParsedQuoteResult,
+} from '../../../core/models/ai-quote-parse.model';
 import { Customer } from '../../../core/models/customer.model';
-import { Template } from '../../../core/models/template.model';
-import { Product } from '../../../core/models/product.model';
 import {
   CreateDocumentLineItemRequest,
   CreateDocumentRequest,
   Document as DocumentModel,
   DocumentStatus,
   DocumentType,
-  UpdateDocumentRequest
+  UpdateDocumentRequest,
 } from '../../../core/models/document.model';
-import { ISO_COUNTRIES, ISO_CURRENCIES } from '../../../core/constants/locale.constants';
-import { EMPTY_CUSTOMER_ID, ParsedQuoteResult } from '../../../core/models/ai-quote-parse.model';
+import { Product } from '../../../core/models/product.model';
+import { Template } from '../../../core/models/template.model';
+import { AnalyticsService } from '../../../core/services/analytics.service';
+import { CustomerService } from '../../../core/services/customer.service';
+import { DocumentService } from '../../../core/services/document.service';
+import { OfflineQueueService } from '../../../core/services/offline-queue.service';
+import { ProductService } from '../../../core/services/product.service';
+import { TemplateService } from '../../../core/services/template.service';
+import { WorkspaceProfileService } from '../../../core/services/workspace-profile.service';
 
 const DEFAULT_DUE_DAYS = 14;
 const MAX_SUGGESTIONS = 6;
@@ -31,7 +38,7 @@ const MAX_SUGGESTIONS = 6;
 @Component({
   selector: 'app-document-form',
   templateUrl: './document-form.component.html',
-  styleUrls: ['./document-form.component.scss']
+  styleUrls: ['./document-form.component.scss'],
 })
 export class DocumentFormComponent implements OnInit {
   form: FormGroup;
@@ -73,7 +80,7 @@ export class DocumentFormComponent implements OnInit {
     private readonly productService: ProductService,
     private readonly offlineQueue: OfflineQueueService,
     private readonly workspaceProfileService: WorkspaceProfileService,
-    private readonly analytics: AnalyticsService
+    private readonly analytics: AnalyticsService,
   ) {
     this.form = this.fb.group({
       type: ['Quote' as DocumentType, Validators.required],
@@ -82,7 +89,7 @@ export class DocumentFormComponent implements OnInit {
       dueDate: ['', Validators.required],
       currency: ['USD', Validators.required],
       clientCountry: [null as string | null],
-      lineItems: this.fb.array([])
+      lineItems: this.fb.array([]),
     });
   }
 
@@ -94,7 +101,12 @@ export class DocumentFormComponent implements OnInit {
       customers: this.customerService.getAll(),
       templates: this.templateService.getAll(),
       products: this.productService.getAll(),
-      workspace: this.workspaceProfileService.getCached(),
+      // take(1): getCached() streams from a ReplaySubject that emits the
+      // profile but never completes (by design: other pages stay subscribed
+      // for live updates after a save). forkJoin needs every source to
+      // complete, not just emit, so without take(1) here it waits forever
+      // even though the value already arrived.
+      workspace: this.workspaceProfileService.getCached().pipe(take(1)),
       document: this.isEditMode ? this.documentService.getById(this.documentId as string) : of(null)
     }).subscribe({
       next: ({ customers, templates, products, workspace, document }) => {
@@ -141,12 +153,14 @@ export class DocumentFormComponent implements OnInit {
       if (result.customerCreated) {
         noticeParts.push(`Created a new customer, ${result.customerName}.`);
       } else {
-        noticeParts.push(`Matched the existing customer ${result.customerName}.`);
+        noticeParts.push(
+          `Matched the existing customer ${result.customerName}.`,
+        );
       }
 
       // The newly resolved customer needs to be in `this.customers` for the
       // select to show it and for `selectedCustomer`/clientCountry defaulting
-      // to work — simplest correct fix is to refetch the list rather than
+      // to work. Simplest correct fix is to refetch the list rather than
       // hand-construct a partial Customer from the parse result's few fields.
       this.customerService.getAll().subscribe((customers) => {
         this.customers = customers;
@@ -154,7 +168,9 @@ export class DocumentFormComponent implements OnInit {
         this.onCustomerSelected();
       });
     } else {
-      noticeParts.push("Couldn't identify a customer from that text. Pick or add one below.");
+      noticeParts.push(
+        "Couldn't identify a customer from that text (an email address is needed to create one automatically). Pick an existing customer below, or add a new one from the Customers page first.",
+      );
     }
 
     if (result.lineItems.length > 0) {
@@ -163,16 +179,29 @@ export class DocumentFormComponent implements OnInit {
         this.lineItems.push(
           this.fb.group({
             description: [item.description, Validators.required],
-            quantity: [item.quantity, [Validators.required, Validators.min(0.01)]],
-            unitPrice: [item.unitPrice, [Validators.required, Validators.min(0)]],
-            productId: [null as string | null]
-          })
+            quantity: [
+              item.quantity,
+              [Validators.required, Validators.min(0.01)],
+            ],
+            unitPrice: [
+              item.unitPrice,
+              [Validators.required, Validators.min(0)],
+            ],
+            productId: [null as string | null],
+          }),
         );
       });
     }
 
+    if (result.suggestedCurrency && result.suggestedCurrency !== this.form.value.currency) {
+      this.form.patchValue({ currency: result.suggestedCurrency });
+      noticeParts.push(`Set currency to ${result.suggestedCurrency} based on the text.`);
+    }
+
     if (result.suggestedDepositPercentage !== null) {
-      noticeParts.push(`Mentioned a ${result.suggestedDepositPercentage}% deposit (there's no deposit field yet, so note it manually).`);
+      noticeParts.push(
+        `Mentioned a ${result.suggestedDepositPercentage}% deposit (there's no deposit field yet, so note it manually).`,
+      );
     }
 
     if (result.unresolvedFields.length > 0) {
@@ -204,8 +233,8 @@ export class DocumentFormComponent implements OnInit {
         description: ['', Validators.required],
         quantity: [1, [Validators.required, Validators.min(0.01)]],
         unitPrice: [0, [Validators.required, Validators.min(0)]],
-        productId: [null as string | null]
-      })
+        productId: [null as string | null],
+      }),
     );
   }
 
@@ -221,23 +250,34 @@ export class DocumentFormComponent implements OnInit {
   }
 
   get subtotal(): number {
-    return this.lineItems.controls.reduce((sum: number, _, index) => sum + this.lineTotal(index), 0);
+    return this.lineItems.controls.reduce(
+      (sum: number, _, index) => sum + this.lineTotal(index),
+      0,
+    );
   }
 
   get selectedTemplate(): Template | undefined {
-    return this.templates.find((template) => template.id === this.form.value.templateId);
+    return this.templates.find(
+      (template) => template.id === this.form.value.templateId,
+    );
   }
 
   get selectedCustomer(): Customer | undefined {
-    return this.customers.find((customer) => customer.id === this.form.value.customerId);
+    return this.customers.find(
+      (customer) => customer.id === this.form.value.customerId,
+    );
   }
 
   // ---- Catalog-linked combobox (line-item description) ----
 
   productSuggestions(index: number): Product[] {
-    const term = (this.lineItems.at(index).get('description')?.value ?? '').toLowerCase().trim();
+    const term = (this.lineItems.at(index).get('description')?.value ?? '')
+      .toLowerCase()
+      .trim();
     const matches = term
-      ? this.products.filter((product) => product.name.toLowerCase().includes(term))
+      ? this.products.filter((product) =>
+          product.name.toLowerCase().includes(term),
+        )
       : this.products;
 
     return matches.slice(0, MAX_SUGGESTIONS);
@@ -258,7 +298,7 @@ export class DocumentFormComponent implements OnInit {
       description: product.name,
       unitPrice: product.price,
       quantity: 1,
-      productId: product.id
+      productId: product.id,
     });
     this.openSuggestionsForIndex = null;
   }
@@ -271,8 +311,13 @@ export class DocumentFormComponent implements OnInit {
       return;
     }
 
-    const linkedProduct = this.products.find((product) => product.id === linkedProductId);
-    if (linkedProduct && linkedProduct.name !== group.get('description')?.value) {
+    const linkedProduct = this.products.find(
+      (product) => product.id === linkedProductId,
+    );
+    if (
+      linkedProduct &&
+      linkedProduct.name !== group.get('description')?.value
+    ) {
       group.patchValue({ productId: null }, { emitEvent: false });
     }
   }
@@ -288,12 +333,13 @@ export class DocumentFormComponent implements OnInit {
     this.saving = true;
     this.saveError = '';
 
-    const lineItems: CreateDocumentLineItemRequest[] = this.lineItems.controls.map((control) => ({
-      description: control.value.description,
-      quantity: Number(control.value.quantity),
-      unitPrice: Number(control.value.unitPrice),
-      productId: control.value.productId
-    }));
+    const lineItems: CreateDocumentLineItemRequest[] =
+      this.lineItems.controls.map((control) => ({
+        description: control.value.description,
+        quantity: Number(control.value.quantity),
+        unitPrice: Number(control.value.unitPrice),
+        productId: control.value.productId,
+      }));
 
     if (this.isEditMode && this.documentId) {
       this.submitEdit(this.documentId, lineItems);
@@ -314,7 +360,7 @@ export class DocumentFormComponent implements OnInit {
       dueDate: this.form.value.dueDate,
       lineItems,
       currency: this.form.value.currency,
-      clientCountry: this.form.value.clientCountry
+      clientCountry: this.form.value.clientCountry,
     };
 
     // No point even trying the request while the browser already knows it's
@@ -327,7 +373,9 @@ export class DocumentFormComponent implements OnInit {
     this.documentService.create(request).subscribe({
       next: (created) => {
         this.trackFirstQuoteSent(created.type);
-        this.router.navigate(['/documents'], { state: { highlightId: created.id } });
+        this.router.navigate(['/documents'], {
+          state: { highlightId: created.id },
+        });
       },
       error: (error: HttpErrorResponse) => {
         // status 0 means the request never reached the server at all (dropped
@@ -340,7 +388,7 @@ export class DocumentFormComponent implements OnInit {
 
         this.saving = false;
         this.saveError = 'Could not create the document. Please try again.';
-      }
+      },
     });
   }
 
@@ -360,17 +408,22 @@ export class DocumentFormComponent implements OnInit {
    * funnel action being measured.
    */
   private trackFirstQuoteSent(documentType: DocumentType): void {
-    this.analytics.trackEvent('first_quote_sent', { document_type: documentType });
+    this.analytics.trackEvent('first_quote_sent', {
+      document_type: documentType,
+    });
   }
 
-  private submitEdit(documentId: string, lineItems: CreateDocumentLineItemRequest[]): void {
+  private submitEdit(
+    documentId: string,
+    lineItems: CreateDocumentLineItemRequest[],
+  ): void {
     const request: UpdateDocumentRequest = {
       templateId: this.form.value.templateId,
       dueDate: this.form.value.dueDate,
       status: this.existingStatus,
       lineItems,
       currency: this.form.value.currency,
-      clientCountry: this.form.value.clientCountry
+      clientCountry: this.form.value.clientCountry,
     };
 
     this.documentService.update(documentId, request).subscribe({
@@ -378,7 +431,7 @@ export class DocumentFormComponent implements OnInit {
       error: () => {
         this.saving = false;
         this.saveError = 'Could not save your changes. Please try again.';
-      }
+      },
     });
   }
 
@@ -391,7 +444,7 @@ export class DocumentFormComponent implements OnInit {
       templateId: document.templateId,
       dueDate: document.dueDate,
       currency: document.currency,
-      clientCountry: document.clientCountry
+      clientCountry: document.clientCountry,
     });
     // Customer and document type are fixed once a document exists — the backend's
     // PUT endpoint doesn't accept them, so disable rather than silently ignore.
@@ -402,22 +455,30 @@ export class DocumentFormComponent implements OnInit {
       this.lineItems.push(
         this.fb.group({
           description: [item.description, Validators.required],
-          quantity: [item.quantity, [Validators.required, Validators.min(0.01)]],
+          quantity: [
+            item.quantity,
+            [Validators.required, Validators.min(0.01)],
+          ],
           unitPrice: [item.unitPrice, [Validators.required, Validators.min(0)]],
-          productId: [item.productId]
-        })
+          productId: [item.productId],
+        }),
       );
     });
   }
 
-  private populateDefaultsForCreate(templates: Template[], defaultCurrency: string, workspaceCountry: string): void {
-    const defaultTemplate = templates.find((template) => template.isDefault) ?? templates[0];
+  private populateDefaultsForCreate(
+    templates: Template[],
+    defaultCurrency: string,
+    workspaceCountry: string,
+  ): void {
+    const defaultTemplate =
+      templates.find((template) => template.isDefault) ?? templates[0];
 
     this.form.patchValue({
       templateId: defaultTemplate?.id ?? '',
       dueDate: this.formatDate(this.addDays(new Date(), DEFAULT_DUE_DAYS)),
       currency: defaultCurrency,
-      clientCountry: workspaceCountry
+      clientCountry: workspaceCountry,
     });
 
     this.addLineItem();

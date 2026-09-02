@@ -13,6 +13,8 @@ export interface ParsedQuoteResult {
   lineItems: ParsedQuoteLineItem[];
   suggestedDepositPercentage: number | null;
   suggestedValidityDays: number | null;
+  /** ISO 4217 code, only when the parser found a real currency signal in the text (an explicit symbol/code or unambiguous regional context). Null means leave the form's currency as it already is. */
+  suggestedCurrency: string | null;
   /** Plain-language field names the parser couldn't find in the text, e.g. "customer email", for the frontend to flag next to the pre-filled form rather than leaving them silently blank. */
   unresolvedFields: string[];
 }
