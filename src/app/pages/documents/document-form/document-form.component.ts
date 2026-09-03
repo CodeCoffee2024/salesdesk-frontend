@@ -62,6 +62,8 @@ export class DocumentFormComponent implements OnInit {
   loadError = false;
   saving = false;
   saveError = '';
+  /** True when saveError is a 402 plan-limit failure (TASK-038) — shows a link to Billing instead of just a "try again" message, since retrying won't help. */
+  saveErrorIsPlanLimit = false;
 
   readonly issueDateDisplay = new Date();
 
@@ -349,6 +351,7 @@ export class DocumentFormComponent implements OnInit {
 
     this.saving = true;
     this.saveError = '';
+    this.saveErrorIsPlanLimit = false;
 
     const lineItems: CreateDocumentLineItemRequest[] =
       this.lineItems.controls.map((control) => ({
@@ -405,9 +408,19 @@ export class DocumentFormComponent implements OnInit {
         }
 
         this.saving = false;
-        this.saveError = 'Could not create the document. Please try again.';
+        this.saveErrorIsPlanLimit = error.status === 402;
+        this.saveError = this.describeCreateError(error);
       },
     });
+  }
+
+  /** 402: the workspace's plan document cap was hit (TASK-038) — surfaces the backend's own message (which names the exact limit and the upgrade path) instead of a generic failure. */
+  private describeCreateError(error: HttpErrorResponse): string {
+    if (error.status === 402) {
+      return error.error?.detail || "You've reached your plan's document limit. Upgrade your plan to keep creating documents.";
+    }
+
+    return 'Could not create the document. Please try again.';
   }
 
   private saveOffline(request: CreateDocumentRequest): void {

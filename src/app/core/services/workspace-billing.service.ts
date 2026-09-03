@@ -7,8 +7,10 @@ import {
   GCashPaymentDetails,
   GCashSubmissionConfirmation,
   PricingCatalog,
+  RequestSubscriptionUpgradeRequest,
   SubmitGCashPaymentRequest,
   SubscriptionTier,
+  UpgradeRequestConfirmation,
   WorkspaceBilling
 } from '../models/workspace-billing.model';
 import { environment } from '../../../environments/environment';
@@ -40,5 +42,9 @@ export class WorkspaceBillingService {
 
   submitGCashPayment(request: SubmitGCashPaymentRequest): Observable<GCashSubmissionConfirmation> {
     return this.http.post<GCashSubmissionConfirmation>(`${BASE_URL}/gcash-submit`, request);
+  }
+
+  requestUpgrade(request: RequestSubscriptionUpgradeRequest): Observable<UpgradeRequestConfirmation> {
+    return this.http.post<UpgradeRequestConfirmation>(`${BASE_URL}/upgrade-request`, request);
   }
 }

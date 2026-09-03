@@ -33,6 +33,11 @@ export class BillingComponent implements OnInit {
   gCashModalTier: SubscriptionTier = 'Pro';
   gCashSubmittedNotice = false;
 
+  /** The fallback upgrade path for everyone else — no card gateway is configured yet, and GCash only applies to PH workspaces. */
+  showUpgradeRequestModal = false;
+  upgradeRequestModalTier: SubscriptionTier = 'Pro';
+  upgradeRequestSentNotice = false;
+
   constructor(private readonly workspaceBillingService: WorkspaceBillingService) {}
 
   ngOnInit(): void {
@@ -83,7 +88,7 @@ export class BillingComponent implements OnInit {
         this.checkingOutTier = null;
         this.checkoutError =
           error.status === 503
-            ? "Paid upgrades aren't available yet — check back soon."
+            ? "Card checkout isn't set up yet — use \"Request upgrade\" below instead and we'll arrange billing directly."
             : 'Something went wrong starting checkout. Please try again.';
       }
     });
@@ -117,5 +122,26 @@ export class BillingComponent implements OnInit {
 
   onGCashModalClosed(): void {
     this.showGCashModal = false;
+  }
+
+  openUpgradeRequestModal(tier: PricingTier): void {
+    if (tier.tier === 'Free') {
+      return;
+    }
+
+    this.upgradeRequestModalTier = tier.tier;
+    this.showUpgradeRequestModal = true;
+  }
+
+  onUpgradeRequestSubmitted(): void {
+    this.showUpgradeRequestModal = false;
+    this.upgradeRequestSentNotice = true;
+    // Picks up the new PendingUpgradeRequest so the usage card reflects it
+    // immediately, without waiting for the next full page load.
+    this.load();
+  }
+
+  onUpgradeRequestModalClosed(): void {
+    this.showUpgradeRequestModal = false;
   }
 }

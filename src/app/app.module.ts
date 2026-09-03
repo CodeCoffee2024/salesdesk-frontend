@@ -41,6 +41,7 @@ import { ReminderSettingsComponent } from './pages/settings/reminder-settings/re
 import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/workspace-profile.component';
 import { BillingComponent } from './pages/settings/billing/billing.component';
 import { GCashPaymentModalComponent } from './pages/settings/billing/gcash-payment-modal/gcash-payment-modal.component';
+import { UpgradeRequestModalComponent } from './pages/settings/billing/upgrade-request-modal/upgrade-request-modal.component';
 import { GCashPendingBannerComponent } from './shared/gcash-pending-banner/gcash-pending-banner.component';
 import { OnboardingChecklistComponent } from './shared/onboarding-checklist/onboarding-checklist.component';
 import { FloatingHelpWidgetComponent } from './shared/floating-help-widget/floating-help-widget.component';
@@ -87,6 +88,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     WorkspaceProfileComponent,
     BillingComponent,
     GCashPaymentModalComponent,
+    UpgradeRequestModalComponent,
     GCashPendingBannerComponent,
     OnboardingChecklistComponent,
     FloatingHelpWidgetComponent,

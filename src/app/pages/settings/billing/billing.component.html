@@ -41,6 +41,19 @@
       <i class="bi bi-check-circle" aria-hidden="true"></i>
       <p class="gcash-pending-notice__title">Submitted — we'll verify your payment and activate your upgrade soon.</p>
     </div>
+
+    <div class="gcash-pending-notice" *ngIf="b.pendingUpgradeRequest as pendingUpgrade">
+      <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+      <div>
+        <p class="gcash-pending-notice__title">{{ pendingUpgrade.tier }} upgrade requested</p>
+        <p class="gcash-pending-notice__detail">We'll reach out to arrange billing and activate it once approved.</p>
+      </div>
+    </div>
+
+    <div class="gcash-pending-notice" *ngIf="upgradeRequestSentNotice && !b.pendingUpgradeRequest">
+      <i class="bi bi-check-circle" aria-hidden="true"></i>
+      <p class="gcash-pending-notice__title">Request sent — we'll reach out to arrange billing and activate your upgrade.</p>
+    </div>
   </div>
 
   <div class="settings-card" *ngIf="pricing as catalog">
@@ -79,6 +92,9 @@
           <button type="button" class="btn-gcash" *ngIf="isPh" (click)="openGCashModal(tier)">
             <i class="bi bi-wallet2" aria-hidden="true"></i> Pay via GCash
           </button>
+          <button type="button" class="btn-request-upgrade" (click)="openUpgradeRequestModal(tier)">
+            <i class="bi bi-envelope" aria-hidden="true"></i> No payment method? Request upgrade
+          </button>
         </ng-container>
       </div>
     </div>
@@ -92,6 +108,14 @@
   (submitted)="onGCashSubmitted()"
   (closed)="onGCashModalClosed()"
 ></app-gcash-payment-modal>
+
+<app-upgrade-request-modal
+  *ngIf="showUpgradeRequestModal"
+  [tier]="upgradeRequestModalTier"
+  [billingCycle]="billingCycle"
+  (submitted)="onUpgradeRequestSubmitted()"
+  (closed)="onUpgradeRequestModalClosed()"
+></app-upgrade-request-modal>
 
 <div class="billing__loading" *ngIf="loading">Loading&hellip;</div>
 

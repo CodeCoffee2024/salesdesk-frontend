@@ -13,12 +13,20 @@ export interface WorkspaceBilling {
   documentsIssuedThisMonth: number;
   /** TASK-039: set while a GCash payment claim is awaiting admin verification. Null once approved, or if nothing's ever been submitted. */
   pendingGCashSubmission: PendingGCashSubmission | null;
+  /** Set while a no-payment-method-available upgrade request is awaiting manual admin approval. Null once approved, or if nothing's ever been requested. */
+  pendingUpgradeRequest: PendingUpgradeRequest | null;
 }
 
 export interface PendingGCashSubmission {
   gCashReferenceNumber: string;
   tier: SubscriptionTier;
   submittedAtUtc: string;
+}
+
+export interface PendingUpgradeRequest {
+  tier: SubscriptionTier;
+  billingCycle: BillingCycle;
+  requestedAtUtc: string;
 }
 
 /** TASK-038: mirrors the backend's PricingTierDto/PricingCatalogDto (GET /api/workspace/billing/pricing). */
@@ -66,4 +74,17 @@ export interface SubmitGCashPaymentRequest {
 export interface GCashSubmissionConfirmation {
   gCashReferenceNumber: string;
   submittedAtUtc: string;
+}
+
+/** The fallback upgrade path for any workspace with no configured payment method (not PH/GCash, no card gateway yet). */
+export interface RequestSubscriptionUpgradeRequest {
+  tier: SubscriptionTier;
+  billingCycle: BillingCycle;
+  note: string | null;
+}
+
+export interface UpgradeRequestConfirmation {
+  tier: SubscriptionTier;
+  billingCycle: BillingCycle;
+  requestedAtUtc: string;
 }

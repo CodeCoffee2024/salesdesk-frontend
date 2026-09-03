@@ -311,3 +311,24 @@
     background: var(--sd-status-sent-bg);
   }
 }
+
+.btn-request-upgrade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--sd-muted);
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--sd-ink);
+  }
+}

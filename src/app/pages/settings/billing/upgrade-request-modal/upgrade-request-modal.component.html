@@ -1,0 +1,26 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal__header">
+      <h2>Request {{ tier }} upgrade</h2>
+      <button type="button" class="modal__close" (click)="close()" aria-label="Close">&times;</button>
+    </div>
+
+    <p class="modal__intro">
+      No payment method is set up for your workspace yet. Send us a request instead — we'll reach out to arrange billing, and your workspace will be upgraded to {{ tier }} ({{ billingCycle === 'Annual' ? 'yearly' : 'monthly' }}) as soon as it's approved.
+    </p>
+
+    <div class="field">
+      <label for="note">Anything we should know? <span class="field__optional">(optional)</span></label>
+      <textarea id="note" rows="3" placeholder="e.g. We're outside the Philippines and don't have a card gateway option yet." [(ngModel)]="note"></textarea>
+    </div>
+
+    <p class="modal__error" *ngIf="submitError">{{ submitError }}</p>
+
+    <div class="modal__actions">
+      <button type="button" class="btn-secondary" (click)="close()">Cancel</button>
+      <button type="button" class="btn-primary" [disabled]="submitting" (click)="submit()">
+        {{ submitting ? 'Sending…' : 'Send request' }}
+      </button>
+    </div>
+  </div>
+</div>

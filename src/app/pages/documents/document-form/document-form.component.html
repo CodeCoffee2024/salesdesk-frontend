@@ -124,7 +124,10 @@
         <button type="button" class="add-line-item" (click)="addLineItem()">+ Add line item</button>
       </div>
 
-      <p class="document-form__error" *ngIf="saveError">{{ saveError }}</p>
+      <p class="document-form__error" *ngIf="saveError">
+        {{ saveError }}
+        <a *ngIf="saveErrorIsPlanLimit" routerLink="/settings/billing">Go to Billing &rarr;</a>
+      </p>
 
       <div class="document-form__actions" *ngIf="!readOnly">
         <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>

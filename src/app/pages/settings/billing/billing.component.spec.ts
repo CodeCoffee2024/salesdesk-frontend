@@ -15,6 +15,7 @@ function makeBilling(overrides: Partial<WorkspaceBilling> = {}): WorkspaceBillin
     monthlyDocumentLimit: 5,
     documentsIssuedThisMonth: 2,
     pendingGCashSubmission: null,
+    pendingUpgradeRequest: null,
     ...overrides
   };
 }
@@ -128,7 +129,7 @@ describe('BillingComponent', () => {
 
     component.upgrade(proTier);
 
-    expect(component.checkoutError).toContain("aren't available yet");
+    expect(component.checkoutError).toContain('Request upgrade');
     expect(component.checkingOutTier).toBeNull();
   });
 });
