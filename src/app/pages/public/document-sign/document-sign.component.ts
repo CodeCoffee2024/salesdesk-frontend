@@ -106,7 +106,11 @@ export class DocumentSignComponent implements OnInit {
       .download(
         this.document,
         this.document.isSigned && this.document.signedByName && this.document.signedAtUtc
-          ? { signerName: this.document.signedByName, signedAtUtc: this.document.signedAtUtc, signatureImageDataUrl: '' }
+          ? {
+              signerName: this.document.signedByName,
+              signedAtUtc: this.document.signedAtUtc,
+              signatureImageDataUrl: this.document.signatureImageDataUrl ?? '',
+            }
           : null
       )
       .catch(() => undefined);

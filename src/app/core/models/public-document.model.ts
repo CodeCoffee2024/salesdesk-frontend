@@ -21,6 +21,7 @@ export interface PublicDocument {
   isSigned: boolean;
   signedByName: string | null;
   signedAtUtc: string | null;
+  signatureImageDataUrl: string | null;
 }
 
 export type SignatureType = 'Drawn' | 'Typed';

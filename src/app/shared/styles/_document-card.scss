@@ -171,6 +171,28 @@
   color: var(--sd-muted);
 }
 
+.document-card__signature {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--sd-border);
+}
+
+.document-card__signature-image {
+  display: block;
+  max-width: 220px;
+  max-height: 90px;
+  margin-bottom: 8px;
+}
+
+.document-card__signature-caption {
+  font-size: 12px;
+  color: var(--sd-muted);
+
+  strong {
+    color: var(--sd-ink);
+  }
+}
+
 .document-card__items-scroll {
   overflow-x: auto;
 }

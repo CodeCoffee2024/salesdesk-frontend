@@ -83,6 +83,18 @@
         </div>
       </div>
 
+      <div class="document-card__signature" *ngIf="doc.isSigned">
+        <img
+          *ngIf="doc.signatureImageDataUrl"
+          [src]="doc.signatureImageDataUrl"
+          alt="{{ doc.signedByName }}'s signature"
+          class="document-card__signature-image"
+        />
+        <p class="document-card__signature-caption">
+          Signed by <strong>{{ doc.signedByName }}</strong> on {{ doc.signedAtUtc | date: 'MMM d, y, h:mm a' }}
+        </p>
+      </div>
+
       <p class="document-card__footnote">Thank you for the opportunity to work together.</p>
     </div>
   </ng-container>
