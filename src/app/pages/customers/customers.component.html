@@ -32,6 +32,8 @@
     No customers match &ldquo;{{ searchTerm }}&rdquo;.
   </p>
 
+  <p class="modal__error" *ngIf="deleteError">{{ deleteError }}</p>
+
   <div class="customer-grid" *ngIf="filteredCustomers.length > 0">
     <button type="button" class="customer-card" *ngFor="let customer of filteredCustomers" (click)="viewProfile(customer)">
       <div class="customer-card__header">
@@ -59,7 +61,7 @@
 
 <div class="modal-backdrop" *ngIf="showAddModal" (click)="closeAddModal()">
   <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
-    <h2>Add customer</h2>
+    <h2>{{ addModalMode === 'edit' ? 'Edit customer' : 'Add customer' }}</h2>
 
     <form [formGroup]="addForm" (ngSubmit)="submitAdd()">
       <div class="field">
@@ -98,7 +100,9 @@
 
       <div class="modal__actions">
         <button type="button" class="btn-secondary" (click)="closeAddModal()">Cancel</button>
-        <button type="submit" class="btn-primary" [disabled]="saving">{{ saving ? 'Adding…' : 'Add customer' }}</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? (addModalMode === 'edit' ? 'Saving…' : 'Adding…') : (addModalMode === 'edit' ? 'Save changes' : 'Add customer') }}
+        </button>
       </div>
     </form>
   </div>
@@ -111,7 +115,21 @@
         <h2>{{ customer.name }}</h2>
         <p>{{ customer.company }}</p>
       </div>
-      <button type="button" class="modal__close" (click)="closeProfile()" aria-label="Close">&times;</button>
+      <div class="profile__header-actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+          (click)="openEditModal(customer)"
+        >Edit</button>
+        <button
+          type="button"
+          class="btn-danger"
+          *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
+          (click)="requestDelete(customer)"
+        >Delete</button>
+        <button type="button" class="modal__close" (click)="closeProfile()" aria-label="Close">&times;</button>
+      </div>
     </div>
 
     <div class="profile__meta">
@@ -152,3 +170,12 @@
     </div>
   </div>
 </div>
+
+<app-confirm-dialog
+  *ngIf="deletingCustomer as customer"
+  heading="Delete this customer?"
+  [message]="'This permanently removes &quot;' + customer.name + '&quot; from your workspace. This cannot be undone.'"
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+></app-confirm-dialog>

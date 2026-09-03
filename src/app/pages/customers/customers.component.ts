@@ -19,6 +19,8 @@ export class CustomersComponent implements OnInit {
   searchTerm = '';
 
   showAddModal = false;
+  addModalMode: 'add' | 'edit' = 'add';
+  editingCustomer: Customer | null = null;
   addForm: FormGroup;
   addError = '';
   saving = false;
@@ -26,6 +28,9 @@ export class CustomersComponent implements OnInit {
   selectedCustomer: Customer | null = null;
   selectedCustomerDocuments: DocumentModel[] = [];
   profileLoading = false;
+
+  deletingCustomer: Customer | null = null;
+  deleteError = '';
 
   readonly countries = ISO_COUNTRIES;
   /** Workspace's own default currency (TASK-029) — used to format the aggregate LifetimeValue figure, which isn't tied to any single document's currency. */
@@ -79,9 +84,27 @@ export class CustomersComponent implements OnInit {
   }
 
   openAddModal(): void {
+    this.addModalMode = 'add';
+    this.editingCustomer = null;
     this.addForm.reset();
     this.addError = '';
     this.showAddModal = true;
+  }
+
+  openEditModal(customer: Customer): void {
+    this.addModalMode = 'edit';
+    this.editingCustomer = customer;
+    this.addForm.reset({
+      name: customer.name,
+      company: customer.company,
+      email: customer.email,
+      phone: customer.phone ?? '',
+      country: customer.country ?? null
+    });
+    this.addError = '';
+    this.showAddModal = true;
+    // The edit form replaces the read-only profile view rather than stacking on top of it.
+    this.selectedCustomer = null;
   }
 
   closeAddModal(): void {
@@ -98,7 +121,14 @@ export class CustomersComponent implements OnInit {
     this.addError = '';
 
     const { name, company, email, phone, country } = this.addForm.value;
-    this.customerService.create({ name, company, email, phone: phone || null, country: country || null }).subscribe({
+    const request = { name, company, email, phone: phone || null, country: country || null };
+
+    const save$ =
+      this.addModalMode === 'edit' && this.editingCustomer
+        ? this.customerService.update(this.editingCustomer.id, request)
+        : this.customerService.create(request);
+
+    save$.subscribe({
       next: () => {
         this.saving = false;
         this.showAddModal = false;
@@ -106,7 +136,9 @@ export class CustomersComponent implements OnInit {
       },
       error: () => {
         this.saving = false;
-        this.addError = 'Could not add this customer. Please try again.';
+        this.addError = this.addModalMode === 'edit'
+          ? 'Could not save this customer. Please try again.'
+          : 'Could not add this customer. Please try again.';
       }
     });
   }
@@ -130,6 +162,36 @@ export class CustomersComponent implements OnInit {
   closeProfile(): void {
     this.selectedCustomer = null;
     this.selectedCustomerDocuments = [];
+  }
+
+  requestDelete(customer: Customer): void {
+    this.deletingCustomer = customer;
+    this.deleteError = '';
+    this.selectedCustomer = null;
+  }
+
+  cancelDelete(): void {
+    this.deletingCustomer = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.deletingCustomer) {
+      return;
+    }
+
+    this.customerService.delete(this.deletingCustomer.id).subscribe({
+      next: () => {
+        this.deletingCustomer = null;
+        this.load();
+      },
+      error: (error) => {
+        this.deletingCustomer = null;
+        // 409: the database still has documents pointing at this customer (restricted FK) — see DeleteCustomerCommand.
+        this.deleteError = error?.status === 409
+          ? 'This customer has existing quotes or invoices and can\'t be deleted. Void those documents first.'
+          : 'Could not delete this customer. Please try again.';
+      }
+    });
   }
 
   private load(): void {

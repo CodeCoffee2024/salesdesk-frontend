@@ -60,7 +60,8 @@
     border-bottom: none;
   }
 
-  &:hover .product-row__edit {
+  &:hover .product-row__edit,
+  &:hover .product-row__delete {
     opacity: 1;
   }
 }
@@ -104,7 +105,8 @@
   font-size: 12px;
 }
 
-.product-row__edit {
+.product-row__edit,
+.product-row__delete {
   border: none;
   background: var(--sd-bg);
   border-radius: var(--sd-radius-sm);
@@ -118,6 +120,16 @@
   &:focus-visible {
     opacity: 1;
     outline: 2px solid var(--sd-primary);
+  }
+}
+
+.product-row__delete {
+  color: var(--sd-danger);
+  font-size: 18px;
+  line-height: 1;
+
+  &:hover {
+    background: var(--sd-danger-bg);
   }
 }
 
@@ -169,9 +181,10 @@
     max-width: none;
   }
 
-  // No hover on touch devices — the edit button must stay visible rather
-  // than relying on a hover state nothing on mobile can trigger.
-  .product-row__edit {
+  // No hover on touch devices — edit/delete must stay visible rather than
+  // relying on a hover state nothing on mobile can trigger.
+  .product-row__edit,
+  .product-row__delete {
     opacity: 1;
   }
 

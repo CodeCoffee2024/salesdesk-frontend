@@ -19,6 +19,8 @@
     description="Use the &ldquo;Add template&rdquo; button above to create your first one."
   ></app-empty-state>
 
+  <p class="modal__error" *ngIf="deleteError">{{ deleteError }}</p>
+
   <div class="template-grid" *ngIf="templates.length > 0">
     <div class="template-card" *ngFor="let template of templates">
       <div class="template-card__swatch" [style.background]="template.accentColor || 'var(--sd-primary)'"></div>
@@ -44,6 +46,13 @@
 
             <button
               type="button"
+              class="template-card__edit-link"
+              *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+              (click)="openEditModal(template)"
+            >Edit details</button>
+
+            <button
+              type="button"
               class="template-card__default-toggle"
               *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
               [class.template-card__default-toggle--active]="template.isDefault"
@@ -52,6 +61,13 @@
             >
               {{ template.isDefault ? 'Default template' : settingDefaultForId === template.id ? 'Setting…' : 'Set as default' }}
             </button>
+
+            <button
+              type="button"
+              class="template-card__delete-link"
+              *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
+              (click)="requestDelete(template)"
+            >Delete</button>
           </div>
         </div>
       </div>
@@ -71,7 +87,7 @@
 
 <div class="modal-backdrop" *ngIf="showAddModal" (click)="closeAddModal()">
   <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
-    <h2>Add template</h2>
+    <h2>{{ modalMode === 'edit' ? 'Edit template' : 'Add template' }}</h2>
 
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="field">
@@ -114,8 +130,19 @@
 
       <div class="modal__actions">
         <button type="button" class="btn-secondary" (click)="closeAddModal()">Cancel</button>
-        <button type="submit" class="btn-primary" [disabled]="saving">{{ saving ? 'Adding…' : 'Add template' }}</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? (modalMode === 'edit' ? 'Saving…' : 'Adding…') : (modalMode === 'edit' ? 'Save changes' : 'Add template') }}
+        </button>
       </div>
     </form>
   </div>
 </div>
+
+<app-confirm-dialog
+  *ngIf="deletingTemplate as template"
+  heading="Delete this template?"
+  [message]="'This permanently removes &quot;' + template.name + '&quot;. Templates still used by an existing quote or invoice can\'t be deleted. This cannot be undone.'"
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+></app-confirm-dialog>

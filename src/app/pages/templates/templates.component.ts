@@ -19,11 +19,16 @@ export class TemplatesComponent implements OnInit {
   loadError = false;
 
   showAddModal = false;
+  modalMode: 'add' | 'edit' = 'add';
+  editingTemplate: Template | null = null;
   form: FormGroup;
   saveError = '';
   saving = false;
 
   settingDefaultForId: string | null = null;
+
+  deletingTemplate: Template | null = null;
+  deleteError = '';
 
   constructor(
     private readonly fb: FormBuilder,
@@ -61,7 +66,22 @@ export class TemplatesComponent implements OnInit {
   }
 
   openAddModal(): void {
+    this.modalMode = 'add';
+    this.editingTemplate = null;
     this.form.reset({ name: '', targetType: 'QuotesAndInvoices', description: '', accentColor: SWATCHES[0] });
+    this.saveError = '';
+    this.showAddModal = true;
+  }
+
+  openEditModal(template: Template): void {
+    this.modalMode = 'edit';
+    this.editingTemplate = template;
+    this.form.reset({
+      name: template.name,
+      targetType: template.targetType,
+      description: template.description ?? '',
+      accentColor: template.accentColor ?? SWATCHES[0]
+    });
     this.saveError = '';
     this.showAddModal = true;
   }
@@ -84,7 +104,18 @@ export class TemplatesComponent implements OnInit {
     this.saveError = '';
 
     const { name, targetType, description, accentColor } = this.form.value;
-    this.templateService.create({ name, targetType, description: description || null, accentColor }).subscribe({
+    const request = { name, targetType, description: description || null, accentColor };
+
+    // Editing here only touches name/type/description/color — the visual
+    // content is authored separately in the template editor ("Edit content"),
+    // so its existing contentHtml is carried forward untouched rather than
+    // sent as null, which UpdateTemplateCommand would otherwise wipe.
+    const save$ =
+      this.modalMode === 'edit' && this.editingTemplate
+        ? this.templateService.update(this.editingTemplate.id, { ...request, contentHtml: this.editingTemplate.contentHtml })
+        : this.templateService.create(request);
+
+    save$.subscribe({
       next: () => {
         this.saving = false;
         this.showAddModal = false;
@@ -92,7 +123,38 @@ export class TemplatesComponent implements OnInit {
       },
       error: () => {
         this.saving = false;
-        this.saveError = 'Could not add this template. Please try again.';
+        this.saveError = this.modalMode === 'edit'
+          ? 'Could not save this template. Please try again.'
+          : 'Could not add this template. Please try again.';
+      }
+    });
+  }
+
+  requestDelete(template: Template): void {
+    this.deletingTemplate = template;
+    this.deleteError = '';
+  }
+
+  cancelDelete(): void {
+    this.deletingTemplate = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.deletingTemplate) {
+      return;
+    }
+
+    this.templateService.delete(this.deletingTemplate.id).subscribe({
+      next: () => {
+        this.deletingTemplate = null;
+        this.load();
+      },
+      error: (error) => {
+        this.deletingTemplate = null;
+        // 409: existing documents still reference this template (restricted FK) — see DeleteTemplateCommand.
+        this.deleteError = error?.status === 409
+          ? 'This template is used by existing documents and can\'t be deleted.'
+          : 'Could not delete this template. Please try again.';
       }
     });
   }

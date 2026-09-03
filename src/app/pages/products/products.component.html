@@ -32,6 +32,8 @@
     No items match &ldquo;{{ searchTerm }}&rdquo;.
   </p>
 
+  <p class="modal__error" *ngIf="deleteError">{{ deleteError }}</p>
+
   <div class="product-list" *ngIf="filteredProducts.length > 0">
     <div class="product-row" *ngFor="let product of filteredProducts">
       <div class="product-row__main">
@@ -52,9 +54,28 @@
       >
         &#9998;
       </button>
+
+      <button
+        type="button"
+        class="product-row__delete"
+        *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
+        (click)="requestDelete(product, $event)"
+        [attr.aria-label]="'Delete ' + product.name"
+      >
+        &times;
+      </button>
     </div>
   </div>
 </div>
+
+<app-confirm-dialog
+  *ngIf="deletingProduct as product"
+  heading="Delete this product?"
+  [message]="'This removes &quot;' + product.name + '&quot; from your catalog. Existing documents that used it are not affected. This cannot be undone.'"
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+></app-confirm-dialog>
 
 <div class="page-placeholder" *ngIf="loading">
   <h1>Products &amp; services</h1>

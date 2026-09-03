@@ -24,6 +24,9 @@ export class ProductsComponent implements OnInit {
   saveError = '';
   saving = false;
 
+  deletingProduct: Product | null = null;
+  deleteError = '';
+
   /** Workspace's own default currency (TASK-029) — catalog prices aren't per-document, so they format in the workspace's base currency. */
   workspaceCurrency = 'USD';
 
@@ -124,6 +127,33 @@ export class ProductsComponent implements OnInit {
       error: () => {
         this.saving = false;
         this.saveError = 'Could not save this product. Please try again.';
+      }
+    });
+  }
+
+  requestDelete(product: Product, event: MouseEvent): void {
+    event.stopPropagation();
+    this.deletingProduct = product;
+    this.deleteError = '';
+  }
+
+  cancelDelete(): void {
+    this.deletingProduct = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.deletingProduct) {
+      return;
+    }
+
+    this.productService.delete(this.deletingProduct.id).subscribe({
+      next: () => {
+        this.deletingProduct = null;
+        this.load();
+      },
+      error: () => {
+        this.deleteError = 'Could not delete this product. Please try again.';
+        this.deletingProduct = null;
       }
     });
   }
