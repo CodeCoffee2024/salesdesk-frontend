@@ -1,4 +1,4 @@
-import { formatCurrency, resolveLocale } from './locale.util';
+import { formatCurrency, formatCurrencyForPdf, resolveLocale } from './locale.util';
 
 describe('resolveLocale', () => {
   it('prefers the target country locale when both country and currency are known', () => {
@@ -40,5 +40,26 @@ describe('formatCurrency', () => {
 
   it('defaults to USD when no currency is provided', () => {
     expect(formatCurrency(50)).toBe('$50.00');
+  });
+});
+
+describe('formatCurrencyForPdf', () => {
+  it('falls back to the ISO code for a currency symbol jsPDF\'s standard fonts cannot render (e.g. the peso sign)', () => {
+    const result = formatCurrencyForPdf(450, 'PHP', 'PH');
+    expect(result).not.toContain('₱');
+    expect(result).toContain('PHP');
+    expect(result).toContain('450.00');
+  });
+
+  it('keeps the real symbol for currencies within jsPDF\'s WinAnsi-safe set', () => {
+    expect(formatCurrencyForPdf(1250, 'USD', 'US')).toBe('$1,250.00');
+    expect(formatCurrencyForPdf(100, 'GBP', 'GB')).toContain('£');
+    expect(formatCurrencyForPdf(100, 'EUR', 'DE')).toContain('€');
+  });
+
+  it('falls back to the ISO code for other unsupported symbols too (e.g. the rupee sign)', () => {
+    const result = formatCurrencyForPdf(100, 'INR', 'IN');
+    expect(result).not.toContain('₹');
+    expect(result).toContain('INR');
   });
 });

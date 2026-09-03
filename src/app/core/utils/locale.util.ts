@@ -48,3 +48,37 @@ export function formatCurrency(amount: number, currencyCode?: string | null, cou
     return new Intl.NumberFormat(DEFAULT_LOCALE, { style: 'currency', currency: DEFAULT_CURRENCY }).format(amount);
   }
 }
+
+/**
+ * jsPDF's standard 14 fonts (Helvetica/Times/Courier) only carry WinAnsiEncoding
+ * (Windows-1252) glyphs — Latin-1 (U+00A0-U+00FF: accented letters, £, ¥, ¢, the
+ * non-breaking space some locales format with, etc.) plus a handful of extras
+ * WinAnsi adds outside that range, of which € (U+20AC) is the only one relevant
+ * here. ₱ (PHP), ₹ (INR), ₩ (KRW), ₦ (NGN), ₫ (VND) and most other currency
+ * signs live well outside both, so `doc.text()` silently drops or mangles them.
+ * There's no embedded Unicode font to fall back on, so for those currencies the
+ * exported PDF uses the plain ISO code ("PHP 450.00") instead of the symbol —
+ * unambiguous and guaranteed renderable, rather than a blank box.
+ */
+const WIN_ANSI_EXTRA_SAFE_CODEPOINTS = new Set([0x20ac]); // €, WinAnsi's one addition beyond Latin-1
+
+export function formatCurrencyForPdf(amount: number, currencyCode?: string | null, countryCode?: string | null): string {
+  const formatted = formatCurrency(amount, currencyCode, countryCode);
+  const hasUnsafeGlyph = Array.from(formatted).some((char) => {
+    const codePoint = char.codePointAt(0) ?? 0;
+    return codePoint > 0xff && !WIN_ANSI_EXTRA_SAFE_CODEPOINTS.has(codePoint);
+  });
+
+  if (!hasUnsafeGlyph) {
+    return formatted;
+  }
+
+  const currency = (currencyCode || DEFAULT_CURRENCY).toUpperCase();
+  const locale = resolveLocale(currency, countryCode);
+
+  try {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency, currencyDisplay: 'code' }).format(amount);
+  } catch {
+    return `${currency} ${amount.toFixed(2)}`;
+  }
+}

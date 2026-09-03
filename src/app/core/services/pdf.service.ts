@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { formatCurrency } from '../utils/locale.util';
+import { formatCurrencyForPdf } from '../utils/locale.util';
 
 const PAGE_WIDTH_PT = 595;
 const MARGIN_X = 48;
@@ -74,7 +74,7 @@ export class PdfService {
 
   private buildDocument(document: PdfDocumentSource, signature?: PdfSignatureInfo | null): jsPDF {
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-    const money = (amount: number) => formatCurrency(amount, document.currency, document.clientCountry);
+    const money = (amount: number) => formatCurrencyForPdf(amount, document.currency, document.clientCountry);
     let y = 56;
 
     doc.setFont('helvetica', 'bold');
