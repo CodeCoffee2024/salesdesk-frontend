@@ -1,0 +1,76 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal__header">
+      <h2>Pay via GCash</h2>
+      <button type="button" class="modal__close" (click)="close()" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="modal__loading" *ngIf="loading">Loading&hellip;</div>
+
+    <app-empty-state
+      *ngIf="!loading && loadError"
+      icon="not-found"
+      heading="Couldn't load GCash details"
+      description="Something went wrong fetching this. Please try again."
+    ></app-empty-state>
+
+    <ng-container *ngIf="!loading && !loadError && details as d">
+      <p class="modal__intro">
+        Send <strong>&#8369;{{ amountDue | number: '1.2-2' }}</strong> for the {{ tier }} plan ({{ billingCycle === 'Annual' ? 'yearly' : 'monthly' }}) to the account below, then submit your reference number — we'll verify it and activate your upgrade within 1&ndash;12 hours.
+      </p>
+
+      <div class="gcash-account">
+        <div class="gcash-account__details">
+          <p><span>Account name</span><strong>{{ d.accountName || 'Not configured yet' }}</strong></p>
+          <p><span>GCash number</span><strong>{{ d.mobileNumber || 'Not configured yet' }}</strong></p>
+        </div>
+        <img *ngIf="d.qrCodeUrl" [src]="d.qrCodeUrl" alt="GCash QR code" class="gcash-account__qr" />
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field">
+          <label for="gCashReferenceNumber">GCash reference number</label>
+          <input id="gCashReferenceNumber" type="text" inputmode="numeric" placeholder="13-digit reference number" formControlName="gCashReferenceNumber" />
+          <small *ngIf="form.get('gCashReferenceNumber')?.touched && form.get('gCashReferenceNumber')?.invalid" class="field__error">
+            Enter the exact 13-digit reference number from your GCash receipt.
+          </small>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="senderName">Your name (as sent from)</label>
+            <input id="senderName" type="text" formControlName="senderName" />
+          </div>
+
+          <div class="field">
+            <label for="senderMobileNumber">Your GCash mobile number</label>
+            <input id="senderMobileNumber" type="text" placeholder="09171234567" formControlName="senderMobileNumber" />
+            <small *ngIf="form.get('senderMobileNumber')?.touched && form.get('senderMobileNumber')?.invalid" class="field__error">
+              Enter a valid PH mobile number, e.g. 09171234567.
+            </small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Screenshot <span class="field__optional">(optional)</span></label>
+          <input type="file" accept="image/png,image/jpeg" (change)="onScreenshotSelected($event)" [disabled]="!!screenshotFileName" />
+          <div class="screenshot-preview" *ngIf="screenshotFileName">
+            <i class="bi bi-image" aria-hidden="true"></i>
+            <span>{{ screenshotFileName }}</span>
+            <button type="button" (click)="removeScreenshot()">Remove</button>
+          </div>
+          <small *ngIf="screenshotError" class="field__error">{{ screenshotError }}</small>
+        </div>
+
+        <p class="modal__error" *ngIf="submitError">{{ submitError }}</p>
+
+        <div class="modal__actions">
+          <button type="button" class="btn-secondary" (click)="close()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="submitting">
+            {{ submitting ? 'Submitting…' : "I've paid — submit for verification" }}
+          </button>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+</div>

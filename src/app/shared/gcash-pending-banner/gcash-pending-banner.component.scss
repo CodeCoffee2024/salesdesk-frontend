@@ -1,0 +1,20 @@
+.gcash-pending-banner {
+  // Sticky, not fixed — same reasoning as ImpersonationBannerComponent/
+  // EmailVerificationBannerComponent: it stacks with either without covering
+  // page content.
+  position: sticky;
+  top: 0;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--sd-status-sent-bg);
+  color: var(--sd-status-sent-fg);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--sd-shadow-md);
+  flex-wrap: wrap;
+  text-align: center;
+}

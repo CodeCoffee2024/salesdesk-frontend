@@ -28,6 +28,19 @@
         </p>
       </div>
     </div>
+
+    <div class="gcash-pending-notice" *ngIf="b.pendingGCashSubmission as pending">
+      <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+      <div>
+        <p class="gcash-pending-notice__title">GCash payment received (Ref: #{{ pending.gCashReferenceNumber }})</p>
+        <p class="gcash-pending-notice__detail">Your {{ pending.tier }} upgrade is being verified and will be activated within 1&ndash;12 hours.</p>
+      </div>
+    </div>
+
+    <div class="gcash-pending-notice" *ngIf="gCashSubmittedNotice && !b.pendingGCashSubmission">
+      <i class="bi bi-check-circle" aria-hidden="true"></i>
+      <p class="gcash-pending-notice__title">Submitted — we'll verify your payment and activate your upgrade soon.</p>
+    </div>
   </div>
 
   <div class="settings-card" *ngIf="pricing as catalog">
@@ -54,19 +67,31 @@
         </ul>
 
         <button type="button" class="btn-secondary" disabled *ngIf="isCurrentTier(tier.tier)">Current plan</button>
-        <button
-          type="button"
-          class="btn-primary"
-          *ngIf="!isCurrentTier(tier.tier) && tier.tier !== 'Free'"
-          [disabled]="checkingOutTier === tier.tier"
-          (click)="upgrade(tier)"
-        >
-          {{ checkingOutTier === tier.tier ? 'Starting checkout…' : 'Upgrade' }}
-        </button>
+        <ng-container *ngIf="!isCurrentTier(tier.tier) && tier.tier !== 'Free'">
+          <button
+            type="button"
+            class="btn-primary"
+            [disabled]="checkingOutTier === tier.tier"
+            (click)="upgrade(tier)"
+          >
+            {{ checkingOutTier === tier.tier ? 'Starting checkout…' : 'Upgrade' }}
+          </button>
+          <button type="button" class="btn-gcash" *ngIf="isPh" (click)="openGCashModal(tier)">
+            <i class="bi bi-wallet2" aria-hidden="true"></i> Pay via GCash
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>
 </div>
+
+<app-gcash-payment-modal
+  *ngIf="showGCashModal"
+  [tier]="gCashModalTier"
+  [billingCycle]="billingCycle"
+  (submitted)="onGCashSubmitted()"
+  (closed)="onGCashModalClosed()"
+></app-gcash-payment-modal>
 
 <div class="billing__loading" *ngIf="loading">Loading&hellip;</div>
 

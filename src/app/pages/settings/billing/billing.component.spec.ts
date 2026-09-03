@@ -14,6 +14,7 @@ function makeBilling(overrides: Partial<WorkspaceBilling> = {}): WorkspaceBillin
     isEarlyBirdPromo: false,
     monthlyDocumentLimit: 5,
     documentsIssuedThisMonth: 2,
+    pendingGCashSubmission: null,
     ...overrides
   };
 }

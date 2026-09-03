@@ -28,6 +28,11 @@ export class BillingComponent implements OnInit {
   checkingOutTier: SubscriptionTier | null = null;
   checkoutError: string | null = null;
 
+  /** TASK-039: the real, working upgrade path for PH workspaces today — manual GCash proof-of-payment, verified by an admin, since no card gateway is configured. */
+  showGCashModal = false;
+  gCashModalTier: SubscriptionTier = 'Pro';
+  gCashSubmittedNotice = false;
+
   constructor(private readonly workspaceBillingService: WorkspaceBillingService) {}
 
   ngOnInit(): void {
@@ -87,5 +92,30 @@ export class BillingComponent implements OnInit {
   /** Isolated so tests can spy on it instead of triggering a real page navigation. */
   protected redirectTo(url: string): void {
     window.location.href = url;
+  }
+
+  get isPh(): boolean {
+    return this.pricing?.region === 'PH';
+  }
+
+  openGCashModal(tier: PricingTier): void {
+    if (tier.tier === 'Free') {
+      return;
+    }
+
+    this.gCashModalTier = tier.tier;
+    this.showGCashModal = true;
+  }
+
+  onGCashSubmitted(): void {
+    this.showGCashModal = false;
+    this.gCashSubmittedNotice = true;
+    // Picks up the new PendingGCashSubmission so the usage card reflects it
+    // immediately, without waiting for the next full page load.
+    this.load();
+  }
+
+  onGCashModalClosed(): void {
+    this.showGCashModal = false;
   }
 }

@@ -40,6 +40,8 @@ import { DocumentSignComponent } from './pages/public/document-sign/document-sig
 import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
 import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/workspace-profile.component';
 import { BillingComponent } from './pages/settings/billing/billing.component';
+import { GCashPaymentModalComponent } from './pages/settings/billing/gcash-payment-modal/gcash-payment-modal.component';
+import { GCashPendingBannerComponent } from './shared/gcash-pending-banner/gcash-pending-banner.component';
 import { OnboardingChecklistComponent } from './shared/onboarding-checklist/onboarding-checklist.component';
 import { FloatingHelpWidgetComponent } from './shared/floating-help-widget/floating-help-widget.component';
 import { InfoTooltipComponent } from './shared/info-tooltip/info-tooltip.component';
@@ -84,6 +86,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     ReminderSettingsComponent,
     WorkspaceProfileComponent,
     BillingComponent,
+    GCashPaymentModalComponent,
+    GCashPendingBannerComponent,
     OnboardingChecklistComponent,
     FloatingHelpWidgetComponent,
     InfoTooltipComponent,

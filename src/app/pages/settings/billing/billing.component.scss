@@ -103,6 +103,35 @@
   margin-bottom: 2px;
 }
 
+.gcash-pending-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: var(--sd-radius-md);
+  background: var(--sd-status-sent-bg);
+  border: 1px solid var(--sd-border);
+
+  .bi-hourglass-split,
+  .bi-check-circle {
+    font-size: 20px;
+    color: var(--sd-status-sent-fg);
+    margin-top: 2px;
+  }
+}
+
+.gcash-pending-notice__title {
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: var(--sd-status-sent-fg);
+}
+
+.gcash-pending-notice__detail {
+  color: var(--sd-muted);
+  font-size: 13px;
+}
+
 .early-bird-banner__detail {
   color: var(--sd-muted);
   font-size: 13px;
@@ -260,5 +289,25 @@
 
   &:disabled {
     cursor: default;
+  }
+}
+
+.btn-gcash {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-status-sent-fg);
+  color: var(--sd-status-sent-fg);
+
+  &:hover {
+    background: var(--sd-status-sent-bg);
   }
 }

@@ -1,0 +1,6 @@
+<div class="gcash-pending-banner" *ngIf="pending as p">
+  <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+  <span>
+    GCash payment received (Ref: #{{ p.gCashReferenceNumber }}). Your {{ p.tier }} upgrade is being verified and will be activated within 1&ndash;12 hours.
+  </span>
+</div>
