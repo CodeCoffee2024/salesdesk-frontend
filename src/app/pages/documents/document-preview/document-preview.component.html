@@ -16,6 +16,8 @@
   <div class="document-preview__actions no-print">
     <div class="document-preview__lifecycle">
       <ng-container *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
+        <button type="button" class="btn-secondary" *ngIf="canEdit" (click)="edit()">Edit</button>
+
         <button
           type="button"
           *ngFor="let action of lifecycleActions; trackBy: trackByLabel"

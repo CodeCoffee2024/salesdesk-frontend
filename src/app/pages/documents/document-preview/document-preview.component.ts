@@ -106,6 +106,19 @@ export class DocumentPreviewComponent implements OnInit {
     return !!this.document && !this.document.isLocked && this.document.status !== 'Draft' && this.document.status !== 'RevisionRequested';
   }
 
+  /** Mirrors documents-list's canEdit — Draft (never sent) and RevisionRequested (client asked for changes) are the only editable states. */
+  get canEdit(): boolean {
+    return !!this.document && !this.document.isLocked && (this.document.status === 'Draft' || this.document.status === 'RevisionRequested');
+  }
+
+  edit(): void {
+    if (!this.document) {
+      return;
+    }
+
+    this.router.navigate(['/documents', this.document.id, 'edit']);
+  }
+
   setStatus(status: DocumentStatus): void {
     if (!this.document) {
       return;
