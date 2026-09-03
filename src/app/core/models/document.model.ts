@@ -18,6 +18,23 @@ export interface DocumentSignatureSummary {
   signatureImageDataUrl: string;
 }
 
+/** Mirrors the backend's DocumentActivityType enum — see DocumentActivity.cs. */
+export type DocumentActivityType =
+  | 'Created'
+  | 'Dispatched'
+  | 'Viewed'
+  | 'RevisionRequested'
+  | 'Edited'
+  | 'Signed'
+  | 'StatusChanged'
+  | 'ReminderSent';
+
+export interface DocumentActivity {
+  type: DocumentActivityType;
+  detail: string | null;
+  occurredAtUtc: string;
+}
+
 export interface Document {
   id: string;
   publicToken: string;
@@ -43,6 +60,8 @@ export interface Document {
   /** Optional ISO 3166-1 alpha-2 override of the client's target country (TASK-029). */
   clientCountry: string | null;
   lineItems: DocumentLineItem[];
+  /** Full history, oldest first — empty on list rows, populated on the single-document fetch. */
+  activities: DocumentActivity[];
 }
 
 export interface DocumentListFilters {

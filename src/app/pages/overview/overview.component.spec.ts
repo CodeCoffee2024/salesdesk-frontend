@@ -33,6 +33,7 @@ function makeDocument(overrides: Partial<DocumentModel>): DocumentModel {
     currency: 'USD',
     clientCountry: null,
     lineItems: [],
+    activities: [],
     ...overrides
   };
 }

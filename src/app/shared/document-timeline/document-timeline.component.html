@@ -1,0 +1,16 @@
+<div class="timeline" *ngIf="entries.length > 0">
+  <div class="timeline__entry" *ngFor="let entry of entries; last as isLast">
+    <div class="timeline__marker">
+      <span class="timeline__icon"><i [class]="'bi ' + entry.icon" aria-hidden="true"></i></span>
+      <span class="timeline__line" *ngIf="!isLast"></span>
+    </div>
+
+    <div class="timeline__body">
+      <p class="timeline__label">{{ entry.label }}</p>
+      <p class="timeline__detail" *ngIf="entry.detail">{{ entry.detail }}</p>
+      <p class="timeline__timestamp">{{ entry.occurredAtUtc | date: 'MMM d, y, h:mm a' }}</p>
+    </div>
+  </div>
+</div>
+
+<p class="timeline__empty" *ngIf="entries.length === 0">No activity recorded yet.</p>

@@ -71,6 +71,7 @@ function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
     currency: 'USD',
     clientCountry: null,
     lineItems: [{ id: 'li-1', productId: null, description: 'Research', quantity: 2, unitPrice: 500, lineTotal: 1000 }],
+    activities: [],
     ...overrides
   };
 }

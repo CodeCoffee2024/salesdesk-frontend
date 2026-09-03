@@ -97,6 +97,11 @@
 
       <p class="document-card__footnote">Thank you for the opportunity to work together.</p>
     </div>
+
+    <div class="document-activity" *ngIf="doc.timeline.length > 0">
+      <p class="panel-label">Activity</p>
+      <app-document-timeline [activities]="doc.timeline" perspective="client"></app-document-timeline>
+    </div>
   </ng-container>
 
   <app-signature-acceptance-modal

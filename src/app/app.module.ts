@@ -19,6 +19,7 @@ import { TemplatesComponent } from './pages/templates/templates.component';
 import { TemplateEditorComponent } from './pages/templates/template-editor/template-editor.component';
 import { NotFoundPageComponent } from './pages/not-found-page/not-found-page.component';
 import { StatusBadgeComponent } from './shared/status-badge/status-badge.component';
+import { DocumentTimelineComponent } from './shared/document-timeline/document-timeline.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
 import { DocumentFormComponent } from './pages/documents/document-form/document-form.component';
 import { LoginComponent } from './pages/auth/login/login.component';
@@ -67,6 +68,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     TemplateEditorComponent,
     NotFoundPageComponent,
     StatusBadgeComponent,
+    DocumentTimelineComponent,
     ConfirmDialogComponent,
     DocumentFormComponent,
     LoginComponent,

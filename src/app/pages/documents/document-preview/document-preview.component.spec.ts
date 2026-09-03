@@ -10,6 +10,7 @@ import { PdfService } from '../../../core/services/pdf.service';
 import { EmptyStateComponent } from '../../../shared/empty-state/empty-state.component';
 import { StatusBadgeComponent } from '../../../shared/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
+import { DocumentTimelineComponent } from '../../../shared/document-timeline/document-timeline.component';
 import { HasRoleDirective } from '../../../shared/has-role.directive';
 import { CurrencyLocalePipe } from '../../../core/pipes/currency-locale.pipe';
 import { Document as DocumentModel } from '../../../core/models/document.model';
@@ -37,6 +38,7 @@ function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
     currency: 'USD',
     clientCountry: null,
     lineItems: [{ id: 'li-1', productId: null, description: 'Web design & build', quantity: 1, unitPrice: 6800, lineTotal: 6800 }],
+    activities: [],
     ...overrides
   };
 }
@@ -63,7 +65,7 @@ describe('DocumentPreviewComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
-      declarations: [DocumentPreviewComponent, EmptyStateComponent, StatusBadgeComponent, ConfirmDialogComponent, HasRoleDirective, CurrencyLocalePipe],
+      declarations: [DocumentPreviewComponent, EmptyStateComponent, StatusBadgeComponent, ConfirmDialogComponent, HasRoleDirective, CurrencyLocalePipe, DocumentTimelineComponent],
       providers: [
         { provide: DocumentService, useValue: documentServiceSpy },
         { provide: PdfService, useValue: pdfServiceSpy },

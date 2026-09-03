@@ -127,6 +127,11 @@
 
     <p class="document-card__footnote">Thank you for the opportunity to work together.</p>
   </div>
+
+  <div class="document-activity no-print">
+    <p class="panel-label">Activity</p>
+    <app-document-timeline [activities]="doc.activities" perspective="business"></app-document-timeline>
+  </div>
 </div>
 
 <app-confirm-dialog

@@ -1,4 +1,4 @@
-import { DocumentLineItem, DocumentStatus, DocumentType } from './document.model';
+import { DocumentActivity, DocumentLineItem, DocumentStatus, DocumentType } from './document.model';
 
 /** What the anonymous /view/:token page renders — a deliberately narrower shape than Document (no internal ids). */
 export interface PublicDocument {
@@ -22,6 +22,8 @@ export interface PublicDocument {
   signedByName: string | null;
   signedAtUtc: string | null;
   signatureImageDataUrl: string | null;
+  /** The client-facing slice of the document's history, oldest first — excludes internal-only entries (drafting, reminder-log noise). */
+  timeline: DocumentActivity[];
 }
 
 export type SignatureType = 'Drawn' | 'Typed';
