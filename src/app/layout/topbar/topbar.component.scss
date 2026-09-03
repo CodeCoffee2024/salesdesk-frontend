@@ -14,12 +14,18 @@
 
 .hamburger {
   display: none;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
   font-size: 20px;
   line-height: 1;
   color: var(--sd-ink);
-  padding: 4px;
+  width: 44px;
+  height: 44px;
+  // Keeps the icon glyph visually where it was against the topbar's own edge
+  // padding — only the invisible hit box grows past it, not the icon position.
+  margin-left: -12px;
   cursor: pointer;
   flex: 0 0 auto;
 }
@@ -54,8 +60,8 @@
   border: 1px solid var(--sd-border);
   background: var(--sd-surface);
   border-radius: var(--sd-radius-sm);
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   font-size: 15px;
   cursor: pointer;
 
@@ -95,7 +101,9 @@
 .new-document-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-height: 44px;
   padding: 8px 16px;
   border-radius: var(--sd-radius-sm);
   background: var(--sd-primary);
@@ -139,13 +147,16 @@
 .account__logout {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   background: transparent;
   color: var(--sd-muted);
   font-size: 13px;
   cursor: pointer;
-  padding: 4px 0;
+  padding: 4px 8px;
   white-space: nowrap;
 
   &:hover {
@@ -187,6 +198,7 @@
   }
 
   .new-document-button {
+    min-width: 44px;
     padding: 8px 10px;
   }
 
