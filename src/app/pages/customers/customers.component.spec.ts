@@ -22,7 +22,8 @@ const workspaceProfile: WorkspaceProfile = {
   address: null,
   logoUrl: null,
   country: 'US',
-  defaultCurrency: 'USD'
+  defaultCurrency: 'USD',
+  timeZoneId: 'UTC'
 };
 
 function makeCustomer(overrides: Partial<Customer> = {}): Customer {

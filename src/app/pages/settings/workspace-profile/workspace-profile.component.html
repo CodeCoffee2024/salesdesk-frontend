@@ -52,6 +52,14 @@
       </div>
     </div>
 
+    <div class="form-group">
+      <label for="timeZoneId">Time zone</label>
+      <select id="timeZoneId" [(ngModel)]="timeZoneId">
+        <option *ngFor="let option of timeZones" [value]="option.code">{{ option.name }}</option>
+      </select>
+      <small>Activity timestamps in document and reminder emails are shown in this time zone instead of UTC.</small>
+    </div>
+
     <div class="settings-card__actions">
       <button type="button" class="btn-primary" [disabled]="saving" (click)="save()">
         {{ saving ? 'Saving…' : 'Save changes' }}

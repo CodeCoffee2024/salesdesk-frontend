@@ -11,7 +11,8 @@ const profile: WorkspaceProfile = {
   address: null,
   logoUrl: null,
   country: 'PH',
-  defaultCurrency: 'PHP'
+  defaultCurrency: 'PHP',
+  timeZoneId: 'Asia/Manila'
 };
 
 describe('WorkspaceProfileService', () => {

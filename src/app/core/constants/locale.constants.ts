@@ -187,6 +187,50 @@ export const TAX_LABEL_BY_COUNTRY: Record<string, string> = {
   AE: 'VAT'
 };
 
+/**
+ * A representative set of IANA time zone ids — not exhaustive, but enough to
+ * cover SalesDesk's target markets, including every zone a multi-zone country
+ * like the US, Canada, or Australia needs (a single "US" entry would silently
+ * be wrong for 5/6 of the country). Used for the Time Zone selector in
+ * Workspace Settings — document/reminder emails localize their activity
+ * timeline into whichever zone is picked here instead of raw UTC.
+ */
+export const IANA_TIMEZONES: IsoOption[] = [
+  { code: 'UTC', name: 'UTC' },
+  { code: 'America/Los_Angeles', name: 'Pacific Time (US & Canada)' },
+  { code: 'America/Denver', name: 'Mountain Time (US & Canada)' },
+  { code: 'America/Chicago', name: 'Central Time (US & Canada)' },
+  { code: 'America/New_York', name: 'Eastern Time (US & Canada)' },
+  { code: 'America/Anchorage', name: 'Alaska Time' },
+  { code: 'Pacific/Honolulu', name: 'Hawaii Time' },
+  { code: 'America/Halifax', name: 'Atlantic Time (Canada)' },
+  { code: 'America/St_Johns', name: 'Newfoundland Time' },
+  { code: 'America/Mexico_City', name: 'Mexico City' },
+  { code: 'America/Sao_Paulo', name: 'Sao Paulo' },
+  { code: 'Europe/London', name: 'London' },
+  { code: 'Europe/Dublin', name: 'Dublin' },
+  { code: 'Europe/Lisbon', name: 'Lisbon' },
+  { code: 'Europe/Madrid', name: 'Madrid' },
+  { code: 'Europe/Paris', name: 'Paris' },
+  { code: 'Europe/Berlin', name: 'Berlin' },
+  { code: 'Europe/Amsterdam', name: 'Amsterdam' },
+  { code: 'Europe/Rome', name: 'Rome' },
+  { code: 'Europe/Zurich', name: 'Zurich' },
+  { code: 'Europe/Stockholm', name: 'Stockholm' },
+  { code: 'Europe/Oslo', name: 'Oslo' },
+  { code: 'Europe/Copenhagen', name: 'Copenhagen' },
+  { code: 'Africa/Johannesburg', name: 'Johannesburg' },
+  { code: 'Asia/Dubai', name: 'Dubai' },
+  { code: 'Asia/Kolkata', name: 'Mumbai, New Delhi' },
+  { code: 'Asia/Singapore', name: 'Singapore' },
+  { code: 'Asia/Manila', name: 'Manila' },
+  { code: 'Asia/Shanghai', name: 'Shanghai' },
+  { code: 'Asia/Tokyo', name: 'Tokyo' },
+  { code: 'Australia/Perth', name: 'Perth' },
+  { code: 'Australia/Sydney', name: 'Sydney' },
+  { code: 'Pacific/Auckland', name: 'Auckland' }
+];
+
 export function taxLabelForCountry(countryCode: string | null | undefined): string {
   if (!countryCode) {
     return 'Tax';

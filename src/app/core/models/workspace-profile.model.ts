@@ -8,6 +8,8 @@ export interface WorkspaceProfile {
   country: string;
   /** ISO 4217 default currency new documents are priced in unless overridden (TASK-029). */
   defaultCurrency: string;
+  /** IANA time zone id document/reminder email timestamps are localized into instead of raw UTC. */
+  timeZoneId: string;
 }
 
 export type UpdateWorkspaceProfileRequest = WorkspaceProfile;

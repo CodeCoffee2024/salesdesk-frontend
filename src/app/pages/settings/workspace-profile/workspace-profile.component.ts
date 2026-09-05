@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WorkspaceProfileService } from '../../../core/services/workspace-profile.service';
 import { WorkspaceProfile } from '../../../core/models/workspace-profile.model';
-import { ISO_COUNTRIES, ISO_CURRENCIES, taxLabelForCountry } from '../../../core/constants/locale.constants';
+import { IANA_TIMEZONES, ISO_COUNTRIES, ISO_CURRENCIES, taxLabelForCountry } from '../../../core/constants/locale.constants';
 
 @Component({
   selector: 'app-workspace-profile',
@@ -22,9 +22,11 @@ export class WorkspaceProfileComponent implements OnInit {
   logoUrl = '';
   country = 'US';
   defaultCurrency = 'USD';
+  timeZoneId = 'UTC';
 
   readonly countries = ISO_COUNTRIES;
   readonly currencies = ISO_CURRENCIES;
+  readonly timeZones = IANA_TIMEZONES;
 
   constructor(private readonly workspaceProfileService: WorkspaceProfileService) {}
 
@@ -65,7 +67,8 @@ export class WorkspaceProfileComponent implements OnInit {
         address: this.address.trim() === '' ? null : this.address.trim(),
         logoUrl: this.logoUrl.trim() === '' ? null : this.logoUrl.trim(),
         country: this.country,
-        defaultCurrency: this.defaultCurrency
+        defaultCurrency: this.defaultCurrency,
+        timeZoneId: this.timeZoneId
       })
       .subscribe({
         next: (profile) => {
@@ -88,5 +91,6 @@ export class WorkspaceProfileComponent implements OnInit {
     this.logoUrl = profile.logoUrl ?? '';
     this.country = profile.country;
     this.defaultCurrency = profile.defaultCurrency;
+    this.timeZoneId = profile.timeZoneId;
   }
 }
