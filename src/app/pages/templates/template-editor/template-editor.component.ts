@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TemplateService } from '../../../core/services/template.service';
 import { Template } from '../../../core/models/template.model';
@@ -26,8 +26,26 @@ const FONT_SIZE_OPTIONS: { value: string; label: string }[] = [
   templateUrl: './template-editor.component.html',
   styleUrls: ['./template-editor.component.scss']
 })
-export class TemplateEditorComponent implements OnInit, AfterViewInit {
-  @ViewChild('editorEl') editorElRef?: ElementRef<HTMLDivElement>;
+export class TemplateEditorComponent implements OnInit {
+  private _editorElRef?: ElementRef<HTMLDivElement>;
+
+  /** A setter, not a plain field: the editor's `#editorEl` div only exists once
+   *  `*ngIf="!loading && !notFound && template"` turns true, which happens well
+   *  after ngOnInit/ngAfterViewInit have already run (load() resolves
+   *  asynchronously). A plain @ViewChild stays undefined forever from
+   *  ngAfterViewInit's point of view, so the loaded contentHtml was set on the
+   *  component but never actually written into the (still-nonexistent) editor
+   *  DOM node — the edit pane rendered permanently empty. Reacting here instead
+   *  means the moment Angular creates the div, whatever editorHtml is already
+   *  holding gets synced into it. */
+  @ViewChild('editorEl')
+  set editorElRef(ref: ElementRef<HTMLDivElement> | undefined) {
+    this._editorElRef = ref;
+    this.syncEditorContent();
+  }
+  get editorElRef(): ElementRef<HTMLDivElement> | undefined {
+    return this._editorElRef;
+  }
 
   readonly mergeTokens = MERGE_TOKENS;
   readonly headingOptions = HEADING_OPTIONS;
@@ -81,10 +99,6 @@ export class TemplateEditorComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.templateId = this.route.snapshot.paramMap.get('id') ?? '';
     this.load();
-  }
-
-  ngAfterViewInit(): void {
-    this.syncEditorContent();
   }
 
   exec(command: string, value?: string): void {

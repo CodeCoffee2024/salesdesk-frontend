@@ -3,7 +3,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule } from '@angular/forms';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 import { TemplateEditorComponent } from './template-editor.component';
 import { TemplateService } from '../../../core/services/template.service';
@@ -60,6 +60,37 @@ describe('TemplateEditorComponent', () => {
     expect(component.notFound).toBeFalse();
     expect(component.name).toBe('Studio Standard');
     expect(component.editorHtml).toBe('<p>Hi {{Customer.Name}}</p>');
+  });
+
+  // Regression (reported live): the editor pane rendered permanently empty when
+  // editing an existing template. getAll() resolving via a real HTTP call (unlike
+  // this suite's other tests, which use the synchronous `of()`) arrives after the
+  // view has already been checked once — a plain @ViewChild captured on
+  // ngAfterViewInit stays undefined forever once the *ngIf'd editor div is
+  // created later, so the loaded contentHtml never actually reached the DOM.
+  it('writes the loaded content into the editor DOM even when the template arrives after the view has already initialized', () => {
+    const templates$ = new Subject<Template[]>();
+    templateServiceSpy = jasmine.createSpyObj('TemplateService', ['getAll', 'update']);
+    templateServiceSpy.getAll.and.returnValue(templates$);
+
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule, FormsModule],
+      declarations: [TemplateEditorComponent],
+      providers: [
+        { provide: TemplateService, useValue: templateServiceSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ id: 'tpl-1' }) } } }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+
+    fixture = TestBed.createComponent(TemplateEditorComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges(); // ngOnInit/ngAfterViewInit run now, with no data yet — editor div doesn't exist
+
+    templates$.next([makeTemplate()]);
+    fixture.detectChanges(); // *ngIf now turns true and creates the editor div
+
+    expect(component.editorElRef!.nativeElement.innerHTML).toBe('<p>Hi {{Customer.Name}}</p>');
   });
 
   it('shows not-found when no template in the list matches the route id', () => {
