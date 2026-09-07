@@ -268,4 +268,76 @@
   .search-input {
     max-width: none;
   }
+
+  // Below the tablet breakpoint a real <table> forces horizontal scrolling
+  // no matter how narrow its columns get, so each row becomes a stacked card
+  // instead — the standard "table collapses to cards" responsive pattern.
+  .documents-table-scroll {
+    overflow-x: visible;
+  }
+
+  .documents-table {
+    display: block;
+    min-width: 0;
+    border: none;
+    background: transparent;
+  }
+
+  .documents-table thead {
+    display: none;
+  }
+
+  .documents-table tbody {
+    display: block;
+  }
+
+  .documents-table tr {
+    position: relative;
+    display: block;
+    background: var(--sd-surface);
+    border: 1px solid var(--sd-border);
+    border-radius: var(--sd-radius-md);
+    padding: 14px 52px 14px 16px;
+    margin-bottom: 12px;
+  }
+
+  .documents-table tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .documents-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: none;
+  }
+
+  .documents-table td:first-child {
+    display: block;
+    padding-top: 0;
+    margin-bottom: 6px;
+  }
+
+  .documents-table td[data-label]::before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--sd-muted);
+  }
+
+  .documents-table__total-col {
+    text-align: left;
+  }
+
+  .documents-table__menu-col {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: auto;
+    padding: 0;
+  }
 }

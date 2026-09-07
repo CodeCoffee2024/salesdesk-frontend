@@ -55,9 +55,9 @@
           <span class="documents-table__number">{{ document.documentNumber }}</span>
           <span class="documents-table__customer">{{ document.customerName }} &middot; {{ document.customerCompany }}</span>
         </td>
-        <td (click)="preview(document.id)">{{ document.issueDate | date: 'MMM d, y' }}</td>
-        <td (click)="preview(document.id)"><app-status-badge [status]="document.status"></app-status-badge></td>
-        <td class="documents-table__total-col" (click)="preview(document.id)">{{ document.total | currencyLocale:document.currency:document.clientCountry }}</td>
+        <td data-label="Issued" (click)="preview(document.id)">{{ document.issueDate | date: 'MMM d, y' }}</td>
+        <td data-label="Status" (click)="preview(document.id)"><app-status-badge [status]="document.status"></app-status-badge></td>
+        <td data-label="Total" class="documents-table__total-col" (click)="preview(document.id)">{{ document.total | currencyLocale:document.currency:document.clientCountry }}</td>
         <td class="documents-table__menu-col">
           <button type="button" class="kebab-button" (click)="toggleMenu(document.id, $event)" aria-label="Row actions">&hellip;</button>
 
