@@ -1,0 +1,157 @@
+<div class="schedules" *ngIf="!loading && !loadError">
+  <div class="schedules__header">
+    <div>
+      <h1>Recurring retainers</h1>
+      <p>Repeat a quote or invoice on a schedule instead of rebuilding it every period.</p>
+    </div>
+    <button
+      type="button"
+      class="btn-primary"
+      *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']"
+      (click)="openCreateModal()"
+    >+ New retainer</button>
+  </div>
+
+  <app-empty-state
+    *ngIf="schedules.length === 0"
+    icon="not-found"
+    heading="No recurring retainers yet"
+    description="Use the &ldquo;New retainer&rdquo; button above to repeat a quote or invoice automatically."
+  ></app-empty-state>
+
+  <p class="modal__error" *ngIf="deleteError">{{ deleteError }}</p>
+
+  <div class="schedule-list" *ngIf="schedules.length > 0">
+    <div class="schedule-row" *ngFor="let schedule of schedules">
+      <div class="schedule-row__main">
+        <p class="schedule-row__title">
+          {{ schedule.customerName }} <span class="schedule-row__company" *ngIf="schedule.customerCompany">&middot; {{ schedule.customerCompany }}</span>
+        </p>
+        <p class="schedule-row__detail">
+          {{ schedule.type }} &middot; {{ schedule.templateName }} &middot; every {{ schedule.interval.toLowerCase() }}
+        </p>
+      </div>
+
+      <span class="schedule-row__status" [class.schedule-row__status--paused]="!schedule.isActive">
+        {{ schedule.isActive ? 'Active' : 'Paused' }}
+      </span>
+
+      <span class="schedule-row__next-run">
+        Next: {{ schedule.nextRunDate | date: 'MMM d, y' }}
+      </span>
+
+      <div class="schedule-row__actions" *appHasRole="['SystemAdmin', 'WorkspaceAdmin', 'SalesManager']">
+        <button type="button" class="btn-secondary" [disabled]="togglingId === schedule.id" (click)="toggleActive(schedule)">
+          {{ schedule.isActive ? 'Pause' : 'Resume' }}
+        </button>
+        <button
+          type="button"
+          class="schedule-row__delete"
+          *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
+          (click)="requestDelete(schedule)"
+          [attr.aria-label]="'Delete retainer for ' + schedule.customerName"
+        >&times;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-placeholder" *ngIf="loading">
+  <h1>Recurring retainers</h1>
+  <p>Loading&hellip;</p>
+</div>
+
+<div class="page-placeholder" *ngIf="loadError">
+  <h1>Recurring retainers</h1>
+  <p>Something went wrong loading your retainer schedules. Try refreshing the page.</p>
+</div>
+
+<app-confirm-dialog
+  *ngIf="scheduleForDeletion as schedule"
+  heading="Delete this retainer?"
+  [message]="'This stops future documents from being generated for ' + schedule.customerName + '. Documents already generated are not affected. This cannot be undone.'"
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+></app-confirm-dialog>
+
+<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <h2>New recurring retainer</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field">
+        <label for="customerId">Customer</label>
+        <select id="customerId" formControlName="customerId">
+          <option value="" disabled>Select a customer</option>
+          <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="type">Document type</label>
+          <select id="type" formControlName="type">
+            <option value="Quote">Quote</option>
+            <option value="Invoice">Invoice</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="templateId">Template</label>
+          <select id="templateId" formControlName="templateId">
+            <option value="" disabled>Select a template</option>
+            <option *ngFor="let template of templates" [value]="template.id">{{ template.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="startDate">First issue date</label>
+          <input id="startDate" type="date" formControlName="startDate" />
+        </div>
+
+        <div class="field">
+          <label for="interval">Repeats</label>
+          <select id="interval" formControlName="interval">
+            <option *ngFor="let interval of intervals" [value]="interval">{{ interval }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="dueDateOffsetDays">Due <span class="field__optional">(days after each issue date)</span></label>
+        <input id="dueDateOffsetDays" type="number" min="0" formControlName="dueDateOffsetDays" />
+      </div>
+
+      <label class="checkbox-field">
+        <input type="checkbox" formControlName="autoDispatch" />
+        Send to the client automatically when generated (otherwise saved as a Draft for review)
+      </label>
+
+      <div class="line-items">
+        <p class="line-items__label">Line items</p>
+
+        <div class="line-item" *ngFor="let item of lineItems.controls; let i = index" [formGroup]="$any(item)">
+          <input type="text" placeholder="Description" formControlName="description" class="line-item__description" />
+          <input type="number" min="0.01" step="0.01" placeholder="Qty" formControlName="quantity" class="line-item__quantity" />
+          <input type="number" min="0" step="0.01" placeholder="Price" formControlName="unitPrice" class="line-item__price" />
+          <span class="line-item__total">{{ lineTotal(i) | number: '1.2-2' }}</span>
+          <button type="button" class="line-item__remove" (click)="removeLineItem(i)" aria-label="Remove line item">&times;</button>
+        </div>
+
+        <button type="button" class="btn-secondary" (click)="addLineItem()">+ Add line item</button>
+      </div>
+
+      <p class="modal__error" *ngIf="saveError">{{ saveError }}</p>
+
+      <div class="modal__actions">
+        <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? 'Creating…' : 'Create retainer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

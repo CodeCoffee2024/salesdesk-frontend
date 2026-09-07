@@ -22,6 +22,7 @@ import { StatusBadgeComponent } from './shared/status-badge/status-badge.compone
 import { DocumentTimelineComponent } from './shared/document-timeline/document-timeline.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
 import { DocumentFormComponent } from './pages/documents/document-form/document-form.component';
+import { RecurringSchedulesComponent } from './pages/documents/recurring-schedules/recurring-schedules.component';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
 import { ForgotPasswordComponent } from './pages/auth/forgot-password/forgot-password.component';
@@ -71,6 +72,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     DocumentTimelineComponent,
     ConfirmDialogComponent,
     DocumentFormComponent,
+    RecurringSchedulesComponent,
     LoginComponent,
     RegisterComponent,
     ForgotPasswordComponent,

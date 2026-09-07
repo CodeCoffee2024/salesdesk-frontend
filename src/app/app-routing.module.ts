@@ -6,6 +6,7 @@ import { OverviewComponent } from './pages/overview/overview.component';
 import { DocumentsListComponent } from './pages/documents/documents-list/documents-list.component';
 import { DocumentFormComponent } from './pages/documents/document-form/document-form.component';
 import { DocumentPreviewComponent } from './pages/documents/document-preview/document-preview.component';
+import { RecurringSchedulesComponent } from './pages/documents/recurring-schedules/recurring-schedules.component';
 import { CustomersComponent } from './pages/customers/customers.component';
 import { ProductsComponent } from './pages/products/products.component';
 import { TemplatesComponent } from './pages/templates/templates.component';
@@ -72,6 +73,11 @@ const routes: Routes = [
         path: 'documents/:id/preview',
         component: DocumentPreviewComponent,
         data: { breadcrumb: [{ label: 'Documents', url: '/documents' }, { label: 'Preview' }] }
+      },
+      {
+        path: 'documents/recurring',
+        component: RecurringSchedulesComponent,
+        data: { breadcrumb: [{ label: 'Documents', url: '/documents' }, { label: 'Recurring retainers' }] }
       },
       { path: 'customers', component: CustomersComponent, data: { breadcrumb: [{ label: 'Customers' }] } },
       { path: 'products', component: ProductsComponent, data: { breadcrumb: [{ label: 'Products & services' }] } },

@@ -19,6 +19,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly navItems: NavItem[] = [
     { label: 'Overview', path: '/overview', icon: 'grid-1x2' },
     { label: 'Documents', path: '/documents', icon: 'file-earmark-text' },
+    { label: 'Retainers', path: '/documents/recurring', icon: 'arrow-repeat' },
     { label: 'Customers', path: '/customers', icon: 'people' },
     { label: 'Products', path: '/products', icon: 'box-seam' },
     { label: 'Templates', path: '/templates', icon: 'layout-text-window' }
