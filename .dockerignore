@@ -4,3 +4,9 @@ dist
 .git
 .github
 *.md
+# Native mobile projects (Capacitor) — never used by the web image build, and
+# a local Gradle build under android/app/build can contain files with a mode
+# bit the Docker build context's tar step can't checksum, breaking `docker
+# compose build web` entirely until they're excluded here.
+android
+ios
