@@ -49,7 +49,7 @@
             [id]="'quota-' + workspace.id"
             type="number"
             min="0"
-            placeholder="Unlimited"
+            placeholder="Plan default"
             [value]="quotaDraft[workspace.id]"
             (input)="onQuotaInput(workspace.id, $event)"
             [disabled]="savingId === workspace.id"
