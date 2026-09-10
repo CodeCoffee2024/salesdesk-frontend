@@ -24,6 +24,10 @@ export interface PublicDocument {
   signatureImageDataUrl: string | null;
   /** The client-facing slice of the document's history, oldest first — excludes internal-only entries (drafting, reminder-log noise). */
   timeline: DocumentActivity[];
+  /** Whether this invoice has actually been paid online via Pay Now (TASK-042) — independent of status, which a workspace can also set to 'Paid' manually. */
+  paymentStatus: 'Unpaid' | 'Paid';
+  paidAmount: number | null;
+  paidAtUtc: string | null;
 }
 
 export type SignatureType = 'Drawn' | 'Typed';
@@ -34,4 +38,9 @@ export interface SignDocumentRequest {
   agreedToTerms: boolean;
   signatureType: SignatureType;
   signatureImageDataUrl: string;
+}
+
+/** A hosted Stripe Checkout page to redirect the browser to (TASK-042) — the caller never handles card details itself. */
+export interface CheckoutSession {
+  checkoutUrl: string;
 }

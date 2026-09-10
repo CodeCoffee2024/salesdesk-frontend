@@ -27,7 +27,8 @@ export type DocumentActivityType =
   | 'Edited'
   | 'Signed'
   | 'StatusChanged'
-  | 'ReminderSent';
+  | 'ReminderSent'
+  | 'PaymentReceived';
 
 export interface DocumentActivity {
   type: DocumentActivityType;

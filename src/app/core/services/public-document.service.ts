@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PublicDocument, SignDocumentRequest } from '../models/public-document.model';
+import { CheckoutSession, PublicDocument, SignDocumentRequest } from '../models/public-document.model';
 import { environment } from '../../../environments/environment';
 
 const BASE_URL = `${environment.apiBaseUrl}/api/public/documents`;
@@ -23,5 +23,9 @@ export class PublicDocumentService {
 
   requestRevision(token: string, feedback: string): Observable<PublicDocument> {
     return this.http.post<PublicDocument>(`${BASE_URL}/${token}/request-revision`, { feedback });
+  }
+
+  createPaymentSession(token: string): Observable<CheckoutSession> {
+    return this.http.post<CheckoutSession>(`${BASE_URL}/${token}/payment-session`, {});
   }
 }

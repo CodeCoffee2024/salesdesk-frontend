@@ -20,6 +20,14 @@
       <button type="button" class="btn-secondary" *ngIf="!doc.isSigned" (click)="openRevisionModal()">Request changes</button>
 
       <button type="button" class="btn-primary" *ngIf="!doc.isSigned" (click)="openSignModal()">Review &amp; sign</button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        *ngIf="doc.type === 'Invoice' && doc.paymentStatus !== 'Paid'"
+        [disabled]="payingNow"
+        (click)="payNow()"
+      >{{ payingNow ? 'Redirecting…' : 'Pay ' + (doc.total | currencyLocale:doc.currency:doc.clientCountry) }}</button>
     </div>
 
     <p class="public-doc__signed-banner" *ngIf="doc.isSigned">
@@ -29,6 +37,16 @@
     <p class="public-doc__revision-banner" *ngIf="!doc.isSigned && doc.status === 'RevisionRequested'">
       <i class="bi bi-pencil-square" aria-hidden="true"></i> We've sent your request for changes. The studio will follow up with an updated version.
     </p>
+
+    <p class="public-doc__payment-banner" *ngIf="showPaymentSuccess">
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Payment received — thank you!
+    </p>
+
+    <p class="public-doc__payment-banner" *ngIf="showPaymentConfirming">
+      <i class="bi bi-hourglass-split" aria-hidden="true"></i> We're confirming your payment — refresh this page in a moment if it doesn't update automatically.
+    </p>
+
+    <p class="public-doc__pay-error" *ngIf="payError">{{ payError }}</p>
 
     <div class="document-card">
       <div class="document-card__header">

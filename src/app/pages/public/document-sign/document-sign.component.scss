@@ -69,6 +69,24 @@
   margin-bottom: 16px;
 }
 
+.public-doc__payment-banner {
+  background: var(--sd-status-paid-bg);
+  color: var(--sd-status-paid-fg);
+  padding: 10px 14px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.public-doc__pay-error {
+  background: var(--sd-danger-bg);
+  color: var(--sd-danger);
+  padding: 10px 14px;
+  border-radius: var(--sd-radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
 .revision-modal__backdrop {
   position: fixed;
   inset: 0;

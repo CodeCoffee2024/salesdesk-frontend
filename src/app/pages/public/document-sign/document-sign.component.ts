@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { PublicDocumentService } from '../../../core/services/public-document.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { PublicDocument, SignDocumentRequest } from '../../../core/models/public-document.model';
@@ -29,6 +30,10 @@ export class DocumentSignComponent implements OnInit {
   requestingRevision = false;
   revisionError = '';
 
+  payingNow = false;
+  payError = '';
+  private paymentReturnStatus: string | null = null;
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly publicDocumentService: PublicDocumentService,
@@ -37,7 +42,16 @@ export class DocumentSignComponent implements OnInit {
 
   ngOnInit(): void {
     this.token = this.route.snapshot.paramMap.get('token') ?? '';
+    this.paymentReturnStatus = this.route.snapshot.queryParamMap.get('payment');
     this.fetch();
+  }
+
+  get showPaymentSuccess(): boolean {
+    return this.paymentReturnStatus === 'success' && this.document?.paymentStatus === 'Paid';
+  }
+
+  get showPaymentConfirming(): boolean {
+    return this.paymentReturnStatus === 'success' && this.document?.paymentStatus !== 'Paid';
   }
 
   openSignModal(): void {
@@ -95,6 +109,33 @@ export class DocumentSignComponent implements OnInit {
         this.revisionError = 'We could not send your request. Please try again.';
       }
     });
+  }
+
+  payNow(): void {
+    if (!this.document || this.payingNow) {
+      return;
+    }
+
+    this.payingNow = true;
+    this.payError = '';
+
+    this.publicDocumentService.createPaymentSession(this.token).subscribe({
+      next: (session) => {
+        this.redirectTo(session.checkoutUrl);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.payingNow = false;
+        this.payError =
+          error.status === 503
+            ? "Online payment isn't set up yet for this invoice — please contact the sender directly to arrange payment."
+            : 'Something went wrong starting checkout. Please try again.';
+      }
+    });
+  }
+
+  /** Isolated so tests can spy on it instead of triggering a real page navigation. */
+  protected redirectTo(url: string): void {
+    window.location.href = url;
   }
 
   downloadPdf(): void {
