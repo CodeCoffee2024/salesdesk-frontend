@@ -1,0 +1,93 @@
+<div class="reports">
+  <header class="reports__header">
+    <h1>Reports</h1>
+  </header>
+
+  <section class="reports__filters">
+    <div class="reports__presets">
+      <button
+        type="button"
+        *ngFor="let preset of presets"
+        class="reports__preset"
+        [class.reports__preset--active]="activePreset === preset.key"
+        (click)="applyPreset(preset.key)"
+      >{{ preset.label }}</button>
+    </div>
+
+    <div class="field-row reports__custom-range">
+      <div class="field">
+        <label for="reportsFrom">From</label>
+        <input id="reportsFrom" type="date" [(ngModel)]="fromInput" (change)="onDateInputChanged()" />
+      </div>
+      <div class="field">
+        <label for="reportsTo">To</label>
+        <input id="reportsTo" type="date" [(ngModel)]="toInput" (change)="onDateInputChanged()" />
+      </div>
+    </div>
+  </section>
+
+  <app-empty-state
+    *ngIf="isEmptyRange"
+    icon="document"
+    heading="No documents in this range"
+    description="Try a wider date range, or come back once you've sent a quote or invoice."
+  ></app-empty-state>
+
+  <div class="reports__body" [class.reports__body--loading]="loading" *ngIf="!isEmptyRange && !loadError">
+    <section class="reports__stat-row">
+      <article class="kpi-tile">
+        <p class="kpi-tile__label">Outstanding</p>
+        <p class="kpi-tile__value">{{ revenue?.outstanding ?? 0 | currencyLocale:revenue?.baseCurrency }}</p>
+        <p class="kpi-tile__caption">Sent &amp; overdue invoices issued in this range</p>
+      </article>
+    </section>
+
+    <section class="revenue-chart">
+      <p class="panel-label">Revenue</p>
+      <h2>Revenue over time</h2>
+
+      <div class="revenue-chart__bars">
+        <div class="revenue-chart__bar-wrap" tabindex="0" *ngFor="let point of revenue?.points">
+          <div class="revenue-chart__tooltip">{{ point.label }}: {{ point.amount | currencyLocale:revenue?.baseCurrency }}</div>
+          <div class="revenue-chart__bar" [style.height.%]="(point.amount / maxRevenue) * 100"></div>
+          <span class="revenue-chart__bar-label">{{ point.label }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="reports__leaderboards">
+      <article class="leaderboard">
+        <p class="panel-label">Customers</p>
+        <h2>Top 5 customers</h2>
+        <p class="leaderboard__empty" *ngIf="topCustomers.length === 0">No billed customers in this range.</p>
+        <div class="leaderboard__row" *ngFor="let customer of topCustomers; let i = index">
+          <span class="leaderboard__rank">{{ i + 1 }}</span>
+          <div class="leaderboard__main">
+            <span class="leaderboard__name">{{ customer.name }}</span>
+            <span class="leaderboard__meta">{{ customer.company }}</span>
+          </div>
+          <span class="leaderboard__value">{{ customer.billedTotal | currencyLocale:revenue?.baseCurrency }}</span>
+        </div>
+      </article>
+
+      <article class="leaderboard">
+        <p class="panel-label">Products &amp; services</p>
+        <h2>Top 5 products &amp; services</h2>
+        <p class="leaderboard__empty" *ngIf="topProducts.length === 0">No billed products in this range.</p>
+        <div class="leaderboard__row" *ngFor="let product of topProducts; let i = index">
+          <span class="leaderboard__rank">{{ i + 1 }}</span>
+          <div class="leaderboard__main">
+            <span class="leaderboard__name">{{ product.name }}</span>
+            <span class="leaderboard__meta">{{ product.quantity }} sold</span>
+          </div>
+          <span class="leaderboard__value">{{ product.amount | currencyLocale:revenue?.baseCurrency }}</span>
+        </div>
+      </article>
+    </section>
+  </div>
+
+  <div class="page-placeholder" *ngIf="loadError">
+    <h1>Reports</h1>
+    <p>Something went wrong loading your reports. Try refreshing the page.</p>
+  </div>
+</div>

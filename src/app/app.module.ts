@@ -11,6 +11,7 @@ import { BreadcrumbComponent } from './layout/breadcrumb/breadcrumb.component';
 import { EmptyStateComponent } from './shared/empty-state/empty-state.component';
 import { LandingComponent } from './pages/landing/landing.component';
 import { OverviewComponent } from './pages/overview/overview.component';
+import { ReportsComponent } from './pages/reports/reports.component';
 import { DocumentsListComponent } from './pages/documents/documents-list/documents-list.component';
 import { DocumentPreviewComponent } from './pages/documents/document-preview/document-preview.component';
 import { CustomersComponent } from './pages/customers/customers.component';
@@ -61,6 +62,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     EmptyStateComponent,
     LandingComponent,
     OverviewComponent,
+    ReportsComponent,
     DocumentsListComponent,
     DocumentPreviewComponent,
     CustomersComponent,

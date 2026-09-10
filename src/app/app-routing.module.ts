@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { LandingComponent } from './pages/landing/landing.component';
 import { OverviewComponent } from './pages/overview/overview.component';
+import { ReportsComponent } from './pages/reports/reports.component';
 import { DocumentsListComponent } from './pages/documents/documents-list/documents-list.component';
 import { DocumentFormComponent } from './pages/documents/document-form/document-form.component';
 import { DocumentPreviewComponent } from './pages/documents/document-preview/document-preview.component';
@@ -53,6 +54,7 @@ const routes: Routes = [
     canActivateChild: [authGuard],
     children: [
       { path: 'overview', component: OverviewComponent, data: { breadcrumb: [{ label: 'Overview' }] } },
+      { path: 'reports', component: ReportsComponent, data: { breadcrumb: [{ label: 'Reports' }] } },
       { path: 'documents', component: DocumentsListComponent, data: { breadcrumb: [{ label: 'Documents' }] } },
       {
         path: 'documents/new',
