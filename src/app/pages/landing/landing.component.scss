@@ -40,6 +40,15 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  flex: 0 0 auto;
+}
+
+.btn-primary--nav {
+  white-space: nowrap;
+}
+
+.btn-primary--nav__short {
+  display: none;
 }
 
 .btn-text {
@@ -478,7 +487,8 @@
   }
 
   .landing-header {
-    padding: 16px 24px;
+    padding: 16px 20px;
+    gap: 12px;
   }
 
   .features,
@@ -493,8 +503,29 @@
 }
 
 @media (max-width: 480px) {
+  .landing-header {
+    padding: 14px 16px;
+  }
+
+  .landing-header__brand .brand__name {
+    font-size: 17px;
+  }
+
   .landing-header__actions {
     gap: 8px;
+  }
+
+  .btn-primary--nav {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+
+  .btn-primary--nav__full {
+    display: none;
+  }
+
+  .btn-primary--nav__short {
+    display: inline;
   }
 
   .hero__cta {
