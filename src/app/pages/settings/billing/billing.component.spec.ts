@@ -12,6 +12,7 @@ function makeBilling(overrides: Partial<WorkspaceBilling> = {}): WorkspaceBillin
     subscriptionTier: 'Free',
     subscriptionEndDate: null,
     isEarlyBirdPromo: false,
+    isFreeTrial: false,
     monthlyDocumentLimit: 5,
     documentsIssuedThisMonth: 2,
     pendingGCashSubmission: null,
@@ -25,9 +26,8 @@ function makePricing(): PricingCatalog {
     region: 'Global',
     currency: 'USD',
     tiers: [
-      { tier: 'Free', displayName: 'Free / Starter', currency: 'USD', monthlyPrice: 0, annualPrice: 0, monthlyDocumentLimit: 5, maxUsers: 1, features: ['5 documents/month'] },
-      { tier: 'Pro', displayName: 'Pro Freelancer', currency: 'USD', monthlyPrice: 9.99, annualPrice: 99.99, monthlyDocumentLimit: null, maxUsers: 1, features: ['Unlimited documents'] },
-      { tier: 'Studio', displayName: 'Studio / Agency', currency: 'USD', monthlyPrice: 29.99, annualPrice: 299.99, monthlyDocumentLimit: null, maxUsers: null, features: ['Multi-user RBAC'] }
+      { tier: 'Free', displayName: 'Free Access', currency: 'USD', monthlyPrice: 0, annualPrice: 0, monthlyDocumentLimit: 5, maxUsers: 1, features: ['5 documents/month'] },
+      { tier: 'Pro', displayName: 'Full Access', currency: 'USD', monthlyPrice: 9.99, annualPrice: 99.99, monthlyDocumentLimit: null, maxUsers: null, features: ['Unlimited documents'] }
     ]
   };
 }
@@ -91,11 +91,19 @@ describe('BillingComponent', () => {
     expect(fixture.nativeElement.querySelector('.early-bird-banner')).toBeNull();
   });
 
-  it('renders all three pricing tiers from the catalog', () => {
+  it('shows a trial banner and its end date for a workspace on the free trial', () => {
+    setup(makeBilling({ subscriptionTier: 'Pro', isFreeTrial: true, subscriptionEndDate: '2026-09-20T00:00:00Z' }));
+
+    const banners = fixture.nativeElement.querySelectorAll('.early-bird-banner');
+    const trialBanner = Array.from(banners as NodeListOf<HTMLElement>).find(el => el.textContent?.includes('free Full Access trial'));
+    expect(trialBanner).toBeTruthy();
+  });
+
+  it('renders both pricing tiers from the catalog', () => {
     setup();
 
     const cards = fixture.nativeElement.querySelectorAll('.pricing-card');
-    expect(cards.length).toBe(3);
+    expect(cards.length).toBe(2);
   });
 
   it('uses annual pricing once the Annual toggle is selected', () => {

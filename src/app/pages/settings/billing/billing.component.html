@@ -29,6 +29,16 @@
       </div>
     </div>
 
+    <div class="early-bird-banner" *ngIf="b.isFreeTrial">
+      <i class="bi bi-hourglass-top" aria-hidden="true"></i>
+      <div>
+        <p class="early-bird-banner__title">You're on your free Full Access trial</p>
+        <p class="early-bird-banner__detail" *ngIf="b.subscriptionEndDate">
+          Your trial ends {{ b.subscriptionEndDate | date: 'longDate' }} — upgrade any time to keep Full Access after that.
+        </p>
+      </div>
+    </div>
+
     <div class="gcash-pending-notice" *ngIf="b.pendingGCashSubmission as pending">
       <i class="bi bi-hourglass-split" aria-hidden="true"></i>
       <div>

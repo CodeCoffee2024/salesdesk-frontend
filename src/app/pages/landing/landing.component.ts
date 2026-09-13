@@ -96,34 +96,24 @@ export class LandingComponent implements OnInit {
 
   readonly plans: PricingPlan[] = [
     {
-      name: 'Starter',
+      name: 'Free Access',
       price: 'Free',
       priceUsd: null,
       cadence: '',
       description: 'For freelancers just getting started.',
-      quota: '10 documents / month',
-      features: ['1 workspace user', '10 documents per month', 'PDF export', 'Studio Standard template'],
+      quota: '5 documents / month',
+      features: ['1 workspace user', '5 documents per month', 'PDF export', 'SalesDesk watermark on documents'],
       highlighted: false
     },
     {
-      name: 'Studio',
-      price: '$24',
-      priceUsd: 24,
+      name: 'Full Access',
+      price: '$9.99',
+      priceUsd: 9.99,
       cadence: '/ month',
-      description: 'For small studios billing clients regularly.',
-      quota: '100 documents / month',
-      features: ['Up to 5 workspace users', '100 documents per month', 'Custom templates', 'Priority support'],
-      highlighted: true
-    },
-    {
-      name: 'Agency',
-      price: '$59',
-      priceUsd: 59,
-      cadence: '/ month',
-      description: 'For agencies managing many clients at once.',
+      description: 'Everything unlocked — try it free for 7 days, no card required.',
       quota: 'Unlimited documents',
-      features: ['Unlimited workspace users', 'Unlimited documents', 'Role-based permissions', 'Dedicated support'],
-      highlighted: false
+      features: ['Unlimited workspace users', 'Unlimited documents', 'Custom templates & branding', 'Native e-signatures', 'Role-based permissions', 'Priority support'],
+      highlighted: true
     }
   ];
 

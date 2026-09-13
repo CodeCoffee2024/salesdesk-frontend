@@ -1,5 +1,5 @@
-/** TASK-031/TASK-038: mirrors the backend's WorkspaceBillingDto (GET /api/workspace/billing). */
-export type SubscriptionTier = 'Free' | 'Pro' | 'Studio';
+/** Mirrors the backend's WorkspaceBillingDto (GET /api/workspace/billing). Two tiers only — Free and Pro ("Full Access" in every user-facing label; see PricingTier.displayName). */
+export type SubscriptionTier = 'Free' | 'Pro';
 
 export interface WorkspaceBilling {
   subscriptionTier: SubscriptionTier;
@@ -7,7 +7,9 @@ export interface WorkspaceBilling {
   subscriptionEndDate: string | null;
   /** True if this workspace was one of the first 100 eligible registrations. */
   isEarlyBirdPromo: boolean;
-  /** This tier's monthly document cap, or null when unlimited (Pro/Studio). */
+  /** True while this workspace is on its one-time 7-day Full Access trial. */
+  isFreeTrial: boolean;
+  /** This tier's monthly document cap, or null when unlimited (Pro/Full Access). */
   monthlyDocumentLimit: number | null;
   /** Documents issued so far this calendar month. */
   documentsIssuedThisMonth: number;
