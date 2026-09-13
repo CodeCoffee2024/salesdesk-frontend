@@ -40,6 +40,7 @@ import { ImpersonationBannerComponent } from './shared/impersonation-banner/impe
 import { SignatureCanvasComponent } from './shared/signature-canvas/signature-canvas.component';
 import { SignatureAcceptanceModalComponent } from './shared/signature-acceptance-modal/signature-acceptance-modal.component';
 import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
+import { PrivacyPolicyComponent } from './pages/public/privacy-policy/privacy-policy.component';
 import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
 import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/workspace-profile.component';
 import { BillingComponent } from './pages/settings/billing/billing.component';
@@ -90,6 +91,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     SignatureCanvasComponent,
     SignatureAcceptanceModalComponent,
     DocumentSignComponent,
+    PrivacyPolicyComponent,
     ReminderSettingsComponent,
     WorkspaceProfileComponent,
     BillingComponent,

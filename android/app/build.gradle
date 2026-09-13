@@ -1,5 +1,17 @@
 apply plugin: 'com.android.application'
 
+// Release signing config — reads app/keystore.properties (gitignored, never
+// committed: see android/.gitignore) rather than hardcoding the keystore
+// path/passwords here. Falls back to unsigned if that file doesn't exist
+// (e.g. a fresh checkout that hasn't generated a release key yet) so debug
+// builds and CI keep working without it.
+def keystorePropertiesFile = rootProject.file('app/keystore.properties')
+def keystoreProperties = new Properties()
+def hasReleaseSigning = keystorePropertiesFile.exists()
+if (hasReleaseSigning) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.salesdesk.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +28,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig hasReleaseSigning ? signingConfigs.release : null
         }
     }
 }

@@ -16,7 +16,19 @@
     </style>
 
 
+    <!--
+        androidx.core:core-splashscreen backports the Android 12 SplashScreen
+        API to API < 31 using these exact attribute names — a plain
+        android:background here is a no-op for the compat theme (it only draws
+        from windowSplashScreenBackground/windowSplashScreenAnimatedIcon, the
+        same ones values-v31/styles.xml sets for real Android 12+), which is
+        why the logo wasn't showing pre-12. Also needs MainActivity to call
+        SplashScreen.installSplashScreen(this) before super.onCreate() — the
+        compat library does nothing without that call.
+    -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

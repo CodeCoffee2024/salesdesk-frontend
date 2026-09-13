@@ -23,6 +23,7 @@ import { AdminWorkspacesComponent } from './pages/admin/admin-workspaces/admin-w
 import { AdminUsersComponent } from './pages/admin/admin-users/admin-users.component';
 import { AdminAuditLogComponent } from './pages/admin/admin-audit-log/admin-audit-log.component';
 import { DocumentSignComponent } from './pages/public/document-sign/document-sign.component';
+import { PrivacyPolicyComponent } from './pages/public/privacy-policy/privacy-policy.component';
 import { ReminderSettingsComponent } from './pages/settings/reminder-settings/reminder-settings.component';
 import { WorkspaceProfileComponent } from './pages/settings/workspace-profile/workspace-profile.component';
 import { BillingComponent } from './pages/settings/billing/billing.component';
@@ -48,6 +49,7 @@ const routes: Routes = [
   // — never behind authGuard, since the whole point is that the client has no
   // SalesDesk account.
   { path: 'view/:token', component: DocumentSignComponent, data: { title: 'Your document' } },
+  { path: 'privacy', component: PrivacyPolicyComponent, data: { title: 'Privacy Policy' } },
   {
     path: '',
     canActivate: [authGuard],
