@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Capacitor } from '@capacitor/core';
 import { forkJoin } from 'rxjs';
 import { WorkspaceBillingService } from '../../../core/services/workspace-billing.service';
 import { BillingCycle, PricingCatalog, PricingTier, SubscriptionTier, WorkspaceBilling } from '../../../core/models/workspace-billing.model';
@@ -18,6 +19,9 @@ import { BillingCycle, PricingCatalog, PricingTier, SubscriptionTier, WorkspaceB
   styleUrls: ['./billing.component.scss']
 })
 export class BillingComponent implements OnInit {
+  /** Google Play policy requires Play Billing for a purchase flow reachable from inside a native Android app; the exempt path (same one Netflix/Spotify use) is to never offer that flow there at all — the native app shows plan/usage but sends the visitor to the website to actually upgrade. */
+  readonly isNativeApp = Capacitor.isNativePlatform();
+
   loading = true;
   loadError = false;
 

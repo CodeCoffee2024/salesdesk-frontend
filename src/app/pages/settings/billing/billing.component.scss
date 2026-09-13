@@ -232,6 +232,15 @@
   font-size: 13px;
 }
 
+.pricing-card__web-only-note {
+  padding: 10px 14px;
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-surface);
+  color: var(--sd-muted);
+  font-size: 13px;
+  margin: 0;
+}
+
 .pricing-card__features {
   list-style: none;
   padding: 0;

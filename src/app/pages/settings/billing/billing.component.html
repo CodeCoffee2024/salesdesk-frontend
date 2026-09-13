@@ -91,20 +91,23 @@
 
         <button type="button" class="btn-secondary" disabled *ngIf="isCurrentTier(tier.tier)">Current plan</button>
         <ng-container *ngIf="!isCurrentTier(tier.tier) && tier.tier !== 'Free'">
-          <button
-            type="button"
-            class="btn-primary"
-            [disabled]="checkingOutTier === tier.tier"
-            (click)="upgrade(tier)"
-          >
-            {{ checkingOutTier === tier.tier ? 'Starting checkout…' : 'Upgrade' }}
-          </button>
-          <button type="button" class="btn-gcash" *ngIf="isPh" (click)="openGCashModal(tier)">
-            <i class="bi bi-wallet2" aria-hidden="true"></i> Pay via GCash
-          </button>
-          <button type="button" class="btn-request-upgrade" (click)="openUpgradeRequestModal(tier)">
-            <i class="bi bi-envelope" aria-hidden="true"></i> No payment method? Request upgrade
-          </button>
+          <p class="pricing-card__web-only-note" *ngIf="isNativeApp">Open SalesDesk in your mobile browser to upgrade.</p>
+          <ng-container *ngIf="!isNativeApp">
+            <button
+              type="button"
+              class="btn-primary"
+              [disabled]="checkingOutTier === tier.tier"
+              (click)="upgrade(tier)"
+            >
+              {{ checkingOutTier === tier.tier ? 'Starting checkout…' : 'Upgrade' }}
+            </button>
+            <button type="button" class="btn-gcash" *ngIf="isPh" (click)="openGCashModal(tier)">
+              <i class="bi bi-wallet2" aria-hidden="true"></i> Pay via GCash
+            </button>
+            <button type="button" class="btn-request-upgrade" (click)="openUpgradeRequestModal(tier)">
+              <i class="bi bi-envelope" aria-hidden="true"></i> No payment method? Request upgrade
+            </button>
+          </ng-container>
         </ng-container>
       </div>
     </div>

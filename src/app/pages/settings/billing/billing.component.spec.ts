@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Capacitor } from '@capacitor/core';
 import { of, throwError } from 'rxjs';
 
 import { BillingComponent } from './billing.component';
@@ -97,6 +98,19 @@ describe('BillingComponent', () => {
     const banners = fixture.nativeElement.querySelectorAll('.early-bird-banner');
     const trialBanner = Array.from(banners as NodeListOf<HTMLElement>).find(el => el.textContent?.includes('free Full Access trial'));
     expect(trialBanner).toBeTruthy();
+  });
+
+  it('hides the checkout buttons and shows a web-only note when running as the native app', () => {
+    // Google Play policy forbids a purchase flow reachable from inside the
+    // native Android app — see billing.component.ts's isNativeApp doc comment.
+    spyOn(Capacitor, 'isNativePlatform').and.returnValue(true);
+    setup();
+
+    const proCard = fixture.nativeElement.querySelectorAll('.pricing-card')[1];
+    expect(proCard.querySelector('.btn-primary')).toBeNull();
+    expect(proCard.querySelector('.btn-gcash')).toBeNull();
+    expect(proCard.querySelector('.btn-request-upgrade')).toBeNull();
+    expect(proCard.querySelector('.pricing-card__web-only-note')?.textContent).toContain('mobile browser');
   });
 
   it('renders both pricing tiers from the catalog', () => {
