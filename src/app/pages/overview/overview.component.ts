@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { DocumentService } from '../../core/services/document.service';
+import { LocalCacheService } from '../../core/services/local-cache.service';
+import { staleWhileRevalidate } from '../../core/utils/stale-while-revalidate.util';
 import { DashboardSummary } from '../../core/models/dashboard.model';
 import { Document as DocumentModel } from '../../core/models/document.model';
 
@@ -10,8 +12,14 @@ interface MonthlyRevenuePoint {
   amount: number;
 }
 
+interface DashboardData {
+  summary: DashboardSummary;
+  documents: DocumentModel[];
+}
+
 const MONTHS_TO_SHOW = 6;
 const RECENT_DOCUMENTS_TO_SHOW = 5;
+const DASHBOARD_CACHE_KEY = 'dashboard:overview';
 
 @Component({
   selector: 'app-overview',
@@ -28,24 +36,28 @@ export class OverviewComponent implements OnInit {
 
   constructor(
     private readonly dashboardService: DashboardService,
-    private readonly documentService: DocumentService
+    private readonly documentService: DocumentService,
+    private readonly cache: LocalCacheService
   ) {}
 
+  /** TASK-041: renders the cached summary+documents immediately on a repeat visit this session (stale-while-revalidate) while a background refresh reconciles it — see staleWhileRevalidate. */
   ngOnInit(): void {
-    forkJoin({
+    const fetch$ = forkJoin({
       summary: this.dashboardService.getSummary(),
       // Fetched unfiltered (server already orders newest-first) so one call can
       // drive both the "recent documents" list and the revenue chart below.
       documents: this.documentService.getAll()
-    }).subscribe({
-      next: ({ summary, documents }) => {
+    });
+
+    staleWhileRevalidate<DashboardData>(this.cache, DASHBOARD_CACHE_KEY, fetch$).subscribe({
+      next: ({ data: { summary, documents } }) => {
         this.summary = summary;
         this.recentDocuments = documents.slice(0, RECENT_DOCUMENTS_TO_SHOW);
         this.monthlyRevenue = this.computeMonthlyRevenue(documents);
         this.loading = false;
       },
       error: () => {
-        this.loadError = true;
+        this.loadError = this.summary === null;
         this.loading = false;
       }
     });

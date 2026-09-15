@@ -6,9 +6,18 @@ import { OverviewComponent } from './overview.component';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { DocumentService } from '../../core/services/document.service';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
+import { TooltipDirective } from '../../shared/tooltip.directive';
+import { SkeletonListComponent } from '../../shared/skeleton/skeleton-list.component';
+import { SkeletonRowComponent } from '../../shared/skeleton/skeleton-row.component';
+import { SkeletonCardComponent } from '../../shared/skeleton/skeleton-card.component';
+import { SkeletonChartComponent } from '../../shared/skeleton/skeleton-chart.component';
+import { SkeletonLineComponent } from '../../shared/skeleton/skeleton-line.component';
 import { CurrencyLocalePipe } from '../../core/pipes/currency-locale.pipe';
 import { Document as DocumentModel } from '../../core/models/document.model';
 import { DashboardSummary } from '../../core/models/dashboard.model';
+import { offlineDb } from '../../core/offline/offline-db';
+
+const SKELETON_DECLARATIONS = [SkeletonListComponent, SkeletonRowComponent, SkeletonCardComponent, SkeletonChartComponent, SkeletonLineComponent];
 
 function makeDocument(overrides: Partial<DocumentModel>): DocumentModel {
   return {
@@ -42,10 +51,18 @@ describe('OverviewComponent', () => {
   let fixture: ComponentFixture<OverviewComponent>;
   let component: OverviewComponent;
 
+  beforeEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
+  afterEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
   function setup(summary: DashboardSummary, documents: DocumentModel[]) {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [OverviewComponent, StatusBadgeComponent, CurrencyLocalePipe],
+      declarations: [OverviewComponent, StatusBadgeComponent, TooltipDirective, ...SKELETON_DECLARATIONS, CurrencyLocalePipe],
       providers: [
         { provide: DashboardService, useValue: { getSummary: () => of(summary) } },
         { provide: DocumentService, useValue: { getAll: () => of(documents) } }
@@ -121,10 +138,10 @@ describe('OverviewComponent', () => {
     expect(component.nextBestActionMessage).toContain('caught up');
   });
 
-  it('shows an error state when loading fails', () => {
+  it('shows an error state when loading fails', async () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [OverviewComponent, StatusBadgeComponent, CurrencyLocalePipe],
+      declarations: [OverviewComponent, StatusBadgeComponent, TooltipDirective, ...SKELETON_DECLARATIONS, CurrencyLocalePipe],
       providers: [
         { provide: DashboardService, useValue: { getSummary: () => throwError(() => new Error('network')) } },
         { provide: DocumentService, useValue: { getAll: () => of([]) } }
@@ -132,6 +149,11 @@ describe('OverviewComponent', () => {
     });
 
     fixture = TestBed.createComponent(OverviewComponent);
+    fixture.detectChanges();
+
+    // staleWhileRevalidate checks the (empty) cache before erroring — a real, if
+    // effectively instant, async IndexedDB read rather than a synchronous rethrow.
+    await new Promise((resolve) => setTimeout(resolve, 50));
     fixture.detectChanges();
 
     expect(fixture.componentInstance.loadError).toBeTrue();

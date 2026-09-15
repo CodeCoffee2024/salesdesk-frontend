@@ -1,14 +1,20 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { DocumentService } from '../../../core/services/document.service';
 import { Document as DocumentModel, DocumentStatus } from '../../../core/models/document.model';
+import { LocalCacheService } from '../../../core/services/local-cache.service';
+import { staleWhileRevalidate } from '../../../core/utils/stale-while-revalidate.util';
+import { documentsListCacheKey } from '../../../core/utils/document-cache-keys.util';
 
 type DocumentTab = 'all' | 'quote' | 'invoice';
 
 const SEARCH_DEBOUNCE_MS = 300;
 const HIGHLIGHT_DURATION_MS = 4000;
+
+/** Status changes cheap enough to reflect immediately and reconcile after the fact (TASK-041). "Paid" is deliberately excluded — a false-positive "payment received" is exactly the misleading optimistic update the guardrail rules out, so it keeps an explicit pending state instead. */
+const OPTIMISTIC_STATUSES: ReadonlySet<DocumentStatus> = new Set<DocumentStatus>(['Draft', 'Sent', 'Overdue', 'Accepted', 'RevisionRequested']);
 
 @Component({
   selector: 'app-documents-list',
@@ -28,6 +34,12 @@ export class DocumentsListComponent implements OnInit {
   openMenuForId: string | null = null;
   statusMenuOpen = false;
   documentPendingDelete: DocumentModel | null = null;
+  deletingDocument = false;
+
+  /** Set while a status change is in flight for a non-optimistic status (currently just "Paid") — everything else updates the row immediately instead. */
+  updatingStatusForId: string | null = null;
+  /** Inline error surfaced when a status change/delete fails (TASK-041) — for an optimistic status change, this is shown alongside the row's rollback to its pre-optimistic status, explaining what didn't save. */
+  actionError = '';
 
   /** The document a create/edit flow just navigated here from, briefly highlighted. */
   highlightedDocumentId: string | null = null;
@@ -39,7 +51,8 @@ export class DocumentsListComponent implements OnInit {
 
   constructor(
     private readonly documentService: DocumentService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly cache: LocalCacheService
   ) {
     // Only readable during construction of the component a navigation targets —
     // this is how the document-form's `{ state: { highlightId } }` extra arrives.
@@ -115,10 +128,43 @@ export class DocumentsListComponent implements OnInit {
     return '';
   }
 
+  /**
+   * TASK-041: "Draft"/"Sent"/"Overdue"/"Accepted"/"Revision requested" are just
+   * workflow labels — reversible, nothing to lose by showing the change before
+   * the server confirms it, so the row updates immediately and only rolls back
+   * (with an inline error) if the request actually fails. "Paid" is excluded —
+   * see OPTIMISTIC_STATUSES — and keeps the previous wait-for-the-server
+   * behavior with its own pending state instead.
+   */
   changeStatus(document: DocumentModel, status: DocumentStatus): void {
-    this.documentService.updateStatus(document.id, status).subscribe(() => {
-      this.closeMenu();
-      this.loadDocuments();
+    this.closeMenu();
+    this.actionError = '';
+
+    if (!OPTIMISTIC_STATUSES.has(status)) {
+      this.updatingStatusForId = document.id;
+      this.documentService.updateStatus(document.id, status).subscribe({
+        next: (updated) => {
+          this.updatingStatusForId = null;
+          this.applyDocumentToList(updated);
+        },
+        error: () => {
+          this.updatingStatusForId = null;
+          this.actionError = 'Could not update the status. Please try again.';
+        }
+      });
+      return;
+    }
+
+    const previousStatus = document.status;
+    this.applyDocumentToList({ ...document, status });
+
+    this.documentService.updateStatus(document.id, status).subscribe({
+      next: (updated) => this.applyDocumentToList(updated),
+      error: () => {
+        this.applyDocumentToList({ ...document, status: previousStatus });
+        const label = status === 'RevisionRequested' ? 'Revision requested' : status;
+        this.actionError = `Could not change ${document.documentNumber} to "${label}". Please try again.`;
+      }
     });
   }
 
@@ -127,14 +173,26 @@ export class DocumentsListComponent implements OnInit {
     this.closeMenu();
   }
 
+  /** Deletion is irreversible, so unlike changeStatus it waits for the server to confirm rather than optimistically removing the row (TASK-041 guardrail). */
   confirmDelete(): void {
     if (!this.documentPendingDelete) {
       return;
     }
 
-    this.documentService.delete(this.documentPendingDelete.id).subscribe(() => {
-      this.documentPendingDelete = null;
-      this.loadDocuments();
+    const id = this.documentPendingDelete.id;
+    this.deletingDocument = true;
+
+    this.documentService.delete(id).subscribe({
+      next: () => {
+        this.documents = this.documents.filter((d) => d.id !== id);
+        this.documentPendingDelete = null;
+        this.deletingDocument = false;
+      },
+      error: () => {
+        this.deletingDocument = false;
+        this.documentPendingDelete = null;
+        this.actionError = 'Could not delete this document. Please try again.';
+      }
     });
   }
 
@@ -148,17 +206,36 @@ export class DocumentsListComponent implements OnInit {
     this.statusMenuOpen = false;
   }
 
+  private applyDocumentToList(updated: DocumentModel): void {
+    this.documents = this.documents.map((d) => (d.id === updated.id ? updated : d));
+  }
+
+  /**
+   * TASK-041: an active search bypasses the cache entirely (it's a one-off
+   * query, not "returning to a screen already loaded"); the plain tab view
+   * goes through staleWhileRevalidate, which renders the cached copy — set on
+   * a previous visit this session — immediately, then reconciles with the
+   * network response once it resolves. `loading` starts true so a genuinely
+   * first-ever visit still shows the skeleton; it flips false on whichever
+   * source (cache or network) emits first, which for a cache hit is within a
+   * frame or two of navigating here.
+   */
   private loadDocuments(): void {
     this.loading = true;
     this.loadError = false;
 
-    this.documentService.getAll({ type: this.activeTab, search: this.searchTerm || undefined }).subscribe({
-      next: (documents) => {
-        this.documents = documents;
+    const request$ = this.documentService.getAll({ type: this.activeTab, search: this.searchTerm || undefined });
+    const source$ = this.searchTerm
+      ? request$.pipe(map((documents) => ({ data: documents, fromCache: false })))
+      : staleWhileRevalidate(this.cache, documentsListCacheKey(this.activeTab), request$);
+
+    source$.subscribe({
+      next: ({ data }) => {
+        this.documents = data;
         this.loading = false;
       },
       error: () => {
-        this.loadError = true;
+        this.loadError = this.documents.length === 0;
         this.loading = false;
       }
     });

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TemplateService } from '../../core/services/template.service';
+import { TemplateService, TEMPLATES_LIST_CACHE_KEY } from '../../core/services/template.service';
+import { LocalCacheService } from '../../core/services/local-cache.service';
+import { staleWhileRevalidate } from '../../core/utils/stale-while-revalidate.util';
 import { Template, TemplateTargetType } from '../../core/models/template.model';
 
 const SWATCHES = ['#2D6A63', '#D9A441', '#8B5FBF', '#B1602C', '#3F6A96'];
@@ -32,7 +34,8 @@ export class TemplatesComponent implements OnInit {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly templateService: TemplateService
+    private readonly templateService: TemplateService,
+    private readonly cache: LocalCacheService
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -176,17 +179,18 @@ export class TemplatesComponent implements OnInit {
     });
   }
 
+  /** TASK-041: renders the cached template list immediately on a repeat visit this session (stale-while-revalidate) while a background refresh reconciles it — see staleWhileRevalidate. */
   private load(): void {
     this.loading = true;
     this.loadError = false;
 
-    this.templateService.getAll().subscribe({
-      next: (templates) => {
-        this.templates = templates;
+    staleWhileRevalidate(this.cache, TEMPLATES_LIST_CACHE_KEY, this.templateService.getAll()).subscribe({
+      next: ({ data }) => {
+        this.templates = data;
         this.loading = false;
       },
       error: () => {
-        this.loadError = true;
+        this.loadError = this.templates.length === 0;
         this.loading = false;
       }
     });

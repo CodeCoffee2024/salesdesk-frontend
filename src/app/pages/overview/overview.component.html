@@ -76,9 +76,24 @@
   </section>
 </div>
 
-<div class="page-placeholder" *ngIf="loading">
-  <h1>Overview</h1>
-  <p>Loading your workspace&hellip;</p>
+<div class="overview" *ngIf="loading">
+  <section class="kpi-row">
+    <app-skeleton-card *ngFor="let i of [1, 2, 3, 4]" [lines]="1"></app-skeleton-card>
+  </section>
+
+  <section class="mid-row">
+    <article class="revenue-pulse">
+      <p class="panel-label">Revenue pulse</p>
+      <app-skeleton-chart [bars]="6"></app-skeleton-chart>
+    </article>
+
+    <app-skeleton-card [lines]="3"></app-skeleton-card>
+  </section>
+
+  <section class="recent-documents">
+    <p class="panel-label">Recent activity</p>
+    <app-skeleton-list type="row" [count]="5" [columns]="4"></app-skeleton-list>
+  </section>
 </div>
 
 <div class="page-placeholder" *ngIf="loadError">

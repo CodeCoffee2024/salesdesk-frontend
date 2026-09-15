@@ -96,6 +96,10 @@ export class AuthService {
     this.currentUserSubject.next(null);
     this.impersonatingSubject.next(false);
     void offlineDb.authToken.delete(AUTH_TOKEN_MIRROR_ID);
+    // TASK-041: wipes every stale-while-revalidate read cache, so the next
+    // sign-in (possibly a different workspace) never briefly renders this
+    // one's cached lists before its own fetch resolves.
+    void offlineDb.cacheEntries.clear();
   }
 
   /**

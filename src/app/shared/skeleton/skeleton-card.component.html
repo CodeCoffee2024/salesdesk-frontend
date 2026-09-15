@@ -1,0 +1,4 @@
+<div class="skeleton-card" aria-hidden="true">
+  <app-skeleton-line width="50%" height="18px"></app-skeleton-line>
+  <app-skeleton-line *ngFor="let index of lineIndexes" [width]="index === lineIndexes.length - 1 ? '65%' : '90%'"></app-skeleton-line>
+</div>

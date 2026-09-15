@@ -52,6 +52,12 @@ import { FloatingHelpWidgetComponent } from './shared/floating-help-widget/float
 import { InfoTooltipComponent } from './shared/info-tooltip/info-tooltip.component';
 import { AiParseModalComponent } from './shared/ai-parse-modal/ai-parse-modal.component';
 import { CurrencyLocalePipe } from './core/pipes/currency-locale.pipe';
+import { TooltipDirective } from './shared/tooltip.directive';
+import { SkeletonLineComponent } from './shared/skeleton/skeleton-line.component';
+import { SkeletonRowComponent } from './shared/skeleton/skeleton-row.component';
+import { SkeletonCardComponent } from './shared/skeleton/skeleton-card.component';
+import { SkeletonChartComponent } from './shared/skeleton/skeleton-chart.component';
+import { SkeletonListComponent } from './shared/skeleton/skeleton-list.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
@@ -102,7 +108,13 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     FloatingHelpWidgetComponent,
     InfoTooltipComponent,
     CurrencyLocalePipe,
-    AiParseModalComponent
+    AiParseModalComponent,
+    TooltipDirective,
+    SkeletonLineComponent,
+    SkeletonRowComponent,
+    SkeletonCardComponent,
+    SkeletonChartComponent,
+    SkeletonListComponent
   ],
   imports: [
     BrowserModule,

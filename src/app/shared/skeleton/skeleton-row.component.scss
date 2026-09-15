@@ -1,0 +1,16 @@
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--sd-border);
+}
+
+.skeleton-row__cell {
+  flex: 1;
+  min-width: 0;
+
+  &:last-child {
+    flex: 0 0 40px;
+  }
+}

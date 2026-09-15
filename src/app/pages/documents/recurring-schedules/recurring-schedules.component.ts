@@ -36,6 +36,8 @@ export class RecurringSchedulesComponent implements OnInit {
 
   /** Row currently mid pause/resume request — disables that row's toggle button so a slow request can't be double-fired. */
   togglingId: string | null = null;
+  /** Inline error surfaced when an optimistic pause/resume gets rolled back (TASK-041). */
+  toggleError = '';
 
   readonly intervals: RecurrenceInterval[] = ['Weekly', 'Monthly', 'Quarterly', 'Yearly'];
 
@@ -164,9 +166,15 @@ export class RecurringSchedulesComponent implements OnInit {
     });
   }
 
+  /** TASK-041: pausing/resuming an automation is a reversible workspace setting, not a financially sensitive action — the row flips immediately and only rolls back (with an inline error) if the request actually fails, instead of waiting on the round trip. */
   toggleActive(schedule: RecurringSchedule): void {
     this.togglingId = schedule.id;
-    const action = schedule.isActive ? this.scheduleService.pause(schedule.id) : this.scheduleService.resume(schedule.id);
+    this.toggleError = '';
+
+    const wasActive = schedule.isActive;
+    this.schedules = this.schedules.map((s) => (s.id === schedule.id ? { ...s, isActive: !wasActive } : s));
+
+    const action = wasActive ? this.scheduleService.pause(schedule.id) : this.scheduleService.resume(schedule.id);
 
     action.subscribe({
       next: (updated) => {
@@ -174,7 +182,9 @@ export class RecurringSchedulesComponent implements OnInit {
         this.togglingId = null;
       },
       error: () => {
+        this.schedules = this.schedules.map((s) => (s.id === schedule.id ? { ...s, isActive: wasActive } : s));
         this.togglingId = null;
+        this.toggleError = `Could not ${wasActive ? 'pause' : 'resume'} "${schedule.customerName}". Please try again.`;
       },
     });
   }

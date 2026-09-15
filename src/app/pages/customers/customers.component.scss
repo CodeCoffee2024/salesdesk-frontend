@@ -106,11 +106,18 @@
   color: var(--sd-muted);
   font-size: 13px;
   margin-bottom: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .customer-card__meta {
+  display: block;
   font-size: 12px;
   color: var(--sd-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .customer-card__since {

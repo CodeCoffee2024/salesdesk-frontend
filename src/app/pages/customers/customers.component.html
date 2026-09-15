@@ -33,6 +33,7 @@
   </p>
 
   <p class="modal__error" *ngIf="deleteError">{{ deleteError }}</p>
+  <p class="modal__error" *ngIf="editRollbackError">{{ editRollbackError }}</p>
 
   <div class="customer-grid" *ngIf="filteredCustomers.length > 0">
     <button type="button" class="customer-card" *ngFor="let customer of filteredCustomers" (click)="viewProfile(customer)">
@@ -40,8 +41,8 @@
         <h3>{{ customer.name }}</h3>
         <span class="customer-card__value">{{ customer.lifetimeValue | currencyLocale:workspaceCurrency }}</span>
       </div>
-      <p class="customer-card__company">{{ customer.company }}</p>
-      <p class="customer-card__meta">{{ customer.email }}</p>
+      <p class="customer-card__company" [appTooltip]="customer.company" [appTooltipOnlyIfTruncated]="true">{{ customer.company }}</p>
+      <p class="customer-card__meta" [appTooltip]="customer.email" [appTooltipOnlyIfTruncated]="true">{{ customer.email }}</p>
       <p class="customer-card__meta" *ngIf="customer.phone">{{ customer.phone }}</p>
       <p class="customer-card__since">Customer since {{ customer.createdAt | date: 'MMM y' }}</p>
       <span class="customer-card__view">View profile &rarr;</span>
@@ -51,7 +52,7 @@
 
 <div class="page-placeholder" *ngIf="loading">
   <h1>Customers</h1>
-  <p>Loading&hellip;</p>
+  <app-skeleton-list type="card" [count]="6" [lines]="3"></app-skeleton-list>
 </div>
 
 <div class="page-placeholder" *ngIf="loadError">
@@ -128,7 +129,7 @@
           *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
           (click)="requestDelete(customer)"
         >Delete</button>
-        <button type="button" class="modal__close" (click)="closeProfile()" aria-label="Close">&times;</button>
+        <button type="button" class="modal__close" appTooltip="Close" (click)="closeProfile()" aria-label="Close">&times;</button>
       </div>
     </div>
 
@@ -176,6 +177,8 @@
   heading="Delete this customer?"
   [message]="'This permanently removes &quot;' + customer.name + '&quot; from your workspace. This cannot be undone.'"
   confirmLabel="Delete"
+  confirmBusyLabel="Deleting&hellip;"
+  [confirmDisabled]="deletingCustomerInFlight"
   (confirmed)="confirmDelete()"
   (cancelled)="cancelDelete()"
 ></app-confirm-dialog>

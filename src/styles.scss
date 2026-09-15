@@ -172,3 +172,63 @@ button {
   }
 }
 
+/*
+ * Skeleton loader shimmer (TASK-041): shared by every app-skeleton-* primitive
+ * in shared/skeleton. Global (not per-component styleUrls) because it's a
+ * single shimmer animation reused verbatim across several small components
+ * rather than a component-specific look.
+ */
+@keyframes sd-skeleton-shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.sd-skeleton {
+  display: block;
+  background-color: var(--sd-border);
+  background-image: linear-gradient(90deg, var(--sd-border) 25%, #eceff5 37%, var(--sd-border) 63%);
+  background-size: 400px 100%;
+  animation: sd-skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--sd-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sd-skeleton {
+    animation: none;
+  }
+}
+
+/*
+ * Tooltip bubble (TASK-041, see shared/tooltip/tooltip.directive.ts). Global
+ * because the directive portals the bubble element onto document.body so it's
+ * never clipped by an ancestor's overflow:hidden (e.g. a table scroll wrapper)
+ * — living outside any component's view, it can't pick up component-scoped
+ * (emulated encapsulation) styles, only global ones.
+ */
+.sd-tooltip-bubble {
+  position: fixed;
+  z-index: 1000;
+  max-width: 240px;
+  padding: 6px 10px;
+  background: var(--sd-sidebar-bg);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: var(--sd-radius-sm);
+  box-shadow: var(--sd-shadow-md);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.sd-tooltip-bubble--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 
 import { CustomersComponent } from './customers.component';
 import { CustomerService } from '../../core/services/customer.service';
@@ -10,10 +10,18 @@ import { WorkspaceProfileService } from '../../core/services/workspace-profile.s
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
 import { HasRoleDirective } from '../../shared/has-role.directive';
+import { TooltipDirective } from '../../shared/tooltip.directive';
+import { SkeletonListComponent } from '../../shared/skeleton/skeleton-list.component';
+import { SkeletonRowComponent } from '../../shared/skeleton/skeleton-row.component';
+import { SkeletonCardComponent } from '../../shared/skeleton/skeleton-card.component';
+import { SkeletonLineComponent } from '../../shared/skeleton/skeleton-line.component';
 import { CurrencyLocalePipe } from '../../core/pipes/currency-locale.pipe';
 import { Customer } from '../../core/models/customer.model';
 import { Document as DocumentModel } from '../../core/models/document.model';
 import { WorkspaceProfile } from '../../core/models/workspace-profile.model';
+import { offlineDb } from '../../core/offline/offline-db';
+
+const SKELETON_DECLARATIONS = [SkeletonListComponent, SkeletonRowComponent, SkeletonCardComponent, SkeletonLineComponent];
 
 const workspaceProfile: WorkspaceProfile = {
   name: 'Northline',
@@ -46,8 +54,16 @@ describe('CustomersComponent', () => {
   let customerServiceSpy: jasmine.SpyObj<CustomerService>;
   let documentServiceSpy: jasmine.SpyObj<DocumentService>;
 
+  beforeEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
+  afterEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
   function setup(customers: Customer[] = [makeCustomer()]) {
-    customerServiceSpy = jasmine.createSpyObj('CustomerService', ['getAll', 'create']);
+    customerServiceSpy = jasmine.createSpyObj('CustomerService', ['getAll', 'create', 'update', 'delete']);
     customerServiceSpy.getAll.and.returnValue(of(customers));
     customerServiceSpy.create.and.returnValue(of(makeCustomer({ id: 'cust-2', name: 'New Customer' })));
 
@@ -56,7 +72,7 @@ describe('CustomersComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, HttpClientTestingModule],
-      declarations: [CustomersComponent, EmptyStateComponent, StatusBadgeComponent, HasRoleDirective, CurrencyLocalePipe],
+      declarations: [CustomersComponent, EmptyStateComponent, StatusBadgeComponent, HasRoleDirective, TooltipDirective, ...SKELETON_DECLARATIONS, CurrencyLocalePipe],
       providers: [
         { provide: CustomerService, useValue: customerServiceSpy },
         { provide: DocumentService, useValue: documentServiceSpy },
@@ -86,14 +102,14 @@ describe('CustomersComponent', () => {
     expect(component.filteredCustomers.map((c) => c.id)).toEqual(['b']);
   });
 
-  it('shows a load error state when the API call fails', () => {
-    customerServiceSpy = jasmine.createSpyObj('CustomerService', ['getAll', 'create']);
+  it('shows a load error state when the API call fails', async () => {
+    customerServiceSpy = jasmine.createSpyObj('CustomerService', ['getAll', 'create', 'update', 'delete']);
     customerServiceSpy.getAll.and.returnValue(throwError(() => new Error('down')));
     documentServiceSpy = jasmine.createSpyObj('DocumentService', ['getAll']);
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, HttpClientTestingModule],
-      declarations: [CustomersComponent, EmptyStateComponent, StatusBadgeComponent, HasRoleDirective, CurrencyLocalePipe],
+      declarations: [CustomersComponent, EmptyStateComponent, StatusBadgeComponent, HasRoleDirective, TooltipDirective, ...SKELETON_DECLARATIONS, CurrencyLocalePipe],
       providers: [
         { provide: CustomerService, useValue: customerServiceSpy },
         { provide: DocumentService, useValue: documentServiceSpy },
@@ -103,6 +119,11 @@ describe('CustomersComponent', () => {
     fixture = TestBed.createComponent(CustomersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    // staleWhileRevalidate's "nothing cached, so surface the error" branch checks
+    // the cache promise before erroring — a real (if effectively instant) async
+    // IndexedDB read, not just a synchronous rethrow.
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     expect(component.loadError).toBeTrue();
   });
@@ -152,5 +173,51 @@ describe('CustomersComponent', () => {
 
     expect(component.selectedCustomer).toBeNull();
     expect(component.selectedCustomerDocuments).toEqual([]);
+  });
+
+  it('editing a customer updates the card immediately and closes the modal without waiting on the server', () => {
+    const customer = makeCustomer();
+    setup([customer]);
+    customerServiceSpy.update.and.returnValue(new Subject<Customer>());
+
+    component.openEditModal(customer);
+    component.addForm.patchValue({ name: 'Maya Chen-Ortiz' });
+    component.submitAdd();
+
+    expect(component.showAddModal).toBeFalse();
+    expect(component.customers[0].name).toBe('Maya Chen-Ortiz');
+    expect(customerServiceSpy.update).toHaveBeenCalledWith('cust-1', jasmine.objectContaining({ name: 'Maya Chen-Ortiz' }));
+  });
+
+  it('rolls back an edited customer and surfaces an inline error if the save fails', () => {
+    const customer = makeCustomer();
+    setup([customer]);
+    customerServiceSpy.update.and.returnValue(throwError(() => new Error('down')));
+
+    component.openEditModal(customer);
+    component.addForm.patchValue({ name: 'Maya Chen-Ortiz' });
+    component.submitAdd();
+
+    expect(component.customers[0].name).toBe('Maya Chen');
+    expect(component.editRollbackError).toContain('Maya Chen');
+  });
+
+  it('confirmDelete waits for the server and removes the card only once it confirms', () => {
+    const customer = makeCustomer();
+    setup([customer]);
+    const pending = new Subject<void>();
+    customerServiceSpy.delete.and.returnValue(pending);
+
+    component.requestDelete(customer);
+    component.confirmDelete();
+
+    expect(component.deletingCustomerInFlight).toBeTrue();
+    expect(component.customers.length).toBe(1);
+
+    pending.next();
+    pending.complete();
+
+    expect(component.customers.length).toBe(0);
+    expect(component.deletingCustomerInFlight).toBeFalse();
   });
 });

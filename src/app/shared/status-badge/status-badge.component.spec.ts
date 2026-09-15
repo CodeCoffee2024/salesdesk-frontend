@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { StatusBadgeComponent } from './status-badge.component';
+import { TooltipDirective } from '../tooltip.directive';
 
 describe('StatusBadgeComponent', () => {
   let component: StatusBadgeComponent;
@@ -8,7 +9,7 @@ describe('StatusBadgeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [StatusBadgeComponent]
+      declarations: [StatusBadgeComponent, TooltipDirective]
     }).compileComponents();
 
     fixture = TestBed.createComponent(StatusBadgeComponent);
@@ -37,6 +38,15 @@ describe('StatusBadgeComponent', () => {
       const badge = fixture.nativeElement.querySelector('.status-badge');
       expect(badge.textContent.trim()).toBe(status);
       expect(badge.classList).toContain(cssClass);
+    }
+  });
+
+  it('exposes a non-empty tooltip explanation for every status', () => {
+    const statuses: Array<typeof component.status> = ['Draft', 'Sent', 'Overdue', 'Accepted', 'Paid', 'RevisionRequested'];
+
+    for (const status of statuses) {
+      component.status = status;
+      expect(component.explanation).toBeTruthy();
     }
   });
 });

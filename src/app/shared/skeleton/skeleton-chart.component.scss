@@ -1,0 +1,14 @@
+.skeleton-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 160px;
+  padding-top: 10px;
+}
+
+.skeleton-chart__bar {
+  flex: 1;
+  min-width: 0;
+  border-radius: 4px 4px 0 0;
+  animation-name: sd-skeleton-shimmer;
+}

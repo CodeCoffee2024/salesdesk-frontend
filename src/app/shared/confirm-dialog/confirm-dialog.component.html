@@ -9,9 +9,10 @@
         type="button"
         class="confirm-dialog__confirm"
         [class.confirm-dialog__confirm--destructive]="destructive"
+        [disabled]="confirmDisabled"
         (click)="confirmed.emit()"
       >
-        {{ confirmLabel }}
+        {{ confirmDisabled && confirmBusyLabel ? confirmBusyLabel : confirmLabel }}
       </button>
     </div>
   </div>

@@ -20,6 +20,7 @@
   ></app-empty-state>
 
   <p class="modal__error" *ngIf="deleteError">{{ deleteError }}</p>
+  <p class="modal__error" *ngIf="toggleError">{{ toggleError }}</p>
 
   <div class="schedule-list" *ngIf="schedules.length > 0">
     <div class="schedule-row" *ngFor="let schedule of schedules">
@@ -47,6 +48,7 @@
         <button
           type="button"
           class="schedule-row__delete"
+          appTooltip="Delete"
           *appHasRole="['SystemAdmin', 'WorkspaceAdmin']"
           (click)="requestDelete(schedule)"
           [attr.aria-label]="'Delete retainer for ' + schedule.customerName"
@@ -58,7 +60,7 @@
 
 <div class="page-placeholder" *ngIf="loading">
   <h1>Recurring retainers</h1>
-  <p>Loading&hellip;</p>
+  <app-skeleton-list type="row" [count]="4" [columns]="4"></app-skeleton-list>
 </div>
 
 <div class="page-placeholder" *ngIf="loadError">

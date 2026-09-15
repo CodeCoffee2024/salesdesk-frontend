@@ -8,7 +8,14 @@ import { TemplatesComponent } from './templates.component';
 import { TemplateService } from '../../core/services/template.service';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { HasRoleDirective } from '../../shared/has-role.directive';
+import { SkeletonListComponent } from '../../shared/skeleton/skeleton-list.component';
+import { SkeletonRowComponent } from '../../shared/skeleton/skeleton-row.component';
+import { SkeletonCardComponent } from '../../shared/skeleton/skeleton-card.component';
+import { SkeletonLineComponent } from '../../shared/skeleton/skeleton-line.component';
 import { Template } from '../../core/models/template.model';
+import { offlineDb } from '../../core/offline/offline-db';
+
+const SKELETON_DECLARATIONS = [SkeletonListComponent, SkeletonRowComponent, SkeletonCardComponent, SkeletonLineComponent];
 
 function makeTemplate(overrides: Partial<Template> = {}): Template {
   return {
@@ -29,6 +36,14 @@ describe('TemplatesComponent', () => {
   let fixture: ComponentFixture<TemplatesComponent>;
   let templateServiceSpy: jasmine.SpyObj<TemplateService>;
 
+  beforeEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
+  afterEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
   function setup(templates: Template[] = [makeTemplate()]) {
     templateServiceSpy = jasmine.createSpyObj('TemplateService', ['getAll', 'create', 'setDefault']);
     templateServiceSpy.getAll.and.returnValue(of(templates));
@@ -37,7 +52,7 @@ describe('TemplatesComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule],
-      declarations: [TemplatesComponent, EmptyStateComponent, HasRoleDirective],
+      declarations: [TemplatesComponent, EmptyStateComponent, HasRoleDirective, ...SKELETON_DECLARATIONS],
       providers: [{ provide: TemplateService, useValue: templateServiceSpy }]
     });
 
@@ -52,18 +67,22 @@ describe('TemplatesComponent', () => {
     expect(component.templates.length).toBe(1);
   });
 
-  it('shows a load error state when the API call fails', () => {
+  it('shows a load error state when the API call fails', async () => {
     templateServiceSpy = jasmine.createSpyObj('TemplateService', ['getAll', 'create', 'setDefault']);
     templateServiceSpy.getAll.and.returnValue(throwError(() => new Error('down')));
 
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule],
-      declarations: [TemplatesComponent, EmptyStateComponent, HasRoleDirective],
+      declarations: [TemplatesComponent, EmptyStateComponent, HasRoleDirective, ...SKELETON_DECLARATIONS],
       providers: [{ provide: TemplateService, useValue: templateServiceSpy }]
     });
     fixture = TestBed.createComponent(TemplatesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    // staleWhileRevalidate checks the (empty) cache before erroring — a real, if
+    // effectively instant, async IndexedDB read rather than a synchronous rethrow.
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     expect(component.loadError).toBeTrue();
   });

@@ -3,9 +3,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { DocumentService } from '../../../core/services/document.service';
 import { PdfService } from '../../../core/services/pdf.service';
+import { LocalCacheService } from '../../../core/services/local-cache.service';
+import { staleWhileRevalidate } from '../../../core/utils/stale-while-revalidate.util';
+import { documentDetailCacheKey } from '../../../core/utils/document-cache-keys.util';
 import { Document as DocumentModel, DocumentStatus } from '../../../core/models/document.model';
 
 const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Same reversible-vs-financially-sensitive split as documents-list's OPTIMISTIC_STATUSES (TASK-041) — "Paid" (a payment confirmation) stays a wait-for-the-server action here too. */
+const OPTIMISTIC_STATUSES: ReadonlySet<DocumentStatus> = new Set<DocumentStatus>(['Draft', 'Sent', 'Overdue', 'Accepted', 'RevisionRequested']);
 
 interface LifecycleAction {
   label: string;
@@ -34,7 +40,8 @@ export class DocumentPreviewComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly documentService: DocumentService,
-    private readonly pdfService: PdfService
+    private readonly pdfService: PdfService,
+    private readonly cache: LocalCacheService
   ) {}
 
   ngOnInit(): void {
@@ -119,21 +126,36 @@ export class DocumentPreviewComponent implements OnInit {
     this.router.navigate(['/documents', this.document.id, 'edit']);
   }
 
+  /** TASK-041: "Mark as sent"/"accepted"/etc. update the badge immediately and reconcile after the fact — see OPTIMISTIC_STATUSES. "Mark as paid" is excluded (a false-positive "payment received" is exactly what the guardrail rules out) and keeps the original wait-for-the-server behavior. */
   setStatus(status: DocumentStatus): void {
     if (!this.document) {
       return;
     }
 
-    this.updatingStatus = true;
     this.actionError = '';
 
-    this.documentService.updateStatus(this.document.id, status).subscribe({
-      next: (updated) => {
-        this.document = updated;
-        this.updatingStatus = false;
-      },
+    if (!OPTIMISTIC_STATUSES.has(status)) {
+      this.updatingStatus = true;
+      this.documentService.updateStatus(this.document.id, status).subscribe({
+        next: (updated) => {
+          this.document = updated;
+          this.updatingStatus = false;
+        },
+        error: () => {
+          this.updatingStatus = false;
+          this.actionError = 'Could not update the status. Please try again.';
+        }
+      });
+      return;
+    }
+
+    const previous = this.document;
+    this.document = { ...previous, status };
+
+    this.documentService.updateStatus(previous.id, status).subscribe({
+      next: (updated) => (this.document = updated),
       error: () => {
-        this.updatingStatus = false;
+        this.document = previous;
         this.actionError = 'Could not update the status. Please try again.';
       }
     });
@@ -245,12 +267,13 @@ export class DocumentPreviewComponent implements OnInit {
       .catch(() => undefined);
   }
 
+  /** TASK-041: renders the cached document immediately on a repeat visit this session (stale-while-revalidate) while a background refresh reconciles it — see staleWhileRevalidate. */
   private fetch(): void {
     this.loading = true;
 
-    this.documentService.getById(this.documentId).subscribe({
-      next: (document) => {
-        this.document = document;
+    staleWhileRevalidate(this.cache, documentDetailCacheKey(this.documentId), this.documentService.getById(this.documentId)).subscribe({
+      next: ({ data }) => {
+        this.document = data;
         this.loading = false;
       },
       error: () => {

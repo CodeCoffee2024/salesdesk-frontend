@@ -1,0 +1,9 @@
+<div class="skeleton-list" [class.skeleton-list--cards]="type === 'card'" aria-hidden="true">
+  <ng-container *ngIf="type === 'row'">
+    <app-skeleton-row *ngFor="let item of items" [columns]="columns" [widths]="widths"></app-skeleton-row>
+  </ng-container>
+
+  <ng-container *ngIf="type === 'card'">
+    <app-skeleton-card *ngFor="let item of items" [lines]="lines"></app-skeleton-card>
+  </ng-container>
+</div>

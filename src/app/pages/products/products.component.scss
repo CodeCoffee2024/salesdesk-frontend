@@ -73,6 +73,9 @@
 
 .product-row__name {
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-row__description {

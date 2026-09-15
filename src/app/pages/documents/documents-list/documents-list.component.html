@@ -32,8 +32,11 @@
     </div>
   </div>
 
-  <p class="documents-page__status" *ngIf="loading">Loading documents&hellip;</p>
-  <p class="documents-page__status" *ngIf="loadError">Something went wrong loading documents.</p>
+  <p class="documents-page__status documents-page__status--error" *ngIf="actionError">{{ actionError }}</p>
+
+  <app-skeleton-list *ngIf="loading" type="row" [count]="6" [columns]="5" [widths]="['60%', '50%', '40%', '40%']"></app-skeleton-list>
+
+  <p class="documents-page__status" *ngIf="!loading && loadError">Something went wrong loading documents.</p>
   <p class="documents-page__status" *ngIf="!loading && !loadError && documents.length === 0">
     No documents match your search yet.
   </p>
@@ -53,13 +56,20 @@
       <tr *ngFor="let document of documents" [class.documents-table__row--highlighted]="document.id === highlightedDocumentId">
         <td (click)="preview(document.id)">
           <span class="documents-table__number">{{ document.documentNumber }}</span>
-          <span class="documents-table__customer">{{ document.customerName }} &middot; {{ document.customerCompany }}</span>
+          <span
+            class="documents-table__customer"
+            [appTooltip]="document.customerName + ' · ' + document.customerCompany"
+            [appTooltipOnlyIfTruncated]="true"
+          >{{ document.customerName }} &middot; {{ document.customerCompany }}</span>
         </td>
         <td data-label="Issued" (click)="preview(document.id)">{{ document.issueDate | date: 'MMM d, y' }}</td>
-        <td data-label="Status" (click)="preview(document.id)"><app-status-badge [status]="document.status"></app-status-badge></td>
+        <td data-label="Status" (click)="preview(document.id)">
+          <app-status-badge [status]="document.status"></app-status-badge>
+          <span class="documents-table__status-pending" *ngIf="updatingStatusForId === document.id">Saving&hellip;</span>
+        </td>
         <td data-label="Total" class="documents-table__total-col" (click)="preview(document.id)">{{ document.total | currencyLocale:document.currency:document.clientCountry }}</td>
         <td class="documents-table__menu-col">
-          <button type="button" class="kebab-button" (click)="toggleMenu(document.id, $event)" aria-label="Row actions">&hellip;</button>
+          <button type="button" class="kebab-button" appTooltip="Row actions" (click)="toggleMenu(document.id, $event)" aria-label="Row actions">&hellip;</button>
 
           <div class="kebab-menu" *ngIf="openMenuForId === document.id" (click)="$event.stopPropagation()">
             <button type="button" (click)="preview(document.id)">Preview</button>
@@ -81,7 +91,7 @@
                 <button
                   type="button"
                   *ngFor="let status of statusOptions"
-                  [disabled]="status === document.status"
+                  [disabled]="status === document.status || updatingStatusForId === document.id"
                   (click)="changeStatus(document, status)"
                 >
                   {{ status === 'RevisionRequested' ? 'Revision requested' : status }}
@@ -110,6 +120,8 @@
   heading="Delete this document?"
   [message]="'This permanently deletes ' + documentPendingDelete.documentNumber + '. This cannot be undone.'"
   confirmLabel="Delete"
+  confirmBusyLabel="Deleting&hellip;"
+  [confirmDisabled]="deletingDocument"
   (confirmed)="confirmDelete()"
   (cancelled)="cancelDelete()"
 ></app-confirm-dialog>

@@ -101,6 +101,20 @@
   padding: 24px 0;
 }
 
+.documents-page__status--error {
+  color: var(--sd-danger);
+  background: var(--sd-danger-bg);
+  padding: 10px 14px;
+  border-radius: var(--sd-radius-sm);
+}
+
+.documents-table__status-pending {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--sd-muted);
+}
+
 .documents-table-scroll {
   overflow-x: auto;
 }
@@ -165,6 +179,10 @@
 
 .documents-table__customer {
   display: block;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 12px;
   color: var(--sd-muted);
 }

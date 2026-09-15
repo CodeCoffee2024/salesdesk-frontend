@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ProductService } from '../../core/services/product.service';
+import { ProductService, PRODUCTS_LIST_CACHE_KEY } from '../../core/services/product.service';
 import { WorkspaceProfileService } from '../../core/services/workspace-profile.service';
+import { LocalCacheService } from '../../core/services/local-cache.service';
+import { staleWhileRevalidate } from '../../core/utils/stale-while-revalidate.util';
 import { Product, ProductUnit } from '../../core/models/product.model';
 
 @Component({
@@ -25,7 +27,11 @@ export class ProductsComponent implements OnInit {
   saving = false;
 
   deletingProduct: Product | null = null;
+  deletingProductInFlight = false;
   deleteError = '';
+
+  /** Inline error surfaced when an optimistic edit gets rolled back (TASK-041). */
+  editRollbackError = '';
 
   /** Workspace's own default currency (TASK-029) — catalog prices aren't per-document, so they format in the workspace's base currency. */
   workspaceCurrency = 'USD';
@@ -33,7 +39,8 @@ export class ProductsComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly productService: ProductService,
-    private readonly workspaceProfileService: WorkspaceProfileService
+    private readonly workspaceProfileService: WorkspaceProfileService,
+    private readonly cache: LocalCacheService
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -107,18 +114,20 @@ export class ProductsComponent implements OnInit {
       return;
     }
 
-    this.saving = true;
     this.saveError = '';
-
     const { name, price, unit, description, category } = this.form.value;
     const request = { name, price, unit, description: description || null, category: category || null };
 
-    const save$ =
-      this.modalMode === 'edit' && this.editingProduct
-        ? this.productService.update(this.editingProduct.id, request)
-        : this.productService.create(request);
+    if (this.modalMode === 'edit' && this.editingProduct) {
+      this.submitEditOptimistically(this.editingProduct, request);
+      return;
+    }
 
-    save$.subscribe({
+    // Creating waits for the server as before (TASK-041): there's no real id to
+    // render a new row under until one is assigned, so there's nothing safe to
+    // show optimistically — only an edit to an already-identified row qualifies.
+    this.saving = true;
+    this.productService.create(request).subscribe({
       next: () => {
         this.saving = false;
         this.showModal = false;
@@ -127,6 +136,29 @@ export class ProductsComponent implements OnInit {
       error: () => {
         this.saving = false;
         this.saveError = 'Could not save this product. Please try again.';
+      }
+    });
+  }
+
+  /** TASK-041: an edit to a product already in the list updates the row immediately and reconciles once the server responds, rolling back (with an inline error) if the save actually fails. */
+  private submitEditOptimistically(
+    target: Product,
+    request: { name: string; price: number; unit: ProductUnit; description: string | null; category: string | null }
+  ): void {
+    this.editRollbackError = '';
+    const previous = target;
+    const optimistic: Product = { ...target, ...request };
+
+    this.products = this.products.map((p) => (p.id === target.id ? optimistic : p));
+    this.showModal = false;
+
+    this.productService.update(target.id, request).subscribe({
+      next: (updated) => {
+        this.products = this.products.map((p) => (p.id === updated.id ? updated : p));
+      },
+      error: () => {
+        this.products = this.products.map((p) => (p.id === previous.id ? previous : p));
+        this.editRollbackError = `Could not save changes to ${previous.name}. Please try again.`;
       }
     });
   }
@@ -141,34 +173,41 @@ export class ProductsComponent implements OnInit {
     this.deletingProduct = null;
   }
 
+  /** Deletion is irreversible, so it waits for the server rather than optimistically removing the row (TASK-041 guardrail). */
   confirmDelete(): void {
     if (!this.deletingProduct) {
       return;
     }
 
-    this.productService.delete(this.deletingProduct.id).subscribe({
+    const id = this.deletingProduct.id;
+    this.deletingProductInFlight = true;
+
+    this.productService.delete(id).subscribe({
       next: () => {
+        this.products = this.products.filter((p) => p.id !== id);
         this.deletingProduct = null;
-        this.load();
+        this.deletingProductInFlight = false;
       },
       error: () => {
         this.deleteError = 'Could not delete this product. Please try again.';
         this.deletingProduct = null;
+        this.deletingProductInFlight = false;
       }
     });
   }
 
+  /** TASK-041: renders the cached catalog immediately on a repeat visit this session (stale-while-revalidate) while a background refresh reconciles it — see staleWhileRevalidate. */
   private load(): void {
     this.loading = true;
     this.loadError = false;
 
-    this.productService.getAll().subscribe({
-      next: (products) => {
-        this.products = products;
+    staleWhileRevalidate(this.cache, PRODUCTS_LIST_CACHE_KEY, this.productService.getAll()).subscribe({
+      next: ({ data }) => {
+        this.products = data;
         this.loading = false;
       },
       error: () => {
-        this.loadError = true;
+        this.loadError = this.products.length === 0;
         this.loading = false;
       }
     });

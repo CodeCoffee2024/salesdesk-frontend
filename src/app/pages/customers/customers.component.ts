@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CustomerService } from '../../core/services/customer.service';
+import { CustomerService, CUSTOMERS_LIST_CACHE_KEY } from '../../core/services/customer.service';
 import { DocumentService } from '../../core/services/document.service';
 import { WorkspaceProfileService } from '../../core/services/workspace-profile.service';
+import { LocalCacheService } from '../../core/services/local-cache.service';
+import { staleWhileRevalidate } from '../../core/utils/stale-while-revalidate.util';
 import { Customer } from '../../core/models/customer.model';
 import { Document as DocumentModel } from '../../core/models/document.model';
 import { ISO_COUNTRIES } from '../../core/constants/locale.constants';
@@ -30,7 +32,11 @@ export class CustomersComponent implements OnInit {
   profileLoading = false;
 
   deletingCustomer: Customer | null = null;
+  deletingCustomerInFlight = false;
   deleteError = '';
+
+  /** Inline error surfaced when an optimistic edit gets rolled back (TASK-041). */
+  editRollbackError = '';
 
   readonly countries = ISO_COUNTRIES;
   /** Workspace's own default currency (TASK-029) — used to format the aggregate LifetimeValue figure, which isn't tied to any single document's currency. */
@@ -40,7 +46,8 @@ export class CustomersComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly customerService: CustomerService,
     private readonly documentService: DocumentService,
-    private readonly workspaceProfileService: WorkspaceProfileService
+    private readonly workspaceProfileService: WorkspaceProfileService,
+    private readonly cache: LocalCacheService
   ) {
     this.addForm = this.fb.group({
       name: ['', Validators.required],
@@ -117,18 +124,21 @@ export class CustomersComponent implements OnInit {
       return;
     }
 
-    this.saving = true;
     this.addError = '';
-
     const { name, company, email, phone, country } = this.addForm.value;
     const request = { name, company, email, phone: phone || null, country: country || null };
 
-    const save$ =
-      this.addModalMode === 'edit' && this.editingCustomer
-        ? this.customerService.update(this.editingCustomer.id, request)
-        : this.customerService.create(request);
+    if (this.addModalMode === 'edit' && this.editingCustomer) {
+      this.submitEditOptimistically(this.editingCustomer, request);
+      return;
+    }
 
-    save$.subscribe({
+    // Creating goes through the normal wait-for-the-server flow (TASK-041): there's
+    // no real id to render a new card under until the server assigns one, so there's
+    // nothing safe to show optimistically here — only an edit to an existing,
+    // already-identified row qualifies.
+    this.saving = true;
+    this.customerService.create(request).subscribe({
       next: () => {
         this.saving = false;
         this.showAddModal = false;
@@ -136,9 +146,27 @@ export class CustomersComponent implements OnInit {
       },
       error: () => {
         this.saving = false;
-        this.addError = this.addModalMode === 'edit'
-          ? 'Could not save this customer. Please try again.'
-          : 'Could not add this customer. Please try again.';
+        this.addError = 'Could not add this customer. Please try again.';
+      }
+    });
+  }
+
+  /** TASK-041: an edit to a customer already in the list updates the card immediately and reconciles once the server responds, rolling back (with an inline error) if the save actually fails. */
+  private submitEditOptimistically(target: Customer, request: { name: string; company: string; email: string; phone: string | null; country: string | null }): void {
+    this.editRollbackError = '';
+    const previous = target;
+    const optimistic: Customer = { ...target, ...request };
+
+    this.customers = this.customers.map((c) => (c.id === target.id ? optimistic : c));
+    this.showAddModal = false;
+
+    this.customerService.update(target.id, request).subscribe({
+      next: (updated) => {
+        this.customers = this.customers.map((c) => (c.id === updated.id ? updated : c));
+      },
+      error: () => {
+        this.customers = this.customers.map((c) => (c.id === previous.id ? previous : c));
+        this.editRollbackError = `Could not save changes to ${previous.name}. Please try again.`;
       }
     });
   }
@@ -174,18 +202,24 @@ export class CustomersComponent implements OnInit {
     this.deletingCustomer = null;
   }
 
+  /** Deletion is irreversible, so it waits for the server rather than optimistically removing the card (TASK-041 guardrail) — deletingCustomerInFlight keeps the confirm button disabled with a busy label instead of just doing nothing if double-clicked. */
   confirmDelete(): void {
     if (!this.deletingCustomer) {
       return;
     }
 
-    this.customerService.delete(this.deletingCustomer.id).subscribe({
+    const id = this.deletingCustomer.id;
+    this.deletingCustomerInFlight = true;
+
+    this.customerService.delete(id).subscribe({
       next: () => {
+        this.customers = this.customers.filter((c) => c.id !== id);
         this.deletingCustomer = null;
-        this.load();
+        this.deletingCustomerInFlight = false;
       },
       error: (error) => {
         this.deletingCustomer = null;
+        this.deletingCustomerInFlight = false;
         // 409: the database still has documents pointing at this customer (restricted FK) — see DeleteCustomerCommand.
         this.deleteError = error?.status === 409
           ? 'This customer has existing quotes or invoices and can\'t be deleted. Void those documents first.'
@@ -194,17 +228,23 @@ export class CustomersComponent implements OnInit {
     });
   }
 
+  /**
+   * TASK-041: renders the last-known-good cached list immediately on a repeat
+   * visit this session (stale-while-revalidate) while a background refresh
+   * reconciles it — `loading` only stays visible long enough to show the
+   * skeleton on a genuine first-ever visit; see staleWhileRevalidate.
+   */
   private load(): void {
     this.loading = true;
     this.loadError = false;
 
-    this.customerService.getAll().subscribe({
-      next: (customers) => {
-        this.customers = customers;
+    staleWhileRevalidate(this.cache, CUSTOMERS_LIST_CACHE_KEY, this.customerService.getAll()).subscribe({
+      next: ({ data }) => {
+        this.customers = data;
         this.loading = false;
       },
       error: () => {
-        this.loadError = true;
+        this.loadError = this.customers.length === 0;
         this.loading = false;
       }
     });

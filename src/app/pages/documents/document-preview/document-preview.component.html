@@ -7,9 +7,9 @@
   actionLink="/documents"
 ></app-empty-state>
 
-<div class="page-placeholder" *ngIf="loading">
-  <h1>Document preview</h1>
-  <p>Loading&hellip;</p>
+<div class="document-preview" *ngIf="loading">
+  <app-skeleton-card [lines]="2"></app-skeleton-card>
+  <app-skeleton-list type="row" [count]="4" [columns]="4"></app-skeleton-list>
 </div>
 
 <div class="document-preview" *ngIf="!loading && !notFound && document as doc">

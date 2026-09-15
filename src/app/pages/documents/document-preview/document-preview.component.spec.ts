@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 
 import { DocumentPreviewComponent } from './document-preview.component';
 import { DocumentService } from '../../../core/services/document.service';
@@ -12,8 +12,16 @@ import { StatusBadgeComponent } from '../../../shared/status-badge/status-badge.
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 import { DocumentTimelineComponent } from '../../../shared/document-timeline/document-timeline.component';
 import { HasRoleDirective } from '../../../shared/has-role.directive';
+import { TooltipDirective } from '../../../shared/tooltip.directive';
+import { SkeletonListComponent } from '../../../shared/skeleton/skeleton-list.component';
+import { SkeletonRowComponent } from '../../../shared/skeleton/skeleton-row.component';
+import { SkeletonCardComponent } from '../../../shared/skeleton/skeleton-card.component';
+import { SkeletonLineComponent } from '../../../shared/skeleton/skeleton-line.component';
 import { CurrencyLocalePipe } from '../../../core/pipes/currency-locale.pipe';
 import { Document as DocumentModel } from '../../../core/models/document.model';
+import { offlineDb } from '../../../core/offline/offline-db';
+
+const SKELETON_DECLARATIONS = [SkeletonListComponent, SkeletonRowComponent, SkeletonCardComponent, SkeletonLineComponent];
 
 function makeDocument(overrides: Partial<DocumentModel> = {}): DocumentModel {
   return {
@@ -50,6 +58,14 @@ describe('DocumentPreviewComponent', () => {
   let pdfServiceSpy: jasmine.SpyObj<PdfService>;
   let router: Router;
 
+  beforeEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
+  afterEach(async () => {
+    await offlineDb.cacheEntries.clear();
+  });
+
   function setup(id: string, documentResult: DocumentModel | 'error' = makeDocument()) {
     documentServiceSpy = jasmine.createSpyObj('DocumentService', ['getById', 'updateStatus', 'convertToInvoice', 'delete']);
     documentServiceSpy.getById.and.returnValue(
@@ -65,7 +81,17 @@ describe('DocumentPreviewComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
-      declarations: [DocumentPreviewComponent, EmptyStateComponent, StatusBadgeComponent, ConfirmDialogComponent, HasRoleDirective, CurrencyLocalePipe, DocumentTimelineComponent],
+      declarations: [
+        DocumentPreviewComponent,
+        EmptyStateComponent,
+        StatusBadgeComponent,
+        ConfirmDialogComponent,
+        HasRoleDirective,
+        TooltipDirective,
+        ...SKELETON_DECLARATIONS,
+        CurrencyLocalePipe,
+        DocumentTimelineComponent
+      ],
       providers: [
         { provide: DocumentService, useValue: documentServiceSpy },
         { provide: PdfService, useValue: pdfServiceSpy },
@@ -92,8 +118,13 @@ describe('DocumentPreviewComponent', () => {
     expect(component.notFound).toBeFalse();
   });
 
-  it('shows not-found when the API 404s for a well-formed but nonexistent id', () => {
+  it('shows not-found when the API 404s for a well-formed but nonexistent id', async () => {
     setup('3a94928f-7367-4206-a02f-b2fc9884b087', 'error');
+
+    // staleWhileRevalidate checks the (empty) cache before erroring — a real, if
+    // effectively instant, async IndexedDB read rather than a synchronous rethrow.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
     expect(component.notFound).toBeTrue();
   });
 
@@ -137,6 +168,41 @@ describe('DocumentPreviewComponent', () => {
     component.setStatus('Accepted');
     expect(documentServiceSpy.updateStatus).toHaveBeenCalledWith('3a94928f-7367-4206-a02f-b2fc9884b087', 'Accepted');
     expect(component.document?.status).toBe('Accepted');
+  });
+
+  it('setStatus("Accepted") updates optimistically, before the server responds', () => {
+    setup('3a94928f-7367-4206-a02f-b2fc9884b087', makeDocument({ status: 'Sent' }));
+    documentServiceSpy.updateStatus.and.returnValue(new Subject<DocumentModel>());
+
+    component.setStatus('Accepted');
+
+    expect(component.document?.status).toBe('Accepted');
+    expect(component.updatingStatus).toBeFalse();
+  });
+
+  it('setStatus rolls back and surfaces an inline error if the request fails', () => {
+    setup('3a94928f-7367-4206-a02f-b2fc9884b087', makeDocument({ status: 'Sent' }));
+    documentServiceSpy.updateStatus.and.returnValue(throwError(() => new Error('down')));
+
+    component.setStatus('Accepted');
+
+    expect(component.document?.status).toBe('Sent');
+    expect(component.actionError).toBeTruthy();
+  });
+
+  it('setStatus("Paid") waits for the server rather than updating optimistically', () => {
+    setup('3a94928f-7367-4206-a02f-b2fc9884b087', makeDocument({ type: 'Invoice', status: 'Sent' }));
+    const pending = new Subject<DocumentModel>();
+    documentServiceSpy.updateStatus.and.returnValue(pending);
+
+    component.setStatus('Paid');
+
+    expect(component.document?.status).toBe('Sent');
+    expect(component.updatingStatus).toBeTrue();
+
+    pending.next(makeDocument({ type: 'Invoice', status: 'Paid' }));
+    expect(component.document?.status).toBe('Paid');
+    expect(component.updatingStatus).toBeFalse();
   });
 
   it('convertToInvoice navigates to the new invoice preview on success', () => {
