@@ -28,7 +28,16 @@
     -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <!--
+            @drawable/ic_splash_icon, not @mipmap/ic_launcher_foreground — the
+            latter is the adaptive-icon foreground LAYER, meant to be rendered
+            through the adaptive-icon system's own mask/safe-zone/inset handling
+            (see mipmap-anydpi-v26/ic_launcher.xml). windowSplashScreenAnimatedIcon
+            has no such system: it draws whatever it's given directly, and the
+            raster mipmap rendered blank there — a self-contained vector sized to
+            fit Android's splash icon budget (240dp) is what actually shows up.
+        -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>

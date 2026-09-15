@@ -66,14 +66,14 @@ export class AppComponent implements OnInit {
         }
       });
 
-      // Android 15+ (targetSdk 35, TASK-041) draws edge-to-edge by default and
-      // can no longer opt out of that via the manifest — without this, the
-      // WebView extends under the status bar and env(safe-area-inset-top) (see
-      // topbar/sidebar SCSS) reports 0 rather than the real inset, so the
-      // topbar's hamburger button renders underneath the status bar/notch
-      // instead of below it. overlay:false hands the inset back to Capacitor,
-      // which reserves real space for the status bar instead of drawing under it.
-      void StatusBar.setOverlaysWebView({ overlay: false });
+      // Only sets icon color (dark icons, since the topbar sits on a light
+      // background) — actually reserving space under the status bar is done
+      // natively in MainActivity now. setOverlaysWebView({overlay:false}) used
+      // to be called here too, but it's a documented no-op once targetSdkVersion
+      // reaches 35 (this app ships 36): Window.setDecorFitsSystemWindows(), which
+      // that call uses internally, can no longer suppress edge-to-edge rendering
+      // at all, so it was doing nothing (and risked fighting the native inset
+      // listener's own window flags).
       void StatusBar.setStyle({ style: Style.Dark });
     }
 

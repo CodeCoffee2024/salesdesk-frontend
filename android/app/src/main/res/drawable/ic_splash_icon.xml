@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Dedicated splash-screen icon (TASK-041 follow-up), built directly from
+  assets/icon-foreground.svg's own path/transform data as a vector drawable
+  rather than reusing @mipmap/ic_launcher_foreground (the adaptive-icon
+  foreground layer) directly. windowSplashScreenAnimatedIcon renders whatever
+  it's given without the adaptive-icon system's own mask/safe-zone handling,
+  and a raster mipmap generated for that different context rendered as a
+  blank/invisible icon there (just the blue windowSplashScreenBackground
+  showing) — a self-contained vector, sized to fit Android's SplashScreen
+  icon budget (max 240dp), sidesteps whatever raster/mipmap-density mismatch
+  caused that.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <group
+        android:translateX="230.5"
+        android:translateY="230.5"
+        android:scaleX="35.2"
+        android:scaleY="35.2">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+    </group>
+</vector>
