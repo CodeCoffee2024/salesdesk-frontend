@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { filter, map, startWith } from 'rxjs';
 import { PageMetaService } from './core/services/page-meta.service';
 import { AuthService } from './core/services/auth.service';
@@ -64,6 +65,16 @@ export class AppComponent implements OnInit {
           void CapacitorApp.exitApp();
         }
       });
+
+      // Android 15+ (targetSdk 35, TASK-041) draws edge-to-edge by default and
+      // can no longer opt out of that via the manifest — without this, the
+      // WebView extends under the status bar and env(safe-area-inset-top) (see
+      // topbar/sidebar SCSS) reports 0 rather than the real inset, so the
+      // topbar's hamburger button renders underneath the status bar/notch
+      // instead of below it. overlay:false hands the inset back to Capacitor,
+      // which reserves real space for the status bar instead of drawing under it.
+      void StatusBar.setOverlaysWebView({ overlay: false });
+      void StatusBar.setStyle({ style: Style.Dark });
     }
 
     // Evaluated once per "a user became present" transition (fresh login/register,
