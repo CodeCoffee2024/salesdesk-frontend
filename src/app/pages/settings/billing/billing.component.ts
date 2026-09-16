@@ -6,12 +6,14 @@ import { WorkspaceBillingService } from '../../../core/services/workspace-billin
 import { BillingCycle, PricingCatalog, PricingTier, SubscriptionTier, WorkspaceBilling } from '../../../core/models/workspace-billing.model';
 
 /**
- * TASK-031/TASK-038: the workspace's current subscription tier and usage, the
- * "Early 100 Free Year" promo badge, and the regional (PH vs Global) pricing
- * catalog with an "Upgrade" action per paid tier. Checkout itself is a stub on
- * the backend today (no PayMongo/Stripe/PayPal account exists yet) — Upgrade
- * always fails with a clear "not available yet" message rather than pretending
- * to charge anyone.
+ * TASK-031/TASK-038/TASK-044: the workspace's current subscription tier and
+ * usage, the "Early 100 Free Year" promo badge, and the regional (PH vs
+ * Global) pricing catalog with an "Upgrade" action per paid tier. "Upgrade"
+ * always posts to the same /checkout-session endpoint and redirects to
+ * whatever checkoutUrl comes back — the backend's PaymentGatewayRouter
+ * decides whether that's a real PayMongo (PH) or Stripe (non-PH) hosted
+ * checkout, or the clear "not available yet" 503 handled below when neither
+ * provider is configured on this server.
  */
 @Component({
   selector: 'app-billing',
